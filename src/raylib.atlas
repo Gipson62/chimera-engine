@@ -1,0 +1,1364 @@
+namespace raylib {
+    public extern struct Vector2
+    {
+    public:
+        x: float32;
+        y: float32;
+        fun default() -> raylib::Vector2 {
+            return raylib::Vector2 { .x = 0.0, .y = 0.0 };
+        }
+    }
+
+    public extern struct Vector3
+    {
+    public:
+        x: float32;
+        y: float32;
+        z: float32;
+    }
+
+    public extern struct Vector4
+    {
+    public:
+        x: float32;
+        y: float32;
+        z: float32;
+        w: float32;
+    }
+
+    public extern struct Matrix
+    {
+    public:
+        m0:  float32;
+        m4:  float32;
+        m8:  float32;
+        m12: float32;
+        m1:  float32;
+        m5:  float32;
+        m9:  float32;
+        m13: float32;
+        m2:  float32;
+        m6:  float32;
+        m10: float32;
+        m14: float32;
+        m3:  float32;
+        m7:  float32;
+        m11: float32;
+        m15: float32;
+    }
+
+    public extern struct Color
+    {
+    public:
+        r: uint8;
+        g: uint8;
+        b: uint8;
+        a: uint8;
+        fun DarkGray() -> raylib::Color {
+            return raylib::Color { .r = 130, .g = 130, .b = 130, .a = 255 };
+        }
+        fun Black() -> raylib::Color {
+            return raylib::Color { .r = 0, .g = 0, .b = 0, .a = 255 };
+        }
+        fun Blue() -> raylib::Color {
+            return raylib::Color { .r = 0, .g = 0, .b = 255, .a = 255 };
+        }
+        fun SkyBlue() -> raylib::Color {
+            return raylib::Color { .r = 135, .g = 206, .b = 235, .a = 255 };
+        }
+        fun Red() -> raylib::Color {
+            return raylib::Color { .r = 255, .g = 0, .b = 0, .a = 255 };
+        }
+        fun Green() -> raylib::Color {
+            return raylib::Color { .r = 0, .g = 255, .b = 0, .a = 255 };
+        }
+        fun RayWhite() -> raylib::Color {
+            return raylib::Color { .r = 245, .g = 245, .b = 245, .a = 255 };
+        }
+    }
+
+    public extern struct Rectangle
+    {
+    public:
+        x: float32;
+        y: float32;
+        width: float32;
+        height: float32;
+    }
+
+    public extern struct Image
+    {
+    public:
+        data: *unit;
+        width: int32;
+        height: int32;
+        mipmaps: int32;
+        format: int32;
+    }
+
+    public extern struct Texture
+    {
+    public:
+        id: uint32;
+        width: int32;
+        height: int32;
+        mipmaps: int32;
+        format: int32;
+    }
+
+    public extern struct RenderTexture
+    {
+    public:
+        id: uint32;
+        texture: raylib::Texture;
+        depth: raylib::Texture;
+    }
+
+    public extern struct NPatchInfo
+    {
+    public:
+        source: raylib::Rectangle;
+        left: int32;
+        top: int32;
+        right: int32;
+        bottom: int32;
+        layout: int32;
+    }
+
+    public extern struct GlyphInfo
+    {
+    public:
+        value: int32;
+        offsetX: int32;
+        offsetY: int32;
+        advanceX: int32;
+        image: raylib::Image;
+    }
+
+    public extern struct Font
+    {
+    public:
+        baseSize: int32;
+        glyphCount: int32;
+        glyphPadding: int32;
+        texture: raylib::Texture2D;
+        recs: *raylib::Rectangle;
+        glyphs: *raylib::GlyphInfo;
+    }
+
+    public extern struct Camera3D
+    {
+    public:
+        position: raylib::Vector3;
+        target: raylib::Vector3;
+        up: raylib::Vector3;
+        fovy: float32;
+        projection: int32;
+    }
+
+    public extern struct Camera2D
+    {
+    public:
+        offset: raylib::Vector2;
+        target: raylib::Vector2;
+        rotation: float32;
+        zoom: float32;
+    }
+
+    public extern struct Mesh
+    {
+    public:
+        vertexCount: int32;
+        triangleCount: int32;
+        vertices: *float32;
+        texcoords: *float32;
+        texcoords2: *float32;
+        normals: *float32;
+        tangents: *float32;
+        colors: *uint8;
+        indices: *uint16;
+        animVertices: *float32;
+        animNormals: *float32;
+        boneIds: *uint8;
+        boneWeights: *float32;
+        boneMatrices: *raylib::Matrix;
+        boneCount: int32;
+        vaoId: uint32;
+        vboId: *uint32;
+    }
+
+    public extern struct Shader
+    {
+    public:
+        id: uint32;
+        locs: *int32;
+    }
+
+    public extern struct MaterialMap
+    {
+    public:
+        texture: raylib::Texture2D;
+        color: raylib::Color;
+        value: float32;
+    }
+
+    public extern struct Material
+    {
+    public:
+        shader: raylib::Shader;
+        maps: *raylib::MaterialMap;
+        params: float32;
+    }
+
+    public extern struct Transform
+    {
+    public:
+        translation: raylib::Vector3;
+        rotation: raylib::Quaternion;
+        scale: raylib::Vector3;
+    }
+
+    public extern struct BoneInfo
+    {
+    public:
+        name: uint8;
+        parent: int32;
+    }
+
+    public extern struct Model
+    {
+    public:
+        transform: raylib::Matrix;
+        meshCount: int32;
+        materialCount: int32;
+        meshes: *raylib::Mesh;
+        materials: *raylib::Material;
+        meshMaterial: *int32;
+        boneCount: int32;
+        bones: *raylib::BoneInfo;
+        bindPose: *raylib::Transform;
+    }
+
+    public extern struct ModelAnimation
+    {
+    public:
+        boneCount: int32;
+        frameCount: int32;
+        bones: *raylib::BoneInfo;
+        framePoses: **raylib::Transform;
+        name: uint8;
+    }
+
+    public extern struct Ray
+    {
+    public:
+        position: raylib::Vector3;
+        direction: raylib::Vector3;
+    }
+
+    public extern struct RayCollision
+    {
+    public:
+        hit: bool;
+        distance: float32;
+        point: raylib::Vector3;
+        normal: raylib::Vector3;
+    }
+
+    public extern struct BoundingBox
+    {
+    public:
+        min: raylib::Vector3;
+        max: raylib::Vector3;
+    }
+
+    public extern struct Wave
+    {
+    public:
+        frameCount: uint32;
+        sampleRate: uint32;
+        sampleSize: uint32;
+        channels: uint32;
+        data: *unit;
+    }
+
+    public extern struct rAudioBuffer
+    {
+    public:
+    }
+
+    public extern struct rAudioProcessor
+    {
+    public:
+    }
+
+    public extern struct AudioStream
+    {
+    public:
+        buffer: *raylib::rAudioBuffer;
+        processor: *raylib::rAudioProcessor;
+        sampleRate: uint32;
+        sampleSize: uint32;
+        channels: uint32;
+    }
+
+    public extern struct Sound
+    {
+    public:
+        stream: raylib::AudioStream;
+        frameCount: uint32;
+    }
+
+    public extern struct Music
+    {
+    public:
+        stream: raylib::AudioStream;
+        frameCount: uint32;
+        looping: bool;
+        ctxType: int32;
+        ctxData: *unit;
+    }
+
+    public extern struct VrDeviceInfo
+    {
+    public:
+        hResolution: int32;
+        vResolution: int32;
+        hScreenSize: float32;
+        vScreenSize: float32;
+        eyeToScreenDistance: float32;
+        lensSeparationDistance: float32;
+        interpupillaryDistance: float32;
+        lensDistortionValues: float32;
+        chromaAbCorrection: float32;
+    }
+
+    public extern struct VrStereoConfig
+    {
+    public:
+        projection: raylib::Matrix;
+        viewOffset: raylib::Matrix;
+        leftLensCenter: float32;
+        rightLensCenter: float32;
+        leftScreenCenter: float32;
+        rightScreenCenter: float32;
+        scale: float32;
+        scaleIn: float32;
+    }
+
+    public extern struct FilePathList
+    {
+    public:
+        capacity: uint32;
+        count: uint32;
+        paths: **uint8;
+    }
+
+    public extern struct AutomationEvent
+    {
+    public:
+        frame: uint32;
+        type: uint32;
+        params: int32;
+    }
+
+    public extern struct AutomationEventList
+    {
+    public:
+        capacity: uint32;
+        count: uint32;
+        events: *raylib::AutomationEvent;
+    }
+
+    public enum ConfigFlags {
+        FLAG_VSYNC_HINT = 0x00000040;
+        FLAG_FULLSCREEN_MODE = 0x00000002;
+        FLAG_WINDOW_RESIZABLE = 0x00000004;
+        FLAG_WINDOW_UNDECORATED = 0x00000008;
+        FLAG_WINDOW_HIDDEN = 0x00000080;
+        FLAG_WINDOW_MINIMIZED = 0x00000200;
+        FLAG_WINDOW_MAXIMIZED = 0x00000400;
+        FLAG_WINDOW_UNFOCUSED = 0x00000800;
+        FLAG_WINDOW_TOPMOST = 0x00001000;
+        FLAG_WINDOW_ALWAYS_RUN = 0x00000100;
+        FLAG_WINDOW_TRANSPARENT = 0x00000010;
+        FLAG_WINDOW_HIGHDPI = 0x00002000;
+        FLAG_WINDOW_MOUSE_PASSTHROUGH = 0x00004000;
+        FLAG_BORDERLESS_WINDOWED_MODE = 0x00008000;
+        FLAG_MSAA_4X_HINT = 0x00000020;
+        FLAG_INTERLACED_HINT = 0x00010000;
+    }
+
+    public enum TraceLogLevel {
+        LOG_ALL = 0;
+        LOG_TRACE;
+        LOG_DEBUG;
+        LOG_INFO;
+        LOG_WARNING;
+        LOG_ERROR;
+        LOG_FATAL;
+        LOG_NONE;
+    }
+
+    public enum KeyboardKey {
+        KEY_NULL = 0;
+        KEY_APOSTROPHE = 39;
+        KEY_COMMA = 44;
+        KEY_MINUS = 45;
+        KEY_PERIOD = 46;
+        KEY_SLASH = 47;
+        KEY_ZERO = 48;
+        KEY_ONE = 49;
+        KEY_TWO = 50;
+        KEY_THREE = 51;
+        KEY_FOUR = 52;
+        KEY_FIVE = 53;
+        KEY_SIX = 54;
+        KEY_SEVEN = 55;
+        KEY_EIGHT = 56;
+        KEY_NINE = 57;
+        KEY_SEMICOLON = 59;
+        KEY_EQUAL = 61;
+        KEY_A = 65;
+        KEY_B = 66;
+        KEY_C = 67;
+        KEY_D = 68;
+        KEY_E = 69;
+        KEY_F = 70;
+        KEY_G = 71;
+        KEY_H = 72;
+        KEY_I = 73;
+        KEY_J = 74;
+        KEY_K = 75;
+        KEY_L = 76;
+        KEY_M = 77;
+        KEY_N = 78;
+        KEY_O = 79;
+        KEY_P = 80;
+        KEY_Q = 81;
+        KEY_R = 82;
+        KEY_S = 83;
+        KEY_T = 84;
+        KEY_U = 85;
+        KEY_V = 86;
+        KEY_W = 87;
+        KEY_X = 88;
+        KEY_Y = 89;
+        KEY_Z = 90;
+        KEY_LEFT_BRACKET = 91;
+        KEY_BACKSLASH = 92;
+        KEY_RIGHT_BRACKET = 93;
+        KEY_GRAVE = 96;
+        KEY_SPACE = 32;
+        KEY_ESCAPE = 256;
+        KEY_ENTER = 257;
+        KEY_TAB = 258;
+        KEY_BACKSPACE = 259;
+        KEY_INSERT = 260;
+        KEY_DELETE = 261;
+        KEY_RIGHT = 262;
+        KEY_LEFT = 263;
+        KEY_DOWN = 264;
+        KEY_UP = 265;
+        KEY_PAGE_UP = 266;
+        KEY_PAGE_DOWN = 267;
+        KEY_HOME = 268;
+        KEY_END = 269;
+        KEY_CAPS_LOCK = 280;
+        KEY_SCROLL_LOCK = 281;
+        KEY_NUM_LOCK = 282;
+        KEY_PRINT_SCREEN = 283;
+        KEY_PAUSE = 284;
+        KEY_F1 = 290;
+        KEY_F2 = 291;
+        KEY_F3 = 292;
+        KEY_F4 = 293;
+        KEY_F5 = 294;
+        KEY_F6 = 295;
+        KEY_F7 = 296;
+        KEY_F8 = 297;
+        KEY_F9 = 298;
+        KEY_F10 = 299;
+        KEY_F11 = 300;
+        KEY_F12 = 301;
+        KEY_LEFT_SHIFT = 340;
+        KEY_LEFT_CONTROL = 341;
+        KEY_LEFT_ALT = 342;
+        KEY_LEFT_SUPER = 343;
+        KEY_RIGHT_SHIFT = 344;
+        KEY_RIGHT_CONTROL = 345;
+        KEY_RIGHT_ALT = 346;
+        KEY_RIGHT_SUPER = 347;
+        KEY_KB_MENU = 348;
+        KEY_KP_0 = 320;
+        KEY_KP_1 = 321;
+        KEY_KP_2 = 322;
+        KEY_KP_3 = 323;
+        KEY_KP_4 = 324;
+        KEY_KP_5 = 325;
+        KEY_KP_6 = 326;
+        KEY_KP_7 = 327;
+        KEY_KP_8 = 328;
+        KEY_KP_9 = 329;
+        KEY_KP_DECIMAL = 330;
+        KEY_KP_DIVIDE = 331;
+        KEY_KP_MULTIPLY = 332;
+        KEY_KP_SUBTRACT = 333;
+        KEY_KP_ADD = 334;
+        KEY_KP_ENTER = 335;
+        KEY_KP_EQUAL = 336;
+        KEY_BACK = 4;
+        KEY_MENU = 5;
+        KEY_VOLUME_UP = 24;
+        KEY_VOLUME_DOWN = 25;
+    }
+
+    public enum MouseButton {
+        MOUSE_BUTTON_LEFT = 0;
+        MOUSE_BUTTON_RIGHT = 1;
+        MOUSE_BUTTON_MIDDLE = 2;
+        MOUSE_BUTTON_SIDE = 3;
+        MOUSE_BUTTON_EXTRA = 4;
+        MOUSE_BUTTON_FORWARD = 5;
+        MOUSE_BUTTON_BACK = 6;
+    }
+
+    public enum MouseCursor {
+        MOUSE_CURSOR_DEFAULT = 0;
+        MOUSE_CURSOR_ARROW = 1;
+        MOUSE_CURSOR_IBEAM = 2;
+        MOUSE_CURSOR_CROSSHAIR = 3;
+        MOUSE_CURSOR_POINTING_HAND = 4;
+        MOUSE_CURSOR_RESIZE_EW = 5;
+        MOUSE_CURSOR_RESIZE_NS = 6;
+        MOUSE_CURSOR_RESIZE_NWSE = 7;
+        MOUSE_CURSOR_RESIZE_NESW = 8;
+        MOUSE_CURSOR_RESIZE_ALL = 9;
+        MOUSE_CURSOR_NOT_ALLOWED = 10;
+    }
+
+    public enum GamepadButton {
+        GAMEPAD_BUTTON_UNKNOWN = 0;
+        GAMEPAD_BUTTON_LEFT_FACE_UP;
+        GAMEPAD_BUTTON_LEFT_FACE_RIGHT;
+        GAMEPAD_BUTTON_LEFT_FACE_DOWN;
+        GAMEPAD_BUTTON_LEFT_FACE_LEFT;
+        GAMEPAD_BUTTON_RIGHT_FACE_UP;
+        GAMEPAD_BUTTON_RIGHT_FACE_RIGHT;
+        GAMEPAD_BUTTON_RIGHT_FACE_DOWN;
+        GAMEPAD_BUTTON_RIGHT_FACE_LEFT;
+        GAMEPAD_BUTTON_LEFT_TRIGGER_1;
+        GAMEPAD_BUTTON_LEFT_TRIGGER_2;
+        GAMEPAD_BUTTON_RIGHT_TRIGGER_1;
+        GAMEPAD_BUTTON_RIGHT_TRIGGER_2;
+        GAMEPAD_BUTTON_MIDDLE_LEFT;
+        GAMEPAD_BUTTON_MIDDLE;
+        GAMEPAD_BUTTON_MIDDLE_RIGHT;
+        GAMEPAD_BUTTON_LEFT_THUMB;
+        GAMEPAD_BUTTON_RIGHT_THUMB;
+    }
+
+    public enum GamepadAxis {
+        GAMEPAD_AXIS_LEFT_X = 0;
+        GAMEPAD_AXIS_LEFT_Y = 1;
+        GAMEPAD_AXIS_RIGHT_X = 2;
+        GAMEPAD_AXIS_RIGHT_Y = 3;
+        GAMEPAD_AXIS_LEFT_TRIGGER = 4;
+        GAMEPAD_AXIS_RIGHT_TRIGGER = 5;
+    }
+
+    public enum MaterialMapIndex {
+        MATERIAL_MAP_ALBEDO = 0;
+        MATERIAL_MAP_METALNESS;
+        MATERIAL_MAP_NORMAL;
+        MATERIAL_MAP_ROUGHNESS;
+        MATERIAL_MAP_OCCLUSION;
+        MATERIAL_MAP_EMISSION;
+        MATERIAL_MAP_HEIGHT;
+        MATERIAL_MAP_CUBEMAP;
+        MATERIAL_MAP_IRRADIANCE;
+        MATERIAL_MAP_PREFILTER;
+        MATERIAL_MAP_BRDF;
+    }
+
+    public enum ShaderLocationIndex {
+        SHADER_LOC_VERTEX_POSITION = 0;
+        SHADER_LOC_VERTEX_TEXCOORD01;
+        SHADER_LOC_VERTEX_TEXCOORD02;
+        SHADER_LOC_VERTEX_NORMAL;
+        SHADER_LOC_VERTEX_TANGENT;
+        SHADER_LOC_VERTEX_COLOR;
+        SHADER_LOC_MATRIX_MVP;
+        SHADER_LOC_MATRIX_VIEW;
+        SHADER_LOC_MATRIX_PROJECTION;
+        SHADER_LOC_MATRIX_MODEL;
+        SHADER_LOC_MATRIX_NORMAL;
+        SHADER_LOC_VECTOR_VIEW;
+        SHADER_LOC_COLOR_DIFFUSE;
+        SHADER_LOC_COLOR_SPECULAR;
+        SHADER_LOC_COLOR_AMBIENT;
+        SHADER_LOC_MAP_ALBEDO;
+        SHADER_LOC_MAP_METALNESS;
+        SHADER_LOC_MAP_NORMAL;
+        SHADER_LOC_MAP_ROUGHNESS;
+        SHADER_LOC_MAP_OCCLUSION;
+        SHADER_LOC_MAP_EMISSION;
+        SHADER_LOC_MAP_HEIGHT;
+        SHADER_LOC_MAP_CUBEMAP;
+        SHADER_LOC_MAP_IRRADIANCE;
+        SHADER_LOC_MAP_PREFILTER;
+        SHADER_LOC_MAP_BRDF;
+        SHADER_LOC_VERTEX_BONEIDS;
+        SHADER_LOC_VERTEX_BONEWEIGHTS;
+        SHADER_LOC_BONE_MATRICES;
+    }
+
+    public enum ShaderUniformDataType {
+        SHADER_UNIFORM_FLOAT = 0;
+        SHADER_UNIFORM_VEC2;
+        SHADER_UNIFORM_VEC3;
+        SHADER_UNIFORM_VEC4;
+        SHADER_UNIFORM_INT;
+        SHADER_UNIFORM_IVEC2;
+        SHADER_UNIFORM_IVEC3;
+        SHADER_UNIFORM_IVEC4;
+        SHADER_UNIFORM_SAMPLER2D;
+    }
+
+    public enum ShaderAttributeDataType {
+        SHADER_ATTRIB_FLOAT = 0;
+        SHADER_ATTRIB_VEC2;
+        SHADER_ATTRIB_VEC3;
+        SHADER_ATTRIB_VEC4;
+    }
+
+    public enum PixelFormat {
+        PIXELFORMAT_UNCOMPRESSED_GRAYSCALE = 1;
+        PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA;
+        PIXELFORMAT_UNCOMPRESSED_R5G6B5;
+        PIXELFORMAT_UNCOMPRESSED_R8G8B8;
+        PIXELFORMAT_UNCOMPRESSED_R5G5B5A1;
+        PIXELFORMAT_UNCOMPRESSED_R4G4B4A4;
+        PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+        PIXELFORMAT_UNCOMPRESSED_R32;
+        PIXELFORMAT_UNCOMPRESSED_R32G32B32;
+        PIXELFORMAT_UNCOMPRESSED_R32G32B32A32;
+        PIXELFORMAT_UNCOMPRESSED_R16;
+        PIXELFORMAT_UNCOMPRESSED_R16G16B16;
+        PIXELFORMAT_UNCOMPRESSED_R16G16B16A16;
+        PIXELFORMAT_COMPRESSED_DXT1_RGB;
+        PIXELFORMAT_COMPRESSED_DXT1_RGBA;
+        PIXELFORMAT_COMPRESSED_DXT3_RGBA;
+        PIXELFORMAT_COMPRESSED_DXT5_RGBA;
+        PIXELFORMAT_COMPRESSED_ETC1_RGB;
+        PIXELFORMAT_COMPRESSED_ETC2_RGB;
+        PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA;
+        PIXELFORMAT_COMPRESSED_PVRT_RGB;
+        PIXELFORMAT_COMPRESSED_PVRT_RGBA;
+        PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA;
+        PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA;
+    }
+
+    public enum TextureFilter {
+        TEXTURE_FILTER_POINT = 0;
+        TEXTURE_FILTER_BILINEAR;
+        TEXTURE_FILTER_TRILINEAR;
+        TEXTURE_FILTER_ANISOTROPIC_4X;
+        TEXTURE_FILTER_ANISOTROPIC_8X;
+        TEXTURE_FILTER_ANISOTROPIC_16X;
+    }
+
+    public enum TextureWrap {
+        TEXTURE_WRAP_REPEAT = 0;
+        TEXTURE_WRAP_CLAMP;
+        TEXTURE_WRAP_MIRROR_REPEAT;
+        TEXTURE_WRAP_MIRROR_CLAMP;
+    }
+
+    public enum CubemapLayout {
+        CUBEMAP_LAYOUT_AUTO_DETECT = 0;
+        CUBEMAP_LAYOUT_LINE_VERTICAL;
+        CUBEMAP_LAYOUT_LINE_HORIZONTAL;
+        CUBEMAP_LAYOUT_CROSS_THREE_BY_FOUR;
+        CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE;
+    }
+
+    public enum FontType {
+        FONT_DEFAULT = 0;
+        FONT_BITMAP;
+        FONT_SDF;
+    }
+
+    public enum BlendMode {
+        BLEND_ALPHA = 0;
+        BLEND_ADDITIVE;
+        BLEND_MULTIPLIED;
+        BLEND_ADD_COLORS;
+        BLEND_SUBTRACT_COLORS;
+        BLEND_ALPHA_PREMULTIPLY;
+        BLEND_CUSTOM;
+        BLEND_CUSTOM_SEPARATE;
+    }
+
+    public enum Gesture {
+        GESTURE_NONE = 0;
+        GESTURE_TAP = 1;
+        GESTURE_DOUBLETAP = 2;
+        GESTURE_HOLD = 4;
+        GESTURE_DRAG = 8;
+        GESTURE_SWIPE_RIGHT = 16;
+        GESTURE_SWIPE_LEFT = 32;
+        GESTURE_SWIPE_UP = 64;
+        GESTURE_SWIPE_DOWN = 128;
+        GESTURE_PINCH_IN = 256;
+        GESTURE_PINCH_OUT = 512;
+    }
+
+    public enum CameraMode {
+        CAMERA_CUSTOM = 0;
+        CAMERA_FREE;
+        CAMERA_ORBITAL;
+        CAMERA_FIRST_PERSON;
+        CAMERA_THIRD_PERSON;
+    }
+
+    public enum CameraProjection {
+        CAMERA_PERSPECTIVE = 0;
+        CAMERA_ORTHOGRAPHIC;
+    }
+
+    public enum NPatchLayout {
+        NPATCH_NINE_PATCH = 0;
+        NPATCH_THREE_PATCH_VERTICAL;
+        NPATCH_THREE_PATCH_HORIZONTAL;
+    }
+
+    public extern fun InitWindow(width: int32, height: int32, title: *uint8);
+    public extern fun CloseWindow();
+    public extern fun WindowShouldClose() -> bool;
+    public extern fun IsWindowReady() -> bool;
+    public extern fun IsWindowFullscreen() -> bool;
+    public extern fun IsWindowHidden() -> bool;
+    public extern fun IsWindowMinimized() -> bool;
+    public extern fun IsWindowMaximized() -> bool;
+    public extern fun IsWindowFocused() -> bool;
+    public extern fun IsWindowResized() -> bool;
+    public extern fun IsWindowState(flag: uint32) -> bool;
+    public extern fun SetWindowState(flags: uint32);
+    public extern fun ClearWindowState(flags: uint32);
+    public extern fun ToggleFullscreen();
+    public extern fun ToggleBorderlessWindowed();
+    public extern fun MaximizeWindow();
+    public extern fun MinimizeWindow();
+    public extern fun RestoreWindow();
+    public extern fun SetWindowIcon(image: raylib::Image);
+    public extern fun SetWindowIcons(images: *raylib::Image, count: int32);
+    public extern fun SetWindowTitle(title: *uint8);
+    public extern fun SetWindowPosition(x: int32, y: int32);
+    public extern fun SetWindowMonitor(monitor: int32);
+    public extern fun SetWindowMinSize(width: int32, height: int32);
+    public extern fun SetWindowMaxSize(width: int32, height: int32);
+    public extern fun SetWindowSize(width: int32, height: int32);
+    public extern fun SetWindowOpacity(opacity: float32);
+    public extern fun SetWindowFocused();
+    public extern fun GetWindowHandle() -> *unit;
+    public extern fun GetScreenWidth() -> int32;
+    public extern fun GetScreenHeight() -> int32;
+    public extern fun GetRenderWidth() -> int32;
+    public extern fun GetRenderHeight() -> int32;
+    public extern fun GetMonitorCount() -> int32;
+    public extern fun GetCurrentMonitor() -> int32;
+    public extern fun GetMonitorPosition(monitor: int32) -> raylib::Vector2;
+    public extern fun GetMonitorWidth(monitor: int32) -> int32;
+    public extern fun GetMonitorHeight(monitor: int32) -> int32;
+    public extern fun GetMonitorPhysicalWidth(monitor: int32) -> int32;
+    public extern fun GetMonitorPhysicalHeight(monitor: int32) -> int32;
+    public extern fun GetMonitorRefreshRate(monitor: int32) -> int32;
+    public extern fun GetWindowPosition() -> raylib::Vector2;
+    public extern fun GetWindowScaleDPI() -> raylib::Vector2;
+    public extern fun GetMonitorName(monitor: int32) -> *uint8;
+    public extern fun SetClipboardText(text: *uint8);
+    public extern fun GetClipboardText() -> *uint8;
+    public extern fun GetClipboardImage() -> raylib::Image;
+    public extern fun EnableEventWaiting();
+    public extern fun DisableEventWaiting();
+    public extern fun ShowCursor();
+    public extern fun HideCursor();
+    public extern fun IsCursorHidden() -> bool;
+    public extern fun EnableCursor();
+    public extern fun DisableCursor();
+    public extern fun IsCursorOnScreen() -> bool;
+    public extern fun ClearBackground(color: raylib::Color);
+    public extern fun BeginDrawing();
+    public extern fun EndDrawing();
+    public extern fun BeginMode2D(camera: raylib::Camera2D);
+    public extern fun EndMode2D();
+    public extern fun BeginMode3D(camera: raylib::Camera3D);
+    public extern fun EndMode3D();
+    public extern fun BeginTextureMode(target: raylib::RenderTexture2D);
+    public extern fun EndTextureMode();
+    public extern fun BeginShaderMode(shader: raylib::Shader);
+    public extern fun EndShaderMode();
+    public extern fun BeginBlendMode(mode: int32);
+    public extern fun EndBlendMode();
+    public extern fun BeginScissorMode(x: int32, y: int32, width: int32, height: int32);
+    public extern fun EndScissorMode();
+    public extern fun BeginVrStereoMode(config: raylib::VrStereoConfig);
+    public extern fun EndVrStereoMode();
+    public extern fun LoadVrStereoConfig(device: raylib::VrDeviceInfo) -> raylib::VrStereoConfig;
+    public extern fun UnloadVrStereoConfig(config: raylib::VrStereoConfig);
+    public extern fun LoadShader(vsFileName: *uint8, fsFileName: *uint8) -> raylib::Shader;
+    public extern fun LoadShaderFromMemory(vsCode: *uint8, fsCode: *uint8) -> raylib::Shader;
+    public extern fun IsShaderValid(shader: raylib::Shader) -> bool;
+    public extern fun GetShaderLocation(shader: raylib::Shader, uniformName: *uint8) -> int32;
+    public extern fun GetShaderLocationAttrib(shader: raylib::Shader, attribName: *uint8) -> int32;
+    public extern fun SetShaderValue(shader: raylib::Shader, locIndex: int32, value: *unit, uniformType: int32);
+    public extern fun SetShaderValueV(shader: raylib::Shader, locIndex: int32, value: *unit, uniformType: int32, count: int32);
+    public extern fun SetShaderValueMatrix(shader: raylib::Shader, locIndex: int32, mat: raylib::Matrix);
+    public extern fun SetShaderValueTexture(shader: raylib::Shader, locIndex: int32, texture: raylib::Texture2D);
+    public extern fun UnloadShader(shader: raylib::Shader);
+    public extern fun GetScreenToWorldRay(position: raylib::Vector2, camera: raylib::Camera) -> raylib::Ray;
+    public extern fun GetScreenToWorldRayEx(position: raylib::Vector2, camera: raylib::Camera, width: int32, height: int32) -> raylib::Ray;
+    public extern fun GetWorldToScreen(position: raylib::Vector3, camera: raylib::Camera) -> raylib::Vector2;
+    public extern fun GetWorldToScreenEx(position: raylib::Vector3, camera: raylib::Camera, width: int32, height: int32) -> raylib::Vector2;
+    public extern fun GetWorldToScreen2D(position: raylib::Vector2, camera: raylib::Camera2D) -> raylib::Vector2;
+    public extern fun GetScreenToWorld2D(position: raylib::Vector2, camera: raylib::Camera2D) -> raylib::Vector2;
+    public extern fun GetCameraMatrix(camera: raylib::Camera) -> raylib::Matrix;
+    public extern fun GetCameraMatrix2D(camera: raylib::Camera2D) -> raylib::Matrix;
+    public extern fun SetTargetFPS(fps: int32);
+    public extern fun GetFrameTime() -> float32;
+    public extern fun GetTime() -> float64;
+    public extern fun GetFPS() -> int32;
+    public extern fun SwapScreenBuffer();
+    public extern fun PollInputEvents();
+    public extern fun WaitTime(seconds: float64);
+    public extern fun SetRandomSeed(seed: uint32);
+    public extern fun GetRandomValue(min: int32, max: int32) -> int32;
+    public extern fun LoadRandomSequence(count: uint32, min: int32, max: int32) -> *int32;
+    public extern fun UnloadRandomSequence(sequence: *int32);
+    public extern fun TakeScreenshot(fileName: *uint8);
+    public extern fun SetConfigFlags(flags: uint32);
+    public extern fun OpenURL(url: *uint8);
+    public extern fun SetTraceLogLevel(logLevel: int32);
+    public extern fun MemAlloc(size: uint32) -> *unit;
+    public extern fun MemRealloc(ptr: *unit, size: uint32) -> *unit;
+    public extern fun MemFree(ptr: *unit);
+    public extern fun SetTraceLogCallback(callback: raylib::TraceLogCallback);
+    public extern fun SetLoadFileDataCallback(callback: raylib::LoadFileDataCallback);
+    public extern fun SetSaveFileDataCallback(callback: raylib::SaveFileDataCallback);
+    public extern fun SetLoadFileTextCallback(callback: raylib::LoadFileTextCallback);
+    public extern fun SetSaveFileTextCallback(callback: raylib::SaveFileTextCallback);
+    public extern fun LoadFileData(fileName: *uint8, dataSize: *int32) -> *uint8;
+    public extern fun UnloadFileData(data: *uint8);
+    public extern fun SaveFileData(fileName: *uint8, data: *unit, dataSize: int32) -> bool;
+    public extern fun ExportDataAsCode(data: *uint8, dataSize: int32, fileName: *uint8) -> bool;
+    public extern fun LoadFileText(fileName: *uint8) -> *uint8;
+    public extern fun UnloadFileText(text: *uint8);
+    public extern fun SaveFileText(fileName: *uint8, text: *uint8) -> bool;
+    public extern fun FileExists(fileName: *uint8) -> bool;
+    public extern fun DirectoryExists(dirPath: *uint8) -> bool;
+    public extern fun IsFileExtension(fileName: *uint8, ext: *uint8) -> bool;
+    public extern fun GetFileLength(fileName: *uint8) -> int32;
+    public extern fun GetFileExtension(fileName: *uint8) -> *uint8;
+    public extern fun GetFileName(filePath: *uint8) -> *uint8;
+    public extern fun GetFileNameWithoutExt(filePath: *uint8) -> *uint8;
+    public extern fun GetDirectoryPath(filePath: *uint8) -> *uint8;
+    public extern fun GetPrevDirectoryPath(dirPath: *uint8) -> *uint8;
+    public extern fun GetWorkingDirectory() -> *uint8;
+    public extern fun GetApplicationDirectory() -> *uint8;
+    public extern fun MakeDirectory(dirPath: *uint8) -> int32;
+    public extern fun ChangeDirectory(dir: *uint8) -> bool;
+    public extern fun IsPathFile(path: *uint8) -> bool;
+    public extern fun IsFileNameValid(fileName: *uint8) -> bool;
+    public extern fun LoadDirectoryFiles(dirPath: *uint8) -> raylib::FilePathList;
+    public extern fun LoadDirectoryFilesEx(basePath: *uint8, filter: *uint8, scanSubdirs: bool) -> raylib::FilePathList;
+    public extern fun UnloadDirectoryFiles(files: raylib::FilePathList);
+    public extern fun IsFileDropped() -> bool;
+    public extern fun LoadDroppedFiles() -> raylib::FilePathList;
+    public extern fun UnloadDroppedFiles(files: raylib::FilePathList);
+    public extern fun GetFileModTime(fileName: *uint8) -> int64;
+    public extern fun CompressData(data: *uint8, dataSize: int32, compDataSize: *int32) -> *uint8;
+    public extern fun DecompressData(compData: *uint8, compDataSize: int32, dataSize: *int32) -> *uint8;
+    public extern fun EncodeDataBase64(data: *uint8, dataSize: int32, outputSize: *int32) -> *uint8;
+    public extern fun DecodeDataBase64(data: *uint8, outputSize: *int32) -> *uint8;
+    public extern fun ComputeCRC32(data: *uint8, dataSize: int32) -> uint32;
+    public extern fun ComputeMD5(data: *uint8, dataSize: int32) -> *uint32;
+    public extern fun ComputeSHA1(data: *uint8, dataSize: int32) -> *uint32;
+    public extern fun LoadAutomationEventList(fileName: *uint8) -> raylib::AutomationEventList;
+    public extern fun UnloadAutomationEventList(list: raylib::AutomationEventList);
+    public extern fun ExportAutomationEventList(list: raylib::AutomationEventList, fileName: *uint8) -> bool;
+    public extern fun SetAutomationEventList(list: *raylib::AutomationEventList);
+    public extern fun SetAutomationEventBaseFrame(frame: int32);
+    public extern fun StartAutomationEventRecording();
+    public extern fun StopAutomationEventRecording();
+    public extern fun PlayAutomationEvent(event: raylib::AutomationEvent);
+    public extern fun IsKeyPressed(key: raylib::KeyboardKey) -> bool;
+    public extern fun IsKeyPressedRepeat(key: raylib::KeyboardKey) -> bool;
+    public extern fun IsKeyDown(key: raylib::KeyboardKey) -> bool;
+    public extern fun IsKeyReleased(key: raylib::KeyboardKey) -> bool;
+    public extern fun IsKeyUp(key: raylib::KeyboardKey) -> bool;
+    public extern fun GetKeyPressed() -> int32;
+    public extern fun GetCharPressed() -> int32;
+    public extern fun SetExitKey(key: raylib::KeyboardKey);
+    public extern fun IsGamepadAvailable(gamepad: int32) -> bool;
+    public extern fun GetGamepadName(gamepad: int32) -> *uint8;
+    public extern fun IsGamepadButtonPressed(gamepad: int32, button: int32) -> bool;
+    public extern fun IsGamepadButtonDown(gamepad: int32, button: int32) -> bool;
+    public extern fun IsGamepadButtonReleased(gamepad: int32, button: int32) -> bool;
+    public extern fun IsGamepadButtonUp(gamepad: int32, button: int32) -> bool;
+    public extern fun GetGamepadButtonPressed() -> int32;
+    public extern fun GetGamepadAxisCount(gamepad: int32) -> int32;
+    public extern fun GetGamepadAxisMovement(gamepad: int32, axis: int32) -> float32;
+    public extern fun SetGamepadMappings(mappings: *uint8) -> int32;
+    public extern fun SetGamepadVibration(gamepad: int32, leftMotor: float32, rightMotor: float32, duration: float32);
+    public extern fun IsMouseButtonPressed(button: int32) -> bool;
+    public extern fun IsMouseButtonDown(button: int32) -> bool;
+    public extern fun IsMouseButtonReleased(button: int32) -> bool;
+    public extern fun IsMouseButtonUp(button: int32) -> bool;
+    public extern fun GetMouseX() -> int32;
+    public extern fun GetMouseY() -> int32;
+    public extern fun GetMousePosition() -> raylib::Vector2;
+    public extern fun GetMouseDelta() -> raylib::Vector2;
+    public extern fun SetMousePosition(x: int32, y: int32);
+    public extern fun SetMouseOffset(offsetX: int32, offsetY: int32);
+    public extern fun SetMouseScale(scaleX: float32, scaleY: float32);
+    public extern fun GetMouseWheelMove() -> float32;
+    public extern fun GetMouseWheelMoveV() -> raylib::Vector2;
+    public extern fun SetMouseCursor(cursor: int32);
+    public extern fun GetTouchX() -> int32;
+    public extern fun GetTouchY() -> int32;
+    public extern fun GetTouchPosition(index: int32) -> raylib::Vector2;
+    public extern fun GetTouchPointId(index: int32) -> int32;
+    public extern fun GetTouchPointCount() -> int32;
+    public extern fun SetGesturesEnabled(flags: uint32);
+    public extern fun IsGestureDetected(gesture: uint32) -> bool;
+    public extern fun GetGestureDetected() -> int32;
+    public extern fun GetGestureHoldDuration() -> float32;
+    public extern fun GetGestureDragVector() -> raylib::Vector2;
+    public extern fun GetGestureDragAngle() -> float32;
+    public extern fun GetGesturePinchVector() -> raylib::Vector2;
+    public extern fun GetGesturePinchAngle() -> float32;
+    public extern fun UpdateCamera(camera: *raylib::Camera, mode: int32);
+    public extern fun UpdateCameraPro(camera: *raylib::Camera, movement: raylib::Vector3, rotation: raylib::Vector3, zoom: float32);
+    public extern fun SetShapesTexture(texture: raylib::Texture2D, source: raylib::Rectangle);
+    public extern fun GetShapesTexture() -> raylib::Texture2D;
+    public extern fun GetShapesTextureRectangle() -> raylib::Rectangle;
+    public extern fun DrawPixel(posX: int32, posY: int32, color: raylib::Color);
+    public extern fun DrawPixelV(position: raylib::Vector2, color: raylib::Color);
+    public extern fun DrawLine(startPosX: int32, startPosY: int32, endPosX: int32, endPosY: int32, color: raylib::Color);
+    public extern fun DrawLineV(startPos: raylib::Vector2, endPos: raylib::Vector2, color: raylib::Color);
+    public extern fun DrawLineEx(startPos: raylib::Vector2, endPos: raylib::Vector2, thick: float32, color: raylib::Color);
+    public extern fun DrawLineStrip(points: *raylib::Vector2, pointCount: int32, color: raylib::Color);
+    public extern fun DrawLineBezier(startPos: raylib::Vector2, endPos: raylib::Vector2, thick: float32, color: raylib::Color);
+    public extern fun DrawCircle(centerX: int32, centerY: int32, radius: float32, color: raylib::Color);
+    public extern fun DrawCircleSector(center: raylib::Vector2, radius: float32, startAngle: float32, endAngle: float32, segments: int32, color: raylib::Color);
+    public extern fun DrawCircleSectorLines(center: raylib::Vector2, radius: float32, startAngle: float32, endAngle: float32, segments: int32, color: raylib::Color);
+    public extern fun DrawCircleGradient(centerX: int32, centerY: int32, radius: float32, inner: raylib::Color, outer: raylib::Color);
+    public extern fun DrawCircleV(center: raylib::Vector2, radius: float32, color: raylib::Color);
+    public extern fun DrawCircleLines(centerX: int32, centerY: int32, radius: float32, color: raylib::Color);
+    public extern fun DrawCircleLinesV(center: raylib::Vector2, radius: float32, color: raylib::Color);
+    public extern fun DrawEllipse(centerX: int32, centerY: int32, radiusH: float32, radiusV: float32, color: raylib::Color);
+    public extern fun DrawEllipseLines(centerX: int32, centerY: int32, radiusH: float32, radiusV: float32, color: raylib::Color);
+    public extern fun DrawRing(center: raylib::Vector2, innerRadius: float32, outerRadius: float32, startAngle: float32, endAngle: float32, segments: int32, color: raylib::Color);
+    public extern fun DrawRingLines(center: raylib::Vector2, innerRadius: float32, outerRadius: float32, startAngle: float32, endAngle: float32, segments: int32, color: raylib::Color);
+    public extern fun DrawRectangle(posX: int32, posY: int32, width: int32, height: int32, color: raylib::Color);
+    public extern fun DrawRectangleV(position: raylib::Vector2, size: raylib::Vector2, color: raylib::Color);
+    public extern fun DrawRectangleRec(rec: raylib::Rectangle, color: raylib::Color);
+    public extern fun DrawRectanglePro(rec: raylib::Rectangle, origin: raylib::Vector2, rotation: float32, color: raylib::Color);
+    public extern fun DrawRectangleGradientV(posX: int32, posY: int32, width: int32, height: int32, top: raylib::Color, bottom: raylib::Color);
+    public extern fun DrawRectangleGradientH(posX: int32, posY: int32, width: int32, height: int32, left: raylib::Color, right: raylib::Color);
+    public extern fun DrawRectangleGradientEx(rec: raylib::Rectangle, topLeft: raylib::Color, bottomLeft: raylib::Color, topRight: raylib::Color, bottomRight: raylib::Color);
+    public extern fun DrawRectangleLines(posX: int32, posY: int32, width: int32, height: int32, color: raylib::Color);
+    public extern fun DrawRectangleLinesEx(rec: raylib::Rectangle, lineThick: float32, color: raylib::Color);
+    public extern fun DrawRectangleRounded(rec: raylib::Rectangle, roundness: float32, segments: int32, color: raylib::Color);
+    public extern fun DrawRectangleRoundedLines(rec: raylib::Rectangle, roundness: float32, segments: int32, color: raylib::Color);
+    public extern fun DrawRectangleRoundedLinesEx(rec: raylib::Rectangle, roundness: float32, segments: int32, lineThick: float32, color: raylib::Color);
+    public extern fun DrawTriangle(v1: raylib::Vector2, v2: raylib::Vector2, v3: raylib::Vector2, color: raylib::Color);
+    public extern fun DrawTriangleLines(v1: raylib::Vector2, v2: raylib::Vector2, v3: raylib::Vector2, color: raylib::Color);
+    public extern fun DrawTriangleFan(points: *raylib::Vector2, pointCount: int32, color: raylib::Color);
+    public extern fun DrawTriangleStrip(points: *raylib::Vector2, pointCount: int32, color: raylib::Color);
+    public extern fun DrawPoly(center: raylib::Vector2, sides: int32, radius: float32, rotation: float32, color: raylib::Color);
+    public extern fun DrawPolyLines(center: raylib::Vector2, sides: int32, radius: float32, rotation: float32, color: raylib::Color);
+    public extern fun DrawPolyLinesEx(center: raylib::Vector2, sides: int32, radius: float32, rotation: float32, lineThick: float32, color: raylib::Color);
+    public extern fun DrawSplineLinear(points: *raylib::Vector2, pointCount: int32, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineBasis(points: *raylib::Vector2, pointCount: int32, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineCatmullRom(points: *raylib::Vector2, pointCount: int32, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineBezierQuadratic(points: *raylib::Vector2, pointCount: int32, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineBezierCubic(points: *raylib::Vector2, pointCount: int32, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineSegmentLinear(p1: raylib::Vector2, p2: raylib::Vector2, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineSegmentBasis(p1: raylib::Vector2, p2: raylib::Vector2, p3: raylib::Vector2, p4: raylib::Vector2, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineSegmentCatmullRom(p1: raylib::Vector2, p2: raylib::Vector2, p3: raylib::Vector2, p4: raylib::Vector2, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineSegmentBezierQuadratic(p1: raylib::Vector2, c2: raylib::Vector2, p3: raylib::Vector2, thick: float32, color: raylib::Color);
+    public extern fun DrawSplineSegmentBezierCubic(p1: raylib::Vector2, c2: raylib::Vector2, c3: raylib::Vector2, p4: raylib::Vector2, thick: float32, color: raylib::Color);
+    public extern fun GetSplinePointLinear(startPos: raylib::Vector2, endPos: raylib::Vector2, t: float32) -> raylib::Vector2;
+    public extern fun GetSplinePointBasis(p1: raylib::Vector2, p2: raylib::Vector2, p3: raylib::Vector2, p4: raylib::Vector2, t: float32) -> raylib::Vector2;
+    public extern fun GetSplinePointCatmullRom(p1: raylib::Vector2, p2: raylib::Vector2, p3: raylib::Vector2, p4: raylib::Vector2, t: float32) -> raylib::Vector2;
+    public extern fun GetSplinePointBezierQuad(p1: raylib::Vector2, c2: raylib::Vector2, p3: raylib::Vector2, t: float32) -> raylib::Vector2;
+    public extern fun GetSplinePointBezierCubic(p1: raylib::Vector2, c2: raylib::Vector2, c3: raylib::Vector2, p4: raylib::Vector2, t: float32) -> raylib::Vector2;
+    public extern fun CheckCollisionRecs(rec1: raylib::Rectangle, rec2: raylib::Rectangle) -> bool;
+    public extern fun CheckCollisionCircles(center1: raylib::Vector2, radius1: float32, center2: raylib::Vector2, radius2: float32) -> bool;
+    public extern fun CheckCollisionCircleRec(center: raylib::Vector2, radius: float32, rec: raylib::Rectangle) -> bool;
+    public extern fun CheckCollisionCircleLine(center: raylib::Vector2, radius: float32, p1: raylib::Vector2, p2: raylib::Vector2) -> bool;
+    public extern fun CheckCollisionPointRec(point: raylib::Vector2, rec: raylib::Rectangle) -> bool;
+    public extern fun CheckCollisionPointCircle(point: raylib::Vector2, center: raylib::Vector2, radius: float32) -> bool;
+    public extern fun CheckCollisionPointTriangle(point: raylib::Vector2, p1: raylib::Vector2, p2: raylib::Vector2, p3: raylib::Vector2) -> bool;
+    public extern fun CheckCollisionPointLine(point: raylib::Vector2, p1: raylib::Vector2, p2: raylib::Vector2, threshold: int32) -> bool;
+    public extern fun CheckCollisionPointPoly(point: raylib::Vector2, points: *raylib::Vector2, pointCount: int32) -> bool;
+    public extern fun CheckCollisionLines(startPos1: raylib::Vector2, endPos1: raylib::Vector2, startPos2: raylib::Vector2, endPos2: raylib::Vector2, collisionPoint: *raylib::Vector2) -> bool;
+    public extern fun GetCollisionRec(rec1: raylib::Rectangle, rec2: raylib::Rectangle) -> raylib::Rectangle;
+    public extern fun LoadImage(fileName: *uint8) -> raylib::Image;
+    public extern fun LoadImageRaw(fileName: *uint8, width: int32, height: int32, format: int32, headerSize: int32) -> raylib::Image;
+    public extern fun LoadImageAnim(fileName: *uint8, frames: *int32) -> raylib::Image;
+    public extern fun LoadImageAnimFromMemory(fileType: *uint8, fileData: *uint8, dataSize: int32, frames: *int32) -> raylib::Image;
+    public extern fun LoadImageFromMemory(fileType: *uint8, fileData: *uint8, dataSize: int32) -> raylib::Image;
+    public extern fun LoadImageFromTexture(texture: raylib::Texture2D) -> raylib::Image;
+    public extern fun LoadImageFromScreen() -> raylib::Image;
+    public extern fun IsImageValid(image: raylib::Image) -> bool;
+    public extern fun UnloadImage(image: raylib::Image);
+    public extern fun ExportImage(image: raylib::Image, fileName: *uint8) -> bool;
+    public extern fun ExportImageToMemory(image: raylib::Image, fileType: *uint8, fileSize: *int32) -> *uint8;
+    public extern fun ExportImageAsCode(image: raylib::Image, fileName: *uint8) -> bool;
+    public extern fun GenImageColor(width: int32, height: int32, color: raylib::Color) -> raylib::Image;
+    public extern fun GenImageGradientLinear(width: int32, height: int32, direction: int32, start: raylib::Color, end: raylib::Color) -> raylib::Image;
+    public extern fun GenImageGradientRadial(width: int32, height: int32, density: float32, inner: raylib::Color, outer: raylib::Color) -> raylib::Image;
+    public extern fun GenImageGradientSquare(width: int32, height: int32, density: float32, inner: raylib::Color, outer: raylib::Color) -> raylib::Image;
+    public extern fun GenImageChecked(width: int32, height: int32, checksX: int32, checksY: int32, col1: raylib::Color, col2: raylib::Color) -> raylib::Image;
+    public extern fun GenImageWhiteNoise(width: int32, height: int32, factor: float32) -> raylib::Image;
+    public extern fun GenImagePerlinNoise(width: int32, height: int32, offsetX: int32, offsetY: int32, scale: float32) -> raylib::Image;
+    public extern fun GenImageCellular(width: int32, height: int32, tileSize: int32) -> raylib::Image;
+    public extern fun GenImageText(width: int32, height: int32, text: *uint8) -> raylib::Image;
+    public extern fun ImageCopy(image: raylib::Image) -> raylib::Image;
+    public extern fun ImageFromImage(image: raylib::Image, rec: raylib::Rectangle) -> raylib::Image;
+    public extern fun ImageFromChannel(image: raylib::Image, selectedChannel: int32) -> raylib::Image;
+    public extern fun ImageText(text: *uint8, fontSize: int32, color: raylib::Color) -> raylib::Image;
+    public extern fun ImageTextEx(font: raylib::Font, text: *uint8, fontSize: float32, spacing: float32, tint: raylib::Color) -> raylib::Image;
+    public extern fun ImageFormat(image: *raylib::Image, newFormat: int32);
+    public extern fun ImageToPOT(image: *raylib::Image, fill: raylib::Color);
+    public extern fun ImageCrop(image: *raylib::Image, crop: raylib::Rectangle);
+    public extern fun ImageAlphaCrop(image: *raylib::Image, threshold: float32);
+    public extern fun ImageAlphaClear(image: *raylib::Image, color: raylib::Color, threshold: float32);
+    public extern fun ImageAlphaMask(image: *raylib::Image, alphaMask: raylib::Image);
+    public extern fun ImageAlphaPremultiply(image: *raylib::Image);
+    public extern fun ImageBlurGaussian(image: *raylib::Image, blurSize: int32);
+    public extern fun ImageKernelConvolution(image: *raylib::Image, kernel: *float32, kernelSize: int32);
+    public extern fun ImageResize(image: *raylib::Image, newWidth: int32, newHeight: int32);
+    public extern fun ImageResizeNN(image: *raylib::Image, newWidth: int32, newHeight: int32);
+    public extern fun ImageResizeCanvas(image: *raylib::Image, newWidth: int32, newHeight: int32, offsetX: int32, offsetY: int32, fill: raylib::Color);
+    public extern fun ImageMipmaps(image: *raylib::Image);
+    public extern fun ImageDither(image: *raylib::Image, rBpp: int32, gBpp: int32, bBpp: int32, aBpp: int32);
+    public extern fun ImageFlipVertical(image: *raylib::Image);
+    public extern fun ImageFlipHorizontal(image: *raylib::Image);
+    public extern fun ImageRotate(image: *raylib::Image, degrees: int32);
+    public extern fun ImageRotateCW(image: *raylib::Image);
+    public extern fun ImageRotateCCW(image: *raylib::Image);
+    public extern fun ImageColorTint(image: *raylib::Image, color: raylib::Color);
+    public extern fun ImageColorInvert(image: *raylib::Image);
+    public extern fun ImageColorGrayscale(image: *raylib::Image);
+    public extern fun ImageColorContrast(image: *raylib::Image, contrast: float32);
+    public extern fun ImageColorBrightness(image: *raylib::Image, brightness: int32);
+    public extern fun ImageColorReplace(image: *raylib::Image, color: raylib::Color, replace: raylib::Color);
+    public extern fun LoadImageColors(image: raylib::Image) -> *raylib::Color;
+    public extern fun LoadImagePalette(image: raylib::Image, maxPaletteSize: int32, colorCount: *int32) -> *raylib::Color;
+    public extern fun UnloadImageColors(colors: *raylib::Color);
+    public extern fun UnloadImagePalette(colors: *raylib::Color);
+    public extern fun GetImageAlphaBorder(image: raylib::Image, threshold: float32) -> raylib::Rectangle;
+    public extern fun GetImageColor(image: raylib::Image, x: int32, y: int32) -> raylib::Color;
+    public extern fun ImageClearBackground(dst: *raylib::Image, color: raylib::Color);
+    public extern fun ImageDrawPixel(dst: *raylib::Image, posX: int32, posY: int32, color: raylib::Color);
+    public extern fun ImageDrawPixelV(dst: *raylib::Image, position: raylib::Vector2, color: raylib::Color);
+    public extern fun ImageDrawLine(dst: *raylib::Image, startPosX: int32, startPosY: int32, endPosX: int32, endPosY: int32, color: raylib::Color);
+    public extern fun ImageDrawLineV(dst: *raylib::Image, start: raylib::Vector2, end: raylib::Vector2, color: raylib::Color);
+    public extern fun ImageDrawLineEx(dst: *raylib::Image, start: raylib::Vector2, end: raylib::Vector2, thick: int32, color: raylib::Color);
+    public extern fun ImageDrawCircle(dst: *raylib::Image, centerX: int32, centerY: int32, radius: int32, color: raylib::Color);
+    public extern fun ImageDrawCircleV(dst: *raylib::Image, center: raylib::Vector2, radius: int32, color: raylib::Color);
+    public extern fun ImageDrawCircleLines(dst: *raylib::Image, centerX: int32, centerY: int32, radius: int32, color: raylib::Color);
+    public extern fun ImageDrawCircleLinesV(dst: *raylib::Image, center: raylib::Vector2, radius: int32, color: raylib::Color);
+    public extern fun ImageDrawRectangle(dst: *raylib::Image, posX: int32, posY: int32, width: int32, height: int32, color: raylib::Color);
+    public extern fun ImageDrawRectangleV(dst: *raylib::Image, position: raylib::Vector2, size: raylib::Vector2, color: raylib::Color);
+    public extern fun ImageDrawRectangleRec(dst: *raylib::Image, rec: raylib::Rectangle, color: raylib::Color);
+    public extern fun ImageDrawRectangleLines(dst: *raylib::Image, rec: raylib::Rectangle, thick: int32, color: raylib::Color);
+    public extern fun ImageDrawTriangle(dst: *raylib::Image, v1: raylib::Vector2, v2: raylib::Vector2, v3: raylib::Vector2, color: raylib::Color);
+    public extern fun ImageDrawTriangleEx(dst: *raylib::Image, v1: raylib::Vector2, v2: raylib::Vector2, v3: raylib::Vector2, c1: raylib::Color, c2: raylib::Color, c3: raylib::Color);
+    public extern fun ImageDrawTriangleLines(dst: *raylib::Image, v1: raylib::Vector2, v2: raylib::Vector2, v3: raylib::Vector2, color: raylib::Color);
+    public extern fun ImageDrawTriangleFan(dst: *raylib::Image, points: *raylib::Vector2, pointCount: int32, color: raylib::Color);
+    public extern fun ImageDrawTriangleStrip(dst: *raylib::Image, points: *raylib::Vector2, pointCount: int32, color: raylib::Color);
+    public extern fun ImageDraw(dst: *raylib::Image, src: raylib::Image, srcRec: raylib::Rectangle, dstRec: raylib::Rectangle, tint: raylib::Color);
+    public extern fun ImageDrawText(dst: *raylib::Image, text: *uint8, posX: int32, posY: int32, fontSize: int32, color: raylib::Color);
+    public extern fun ImageDrawTextEx(dst: *raylib::Image, font: raylib::Font, text: *uint8, position: raylib::Vector2, fontSize: float32, spacing: float32, tint: raylib::Color);
+    public extern fun LoadTexture(fileName: *uint8) -> raylib::Texture2D;
+    public extern fun LoadTextureFromImage(image: raylib::Image) -> raylib::Texture2D;
+    public extern fun LoadTextureCubemap(image: raylib::Image, layout: int32) -> raylib::TextureCubemap;
+    public extern fun LoadRenderTexture(width: int32, height: int32) -> raylib::RenderTexture2D;
+    public extern fun IsTextureValid(texture: raylib::Texture2D) -> bool;
+    public extern fun UnloadTexture(texture: raylib::Texture2D);
+    public extern fun IsRenderTextureValid(target: raylib::RenderTexture2D) -> bool;
+    public extern fun UnloadRenderTexture(target: raylib::RenderTexture2D);
+    public extern fun UpdateTexture(texture: raylib::Texture2D, pixels: *unit);
+    public extern fun UpdateTextureRec(texture: raylib::Texture2D, rec: raylib::Rectangle, pixels: *unit);
+    public extern fun GenTextureMipmaps(texture: *raylib::Texture2D);
+    public extern fun SetTextureFilter(texture: raylib::Texture2D, filter: int32);
+    public extern fun SetTextureWrap(texture: raylib::Texture2D, wrap: int32);
+    public extern fun DrawTexture(texture: raylib::Texture2D, posX: int32, posY: int32, tint: raylib::Color);
+    public extern fun DrawTextureV(texture: raylib::Texture2D, position: raylib::Vector2, tint: raylib::Color);
+    public extern fun DrawTextureEx(texture: raylib::Texture2D, position: raylib::Vector2, rotation: float32, scale: float32, tint: raylib::Color);
+    public extern fun DrawTextureRec(texture: raylib::Texture2D, source: raylib::Rectangle, position: raylib::Vector2, tint: raylib::Color);
+    public extern fun DrawTexturePro(texture: raylib::Texture2D, source: raylib::Rectangle, dest: raylib::Rectangle, origin: raylib::Vector2, rotation: float32, tint: raylib::Color);
+    public extern fun DrawTextureNPatch(texture: raylib::Texture2D, nPatchInfo: raylib::NPatchInfo, dest: raylib::Rectangle, origin: raylib::Vector2, rotation: float32, tint: raylib::Color);
+    public extern fun ColorIsEqual(col1: raylib::Color, col2: raylib::Color) -> bool;
+    public extern fun Fade(color: raylib::Color, alpha: float32) -> raylib::Color;
+    public extern fun ColorToInt(color: raylib::Color) -> int32;
+    public extern fun ColorNormalize(color: raylib::Color) -> raylib::Vector4;
+    public extern fun ColorFromNormalized(normalized: raylib::Vector4) -> raylib::Color;
+    public extern fun ColorToHSV(color: raylib::Color) -> raylib::Vector3;
+    public extern fun ColorFromHSV(hue: float32, saturation: float32, value: float32) -> raylib::Color;
+    public extern fun ColorTint(color: raylib::Color, tint: raylib::Color) -> raylib::Color;
+    public extern fun ColorBrightness(color: raylib::Color, factor: float32) -> raylib::Color;
+    public extern fun ColorContrast(color: raylib::Color, contrast: float32) -> raylib::Color;
+    public extern fun ColorAlpha(color: raylib::Color, alpha: float32) -> raylib::Color;
+    public extern fun ColorAlphaBlend(dst: raylib::Color, src: raylib::Color, tint: raylib::Color) -> raylib::Color;
+    public extern fun ColorLerp(color1: raylib::Color, color2: raylib::Color, factor: float32) -> raylib::Color;
+    public extern fun GetColor(hexValue: uint32) -> raylib::Color;
+    public extern fun GetPixelColor(srcPtr: *unit, format: int32) -> raylib::Color;
+    public extern fun SetPixelColor(dstPtr: *unit, color: raylib::Color, format: int32);
+    public extern fun GetPixelDataSize(width: int32, height: int32, format: int32) -> int32;
+    public extern fun GetFontDefault() -> raylib::Font;
+    public extern fun LoadFont(fileName: *uint8) -> raylib::Font;
+    public extern fun LoadFontEx(fileName: *uint8, fontSize: int32, codepoints: *int32, codepointCount: int32) -> raylib::Font;
+    public extern fun LoadFontFromImage(image: raylib::Image, key: raylib::Color, firstChar: int32) -> raylib::Font;
+    public extern fun LoadFontFromMemory(fileType: *uint8, fileData: *uint8, dataSize: int32, fontSize: int32, codepoints: *int32, codepointCount: int32) -> raylib::Font;
+    public extern fun IsFontValid(font: raylib::Font) -> bool;
+    public extern fun LoadFontData(fileData: *uint8, dataSize: int32, fontSize: int32, codepoints: *int32, codepointCount: int32, type: int32) -> *raylib::GlyphInfo;
+    public extern fun GenImageFontAtlas(glyphs: *raylib::GlyphInfo, glyphRecs: **raylib::Rectangle, glyphCount: int32, fontSize: int32, padding: int32, packMethod: int32) -> raylib::Image;
+    public extern fun UnloadFontData(glyphs: *raylib::GlyphInfo, glyphCount: int32);
+    public extern fun UnloadFont(font: raylib::Font);
+    public extern fun ExportFontAsCode(font: raylib::Font, fileName: *uint8) -> bool;
+    public extern fun DrawFPS(posX: int32, posY: int32);
+    public extern fun DrawText(text: *uint8, posX: int32, posY: int32, fontSize: int32, color: raylib::Color);
+    public extern fun DrawTextEx(font: raylib::Font, text: *uint8, position: raylib::Vector2, fontSize: float32, spacing: float32, tint: raylib::Color);
+    public extern fun DrawTextPro(font: raylib::Font, text: *uint8, position: raylib::Vector2, origin: raylib::Vector2, rotation: float32, fontSize: float32, spacing: float32, tint: raylib::Color);
+    public extern fun DrawTextCodepoint(font: raylib::Font, codepoint: int32, position: raylib::Vector2, fontSize: float32, tint: raylib::Color);
+    public extern fun DrawTextCodepoints(font: raylib::Font, codepoints: *int32, codepointCount: int32, position: raylib::Vector2, fontSize: float32, spacing: float32, tint: raylib::Color);
+    public extern fun SetTextLineSpacing(spacing: int32);
+    public extern fun MeasureText(text: *uint8, fontSize: int32) -> int32;
+    public extern fun MeasureTextEx(font: raylib::Font, text: *uint8, fontSize: float32, spacing: float32) -> raylib::Vector2;
+    public extern fun GetGlyphIndex(font: raylib::Font, codepoint: int32) -> int32;
+    public extern fun GetGlyphInfo(font: raylib::Font, codepoint: int32) -> raylib::GlyphInfo;
+    public extern fun GetGlyphAtlasRec(font: raylib::Font, codepoint: int32) -> raylib::Rectangle;
+    public extern fun LoadUTF8(codepoints: *int32, length: int32) -> *uint8;
+    public extern fun UnloadUTF8(text: *uint8);
+    public extern fun LoadCodepoints(text: *uint8, count: *int32) -> *int32;
+    public extern fun UnloadCodepoints(codepoints: *int32);
+    public extern fun GetCodepointCount(text: *uint8) -> int32;
+    public extern fun GetCodepoint(text: *uint8, codepointSize: *int32) -> int32;
+    public extern fun GetCodepointNext(text: *uint8, codepointSize: *int32) -> int32;
+    public extern fun GetCodepointPrevious(text: *uint8, codepointSize: *int32) -> int32;
+    public extern fun CodepointToUTF8(codepoint: int32, utf8Size: *int32) -> *uint8;
+    public extern fun TextCopy(dst: *uint8, src: *uint8) -> int32;
+    public extern fun TextIsEqual(text1: *uint8, text2: *uint8) -> bool;
+    public extern fun TextLength(text: *uint8) -> uint32;
+    public extern fun TextSubtext(text: *uint8, position: int32, length: int32) -> *uint8;
+    public extern fun TextReplace(text: *uint8, replace: *uint8, by: *uint8) -> *uint8;
+    public extern fun TextInsert(text: *uint8, insert: *uint8, position: int32) -> *uint8;
+    public extern fun TextJoin(textList: **uint8, count: int32, delimiter: *uint8) -> *uint8;
+    public extern fun TextSplit(text: *uint8, delimiter: uint8, count: *int32) -> **uint8;
+    public extern fun TextAppend(text: *uint8, append: *uint8, position: *int32);
+    public extern fun TextFindIndex(text: *uint8, find: *uint8) -> int32;
+    public extern fun TextToUpper(text: *uint8) -> *uint8;
+    public extern fun TextToLower(text: *uint8) -> *uint8;
+    public extern fun TextToPascal(text: *uint8) -> *uint8;
+    public extern fun TextToSnake(text: *uint8) -> *uint8;
+    public extern fun TextToCamel(text: *uint8) -> *uint8;
+    public extern fun TextToInteger(text: *uint8) -> int32;
+    public extern fun TextToFloat(text: *uint8) -> float32;
+    public extern fun DrawLine3D(startPos: raylib::Vector3, endPos: raylib::Vector3, color: raylib::Color);
+    public extern fun DrawPoint3D(position: raylib::Vector3, color: raylib::Color);
+    public extern fun DrawCircle3D(center: raylib::Vector3, radius: float32, rotationAxis: raylib::Vector3, rotationAngle: float32, color: raylib::Color);
+    public extern fun DrawTriangle3D(v1: raylib::Vector3, v2: raylib::Vector3, v3: raylib::Vector3, color: raylib::Color);
+    public extern fun DrawTriangleStrip3D(points: *raylib::Vector3, pointCount: int32, color: raylib::Color);
+    public extern fun DrawCube(position: raylib::Vector3, width: float32, height: float32, length: float32, color: raylib::Color);
+    public extern fun DrawCubeV(position: raylib::Vector3, size: raylib::Vector3, color: raylib::Color);
+    public extern fun DrawCubeWires(position: raylib::Vector3, width: float32, height: float32, length: float32, color: raylib::Color);
+    public extern fun DrawCubeWiresV(position: raylib::Vector3, size: raylib::Vector3, color: raylib::Color);
+    public extern fun DrawSphere(centerPos: raylib::Vector3, radius: float32, color: raylib::Color);
+    public extern fun DrawSphereEx(centerPos: raylib::Vector3, radius: float32, rings: int32, slices: int32, color: raylib::Color);
+    public extern fun DrawSphereWires(centerPos: raylib::Vector3, radius: float32, rings: int32, slices: int32, color: raylib::Color);
+    public extern fun DrawCylinder(position: raylib::Vector3, radiusTop: float32, radiusBottom: float32, height: float32, slices: int32, color: raylib::Color);
+    public extern fun DrawCylinderEx(startPos: raylib::Vector3, endPos: raylib::Vector3, startRadius: float32, endRadius: float32, sides: int32, color: raylib::Color);
+    public extern fun DrawCylinderWires(position: raylib::Vector3, radiusTop: float32, radiusBottom: float32, height: float32, slices: int32, color: raylib::Color);
+    public extern fun DrawCylinderWiresEx(startPos: raylib::Vector3, endPos: raylib::Vector3, startRadius: float32, endRadius: float32, sides: int32, color: raylib::Color);
+    public extern fun DrawCapsule(startPos: raylib::Vector3, endPos: raylib::Vector3, radius: float32, slices: int32, rings: int32, color: raylib::Color);
+    public extern fun DrawCapsuleWires(startPos: raylib::Vector3, endPos: raylib::Vector3, radius: float32, slices: int32, rings: int32, color: raylib::Color);
+    public extern fun DrawPlane(centerPos: raylib::Vector3, size: raylib::Vector2, color: raylib::Color);
+    public extern fun DrawRay(ray: raylib::Ray, color: raylib::Color);
+    public extern fun DrawGrid(slices: int32, spacing: float32);
+    public extern fun LoadModel(fileName: *uint8) -> raylib::Model;
+    public extern fun LoadModelFromMesh(mesh: raylib::Mesh) -> raylib::Model;
+    public extern fun IsModelValid(model: raylib::Model) -> bool;
+    public extern fun UnloadModel(model: raylib::Model);
+    public extern fun GetModelBoundingBox(model: raylib::Model) -> raylib::BoundingBox;
+    public extern fun DrawModel(model: raylib::Model, position: raylib::Vector3, scale: float32, tint: raylib::Color);
+    public extern fun DrawModelEx(model: raylib::Model, position: raylib::Vector3, rotationAxis: raylib::Vector3, rotationAngle: float32, scale: raylib::Vector3, tint: raylib::Color);
+    public extern fun DrawModelWires(model: raylib::Model, position: raylib::Vector3, scale: float32, tint: raylib::Color);
+    public extern fun DrawModelWiresEx(model: raylib::Model, position: raylib::Vector3, rotationAxis: raylib::Vector3, rotationAngle: float32, scale: raylib::Vector3, tint: raylib::Color);
+    public extern fun DrawModelPoints(model: raylib::Model, position: raylib::Vector3, scale: float32, tint: raylib::Color);
+    public extern fun DrawModelPointsEx(model: raylib::Model, position: raylib::Vector3, rotationAxis: raylib::Vector3, rotationAngle: float32, scale: raylib::Vector3, tint: raylib::Color);
+    public extern fun DrawBoundingBox(box: raylib::BoundingBox, color: raylib::Color);
+    public extern fun DrawBillboard(camera: raylib::Camera, texture: raylib::Texture2D, position: raylib::Vector3, scale: float32, tint: raylib::Color);
+    public extern fun DrawBillboardRec(camera: raylib::Camera, texture: raylib::Texture2D, source: raylib::Rectangle, position: raylib::Vector3, size: raylib::Vector2, tint: raylib::Color);
+    public extern fun DrawBillboardPro(camera: raylib::Camera, texture: raylib::Texture2D, source: raylib::Rectangle, position: raylib::Vector3, up: raylib::Vector3, size: raylib::Vector2, origin: raylib::Vector2, rotation: float32, tint: raylib::Color);
+    public extern fun UploadMesh(mesh: *raylib::Mesh, dynamic: bool);
+    public extern fun UpdateMeshBuffer(mesh: raylib::Mesh, index: int32, data: *unit, dataSize: int32, offset: int32);
+    public extern fun UnloadMesh(mesh: raylib::Mesh);
+    public extern fun DrawMesh(mesh: raylib::Mesh, material: raylib::Material, transform: raylib::Matrix);
+    public extern fun DrawMeshInstanced(mesh: raylib::Mesh, material: raylib::Material, transforms: *raylib::Matrix, instances: int32);
+    public extern fun GetMeshBoundingBox(mesh: raylib::Mesh) -> raylib::BoundingBox;
+    public extern fun GenMeshTangents(mesh: *raylib::Mesh);
+    public extern fun ExportMesh(mesh: raylib::Mesh, fileName: *uint8) -> bool;
+    public extern fun ExportMeshAsCode(mesh: raylib::Mesh, fileName: *uint8) -> bool;
+    public extern fun GenMeshPoly(sides: int32, radius: float32) -> raylib::Mesh;
+    public extern fun GenMeshPlane(width: float32, length: float32, resX: int32, resZ: int32) -> raylib::Mesh;
+    public extern fun GenMeshCube(width: float32, height: float32, length: float32) -> raylib::Mesh;
+    public extern fun GenMeshSphere(radius: float32, rings: int32, slices: int32) -> raylib::Mesh;
+    public extern fun GenMeshHemiSphere(radius: float32, rings: int32, slices: int32) -> raylib::Mesh;
+    public extern fun GenMeshCylinder(radius: float32, height: float32, slices: int32) -> raylib::Mesh;
+    public extern fun GenMeshCone(radius: float32, height: float32, slices: int32) -> raylib::Mesh;
+    public extern fun GenMeshTorus(radius: float32, size: float32, radSeg: int32, sides: int32) -> raylib::Mesh;
+    public extern fun GenMeshKnot(radius: float32, size: float32, radSeg: int32, sides: int32) -> raylib::Mesh;
+    public extern fun GenMeshHeightmap(heightmap: raylib::Image, size: raylib::Vector3) -> raylib::Mesh;
+    public extern fun GenMeshCubicmap(cubicmap: raylib::Image, cubeSize: raylib::Vector3) -> raylib::Mesh;
+    public extern fun LoadMaterials(fileName: *uint8, materialCount: *int32) -> *raylib::Material;
+    public extern fun LoadMaterialDefault() -> raylib::Material;
+    public extern fun IsMaterialValid(material: raylib::Material) -> bool;
+    public extern fun UnloadMaterial(material: raylib::Material);
+    public extern fun SetMaterialTexture(material: *raylib::Material, mapType: int32, texture: raylib::Texture2D);
+    public extern fun SetModelMeshMaterial(model: *raylib::Model, meshId: int32, materialId: int32);
+    public extern fun LoadModelAnimations(fileName: *uint8, animCount: *int32) -> *raylib::ModelAnimation;
+    public extern fun UpdateModelAnimation(model: raylib::Model, anim: raylib::ModelAnimation, frame: int32);
+    public extern fun UpdateModelAnimationBones(model: raylib::Model, anim: raylib::ModelAnimation, frame: int32);
+    public extern fun UnloadModelAnimation(anim: raylib::ModelAnimation);
+    public extern fun UnloadModelAnimations(animations: *raylib::ModelAnimation, animCount: int32);
+    public extern fun IsModelAnimationValid(model: raylib::Model, anim: raylib::ModelAnimation) -> bool;
+    public extern fun CheckCollisionSpheres(center1: raylib::Vector3, radius1: float32, center2: raylib::Vector3, radius2: float32) -> bool;
+    public extern fun CheckCollisionBoxes(box1: raylib::BoundingBox, box2: raylib::BoundingBox) -> bool;
+    public extern fun CheckCollisionBoxSphere(box: raylib::BoundingBox, center: raylib::Vector3, radius: float32) -> bool;
+    public extern fun GetRayCollisionSphere(ray: raylib::Ray, center: raylib::Vector3, radius: float32) -> raylib::RayCollision;
+    public extern fun GetRayCollisionBox(ray: raylib::Ray, box: raylib::BoundingBox) -> raylib::RayCollision;
+    public extern fun GetRayCollisionMesh(ray: raylib::Ray, mesh: raylib::Mesh, transform: raylib::Matrix) -> raylib::RayCollision;
+    public extern fun GetRayCollisionTriangle(ray: raylib::Ray, p1: raylib::Vector3, p2: raylib::Vector3, p3: raylib::Vector3) -> raylib::RayCollision;
+    public extern fun GetRayCollisionQuad(ray: raylib::Ray, p1: raylib::Vector3, p2: raylib::Vector3, p3: raylib::Vector3, p4: raylib::Vector3) -> raylib::RayCollision;
+    public extern fun InitAudioDevice();
+    public extern fun CloseAudioDevice();
+    public extern fun IsAudioDeviceReady() -> bool;
+    public extern fun SetMasterVolume(volume: float32);
+    public extern fun GetMasterVolume() -> float32;
+    public extern fun LoadWave(fileName: *uint8) -> raylib::Wave;
+    public extern fun LoadWaveFromMemory(fileType: *uint8, fileData: *uint8, dataSize: int32) -> raylib::Wave;
+    public extern fun IsWaveValid(wave: raylib::Wave) -> bool;
+    public extern fun LoadSound(fileName: *uint8) -> raylib::Sound;
+    public extern fun LoadSoundFromWave(wave: raylib::Wave) -> raylib::Sound;
+    public extern fun LoadSoundAlias(source: raylib::Sound) -> raylib::Sound;
+    public extern fun IsSoundValid(sound: raylib::Sound) -> bool;
+    public extern fun UpdateSound(sound: raylib::Sound, data: *unit, sampleCount: int32);
+    public extern fun UnloadWave(wave: raylib::Wave);
+    public extern fun UnloadSound(sound: raylib::Sound);
+    public extern fun UnloadSoundAlias(alias: raylib::Sound);
+    public extern fun ExportWave(wave: raylib::Wave, fileName: *uint8) -> bool;
+    public extern fun ExportWaveAsCode(wave: raylib::Wave, fileName: *uint8) -> bool;
+    public extern fun PlaySound(sound: raylib::Sound);
+    public extern fun StopSound(sound: raylib::Sound);
+    public extern fun PauseSound(sound: raylib::Sound);
+    public extern fun ResumeSound(sound: raylib::Sound);
+    public extern fun IsSoundPlaying(sound: raylib::Sound) -> bool;
+    public extern fun SetSoundVolume(sound: raylib::Sound, volume: float32);
+    public extern fun SetSoundPitch(sound: raylib::Sound, pitch: float32);
+    public extern fun SetSoundPan(sound: raylib::Sound, pan: float32);
+    public extern fun WaveCopy(wave: raylib::Wave) -> raylib::Wave;
+    public extern fun WaveCrop(wave: *raylib::Wave, initFrame: int32, finalFrame: int32);
+    public extern fun WaveFormat(wave: *raylib::Wave, sampleRate: int32, sampleSize: int32, channels: int32);
+    public extern fun LoadWaveSamples(wave: raylib::Wave) -> *float32;
+    public extern fun UnloadWaveSamples(samples: *float32);
+    public extern fun LoadMusicStream(fileName: *uint8) -> raylib::Music;
+    public extern fun LoadMusicStreamFromMemory(fileType: *uint8, data: *uint8, dataSize: int32) -> raylib::Music;
+    public extern fun IsMusicValid(music: raylib::Music) -> bool;
+    public extern fun UnloadMusicStream(music: raylib::Music);
+    public extern fun PlayMusicStream(music: raylib::Music);
+    public extern fun IsMusicStreamPlaying(music: raylib::Music) -> bool;
+    public extern fun UpdateMusicStream(music: raylib::Music);
+    public extern fun StopMusicStream(music: raylib::Music);
+    public extern fun PauseMusicStream(music: raylib::Music);
+    public extern fun ResumeMusicStream(music: raylib::Music);
+    public extern fun SeekMusicStream(music: raylib::Music, position: float32);
+    public extern fun SetMusicVolume(music: raylib::Music, volume: float32);
+    public extern fun SetMusicPitch(music: raylib::Music, pitch: float32);
+    public extern fun SetMusicPan(music: raylib::Music, pan: float32);
+    public extern fun GetMusicTimeLength(music: raylib::Music) -> float32;
+    public extern fun GetMusicTimePlayed(music: raylib::Music) -> float32;
+    public extern fun LoadAudioStream(sampleRate: uint32, sampleSize: uint32, channels: uint32) -> raylib::AudioStream;
+    public extern fun IsAudioStreamValid(stream: raylib::AudioStream) -> bool;
+    public extern fun UnloadAudioStream(stream: raylib::AudioStream);
+    public extern fun UpdateAudioStream(stream: raylib::AudioStream, data: *unit, frameCount: int32);
+    public extern fun IsAudioStreamProcessed(stream: raylib::AudioStream) -> bool;
+    public extern fun PlayAudioStream(stream: raylib::AudioStream);
+    public extern fun PauseAudioStream(stream: raylib::AudioStream);
+    public extern fun ResumeAudioStream(stream: raylib::AudioStream);
+    public extern fun IsAudioStreamPlaying(stream: raylib::AudioStream) -> bool;
+    public extern fun StopAudioStream(stream: raylib::AudioStream);
+    public extern fun SetAudioStreamVolume(stream: raylib::AudioStream, volume: float32);
+    public extern fun SetAudioStreamPitch(stream: raylib::AudioStream, pitch: float32);
+    public extern fun SetAudioStreamPan(stream: raylib::AudioStream, pan: float32);
+    public extern fun SetAudioStreamBufferSizeDefault(size: int32);
+    public extern fun SetAudioStreamCallback(stream: raylib::AudioStream, callback: raylib::AudioCallback);
+    public extern fun AttachAudioStreamProcessor(stream: raylib::AudioStream, processor: raylib::AudioCallback);
+    public extern fun DetachAudioStreamProcessor(stream: raylib::AudioStream, processor: raylib::AudioCallback);
+    public extern fun AttachAudioMixedProcessor(processor: raylib::AudioCallback);
+    public extern fun DetachAudioMixedProcessor(processor: raylib::AudioCallback);
+
+    // Skipped by package command:
+    // - LoadFileDataCallback: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadFileTextCallback: function-pointer declaration emits as *uint8 in .atlas
+    // - GetWindowHandle: function-pointer declaration emits as *uint8 in .atlas
+    // - GetMonitorName: function-pointer declaration emits as *uint8 in .atlas
+    // - GetClipboardText: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadRandomSequence: function-pointer declaration emits as *uint8 in .atlas
+    // - TraceLog: variadic function (unsafe forwarding)
+    // - MemAlloc: function-pointer declaration emits as *uint8 in .atlas
+    // - MemRealloc: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadFileData: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadFileText: function-pointer declaration emits as *uint8 in .atlas
+    // - GetFileExtension: function-pointer declaration emits as *uint8 in .atlas
+    // - GetFileName: function-pointer declaration emits as *uint8 in .atlas
+    // - GetFileNameWithoutExt: function-pointer declaration emits as *uint8 in .atlas
+    // - GetDirectoryPath: function-pointer declaration emits as *uint8 in .atlas
+    // - GetPrevDirectoryPath: function-pointer declaration emits as *uint8 in .atlas
+    // - GetWorkingDirectory: function-pointer declaration emits as *uint8 in .atlas
+    // - GetApplicationDirectory: function-pointer declaration emits as *uint8 in .atlas
+    // - CompressData: function-pointer declaration emits as *uint8 in .atlas
+    // - DecompressData: function-pointer declaration emits as *uint8 in .atlas
+    // - EncodeDataBase64: function-pointer declaration emits as *uint8 in .atlas
+    // - DecodeDataBase64: function-pointer declaration emits as *uint8 in .atlas
+    // - ComputeMD5: function-pointer declaration emits as *uint8 in .atlas
+    // - ComputeSHA1: function-pointer declaration emits as *uint8 in .atlas
+    // - GetGamepadName: function-pointer declaration emits as *uint8 in .atlas
+    // - ExportImageToMemory: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadImageColors: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadImagePalette: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadFontData: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadUTF8: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadCodepoints: function-pointer declaration emits as *uint8 in .atlas
+    // - CodepointToUTF8: function-pointer declaration emits as *uint8 in .atlas
+    // - TextFormat: function-pointer declaration emits as *uint8 in .atlas
+    // - TextFormat: variadic function (unsafe forwarding)
+    // - TextSubtext: function-pointer declaration emits as *uint8 in .atlas
+    // - TextReplace: function-pointer declaration emits as *uint8 in .atlas
+    // - TextInsert: function-pointer declaration emits as *uint8 in .atlas
+    // - TextJoin: function-pointer declaration emits as *uint8 in .atlas
+    // - TextSplit: function-pointer declaration emits as *uint8 in .atlas
+    // - TextToUpper: function-pointer declaration emits as *uint8 in .atlas
+    // - TextToLower: function-pointer declaration emits as *uint8 in .atlas
+    // - TextToPascal: function-pointer declaration emits as *uint8 in .atlas
+    // - TextToSnake: function-pointer declaration emits as *uint8 in .atlas
+    // - TextToCamel: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadMaterials: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadModelAnimations: function-pointer declaration emits as *uint8 in .atlas
+    // - LoadWaveSamples: function-pointer declaration emits as *uint8 in .atlas
+}

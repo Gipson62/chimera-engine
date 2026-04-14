@@ -1,0 +1,33 @@
+[package]
+name = "my_awesome_project"
+version = "0.1.0"
+entry = "src/main.atlas"
+# The C compiler to use. Supported values: "gcc", "clang", "msvc", "intel", "tinycc". Default is "tinycc".
+compiler = "tinycc"
+# Raw args passed to the C compiler. e.g.: -O2
+args = []
+
+[dependencies]
+headers = ["atlas77-raylib.h", "math.h"]
+
+[link]
+# The libraries to link against.
+shared = ["m"]
+
+[link.windows]
+# The libraries to link against on Windows specifically.
+libs = ["raylib", "opengl32", "gdi32", "winmm"]
+
+[link.linux]
+# The libraries to link against on Linux specifically.
+libs = ["raylib", "GL", "X11", "pthread"]
+
+# NB: There will be a "c.windows" and "c.linux" section in the future.
+[c]
+# The directories to search for header files.
+include_dirs = ["include/"]
+# The directories to search for libraries.
+lib_dirs = ["lib/"]
+# Directories recursively scanned for extra .c source files compiled and linked
+# alongside generated output.
+source_dirs = ["include/"]

@@ -1,0 +1,160 @@
+import "src/raylib.atlas";
+import "std/io";
+import "std/math";
+
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
+fun main()
+{
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    const MAX_BUILDINGS: uint64 = 256;
+    const screenWidth: int32 = 800;
+    const screenHeight: int32 = 450;
+
+    raylib::InitWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera");
+
+    let player: raylib::Rectangle = raylib::Rectangle { .x = 400.0, .y = 280.0, .width = 40.0, .height = 40.0 };
+    // TODO: Add a way to create inline arrays with: `[1_expr; lit_size]`
+    let buildings: [raylib::Rectangle; 256] = [raylib::Rectangle  { .x = 0.0, .y = 0.0, .width = 0.0, .height = 0.0 }; 256];
+    let buildColors: [raylib::Color; 256] = [raylib::Color { .r = 0, .g = 0, .b = 0, .a = 0 }; 256];
+
+    let spacing: int32 = 0;
+
+    let i: uint64 = 0;
+    while i < MAX_BUILDINGS
+    {
+        std::printf("Generating building %d: ", i);
+        buildings[i].width = raylib::GetRandomValue(50, 200) as float32;
+        std::printf("width = %f, ", buildings[i].width);
+        buildings[i].height = raylib::GetRandomValue(100, 800) as float32;
+        std::printf("height = %f, ", buildings[i].height);
+        buildings[i].y = (screenHeight - 130) as float32 - buildings[i].height;
+        std::printf("y = %f, ", buildings[i].y);
+        buildings[i].x = (-6000.0 + spacing as float32);
+        std::printf("x = %f\n", buildings[i].x);
+
+        spacing = spacing + buildings[i].width as int32;
+
+        buildColors[i] = raylib::Color {
+            .r = raylib::GetRandomValue(200, 240) as uint8,
+            .g = raylib::GetRandomValue(200, 240) as uint8,
+            .b = raylib::GetRandomValue(200, 250) as uint8,
+            .a = 255};
+        
+        i = i + 1;
+    }
+
+    let camera: raylib::Camera2D = raylib::Camera2D { 
+        .offset = raylib::Vector2::default(), 
+        .target = raylib::Vector2::default(), 
+        .rotation = 0.0, 
+        .zoom = 0.0 
+    };
+    camera.target = raylib::Vector2 { .x = player.x + 20.0, .y = player.y + 20.0 };
+    camera.offset = raylib::Vector2 { .x = (screenWidth/2) as float32, .y = (screenHeight/2) as float32 };
+    camera.rotation = 0.0;
+    camera.zoom = 1.0;
+
+    raylib::SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
+    //--------------------------------------------------------------------------------------
+
+    // Main game loop
+    while (!raylib::WindowShouldClose())        // Detect window close button or ESC key
+    {
+        // Update
+        //----------------------------------------------------------------------------------
+        // Player movement
+        if (raylib::IsKeyDown(raylib::KeyboardKey::KEY_RIGHT)) {
+            player.x = player.x + 10.0;
+        }
+        else if (raylib::IsKeyDown(raylib::KeyboardKey::KEY_LEFT)) {
+            player.x = player.x - 10.0;
+        }
+
+        // Camera target follows player
+        camera.target = raylib::Vector2 { 
+            .x = player.x + 20.0, 
+            .y = player.y + 20.0 
+        };
+
+        // Camera rotation controls
+        if (raylib::IsKeyDown(raylib::KeyboardKey::KEY_A)) {
+            camera.rotation = camera.rotation - 1.0;
+        }
+        else if (raylib::IsKeyDown(raylib::KeyboardKey::KEY_S)) {
+            camera.rotation = camera.rotation + 1.0;
+        }
+
+        // Limit camera rotation to 80 degrees (-40 to 40)
+        if (camera.rotation > 40.0) {
+            camera.rotation = 40.0;
+        }
+        else if (camera.rotation < -40.0) {
+            camera.rotation = -40.0;
+        }
+
+        // Camera zoom controls
+        // Uses log scaling to provide consistent zoom speed
+        camera.zoom = std::expf(std::logf(camera.zoom) + (raylib::GetMouseWheelMove()*0.1));
+
+        if (camera.zoom > 3.0) {camera.zoom = 3.0;}
+        else if (camera.zoom < 0.1) {camera.zoom = 0.1;}
+
+        // Camera reset (zoom and rotation)
+        if (raylib::IsKeyPressed(raylib::KeyboardKey::KEY_R)) {
+            camera.zoom = 1.0;
+            camera.rotation = 0.0;
+        }
+        //----------------------------------------------------------------------------------
+
+        // Draw
+        //----------------------------------------------------------------------------------
+        raylib::BeginDrawing();
+
+        raylib::ClearBackground(raylib::Color::RayWhite());
+
+        raylib::BeginMode2D(camera);
+
+        raylib::DrawRectangle(-6000, 320, 13000, 8000, raylib::Color::DarkGray());
+
+        let iBuilding: uint64 = 0;
+        while (iBuilding < MAX_BUILDINGS) {
+            raylib::DrawRectangleRec(buildings[iBuilding], buildColors[iBuilding]);
+
+            iBuilding = iBuilding + 1;
+        }
+
+        raylib::DrawRectangleRec(player, raylib::Color::Red());
+
+        raylib::DrawLine(camera.target.x as int32, -screenHeight*10, camera.target.x as int32, screenHeight*10, raylib::Color::Green());
+        raylib::DrawLine(-screenWidth*10, camera.target.y as int32, screenWidth*10, camera.target.y as int32, raylib::Color::Green());
+
+        raylib::EndMode2D();
+
+        raylib::DrawText("SCREEN AREA", 640, 10, 20, raylib::Color::Red());
+
+        raylib::DrawRectangle(0, 0, screenWidth, 5, raylib::Color::Red());
+        raylib::DrawRectangle(0, 5, 5, screenHeight - 10, raylib::Color::Red());
+        raylib::DrawRectangle(screenWidth - 5, 5, 5, screenHeight - 10, raylib::Color::Red());
+        raylib::DrawRectangle(0, screenHeight - 5, screenWidth, 5, raylib::Color::Red());
+
+        raylib::DrawRectangle( 10, 10, 250, 113, raylib::Fade(raylib::Color::SkyBlue(), 0.5));
+        raylib::DrawRectangleLines( 10, 10, 250, 113, raylib::Color::Blue());
+
+        raylib::DrawText("Free 2D camera controls:", 20, 20, 10, raylib::Color::Black());
+        raylib::DrawText("- Right/Left to move player", 40, 40, 10, raylib::Color::DarkGray());
+        raylib::DrawText("- Mouse Wheel to Zoom in-out", 40, 60, 10, raylib::Color::DarkGray());
+        raylib::DrawText("- A / S to Rotate", 40, 80, 10, raylib::Color::DarkGray());
+        raylib::DrawText("- R to reset Zoom and Rotation", 40, 100, 10, raylib::Color::DarkGray());
+
+        raylib::EndDrawing();
+        //----------------------------------------------------------------------------------
+    }
+
+    // De-Initialization
+    //--------------------------------------------------------------------------------------
+    raylib::CloseWindow();        // Close window and OpenGL context
+    //--------------------------------------------------------------------------------------
+}
