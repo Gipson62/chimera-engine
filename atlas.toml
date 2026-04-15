@@ -8,7 +8,7 @@ compiler = "tinycc"
 args = []
 
 [dependencies]
-headers = ["math.h", "atlas77-glfw3.h"]
+headers = ["math.h", "atlas77-glfw3.h", "glad/glad.h"]
 
 [link]
 # The libraries to link against.
@@ -25,9 +25,14 @@ libs = ["glfw3"]
 # NB: There will be a "c.windows" and "c.linux" section in the future.
 [c]
 # The directories to search for header files.
-include_dirs = ["include/", "C:/msys64/mingw64/include/"]
+include_dirs = [
+    "include/",
+    "include/glad/",
+    "include/KHR",
+    "C:/msys64/mingw64/include/",
+]
 # The directories to search for libraries.
 lib_dirs = ["lib/"]
 # Directories recursively scanned for extra .c source files compiled and linked
 # alongside generated output.
-source_dirs = ["include/"]
+source_dirs = ["include/", "include/glad/"]
