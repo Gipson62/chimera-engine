@@ -8,24 +8,24 @@ compiler = "tinycc"
 args = []
 
 [dependencies]
-headers = ["atlas77-raylib.h", "math.h"]
+headers = ["math.h", "atlas77-glfw3.h"]
 
 [link]
 # The libraries to link against.
-shared = ["m"]
+shared = []
 
 [link.windows]
 # The libraries to link against on Windows specifically.
-libs = ["raylib", "opengl32", "gdi32", "winmm"]
+libs = ["glfw3"]
 
 [link.linux]
 # The libraries to link against on Linux specifically.
-libs = ["raylib", "GL", "X11", "pthread"]
+libs = ["glfw3"]
 
 # NB: There will be a "c.windows" and "c.linux" section in the future.
 [c]
 # The directories to search for header files.
-include_dirs = ["include/"]
+include_dirs = ["include/", "C:/msys64/mingw64/include/"]
 # The directories to search for libraries.
 lib_dirs = ["lib/"]
 # Directories recursively scanned for extra .c source files compiled and linked
