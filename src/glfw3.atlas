@@ -199,7 +199,7 @@ namespace glfw {
     public extern fun SwapBuffers(window: *glfw::window);
     public extern fun SwapInterval(interval: int32);
     public extern fun ExtensionSupported(extension: *uint8) -> int32;
-    public extern fun GetProcAddress(procname: *const uint8) -> fun() -> *unit;
+    public extern fun GetProcAddress(procname: *const uint8) -> *unit;
     public extern fun VulkanSupported() -> int32;
     public extern fun GetRequiredInstanceExtensions(count: *uint32) -> **uint8;
 }

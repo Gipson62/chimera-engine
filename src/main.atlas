@@ -1,4 +1,44 @@
 import "std/io";
-import "std/math";
 
-fun main() { }
+import "src/glfw3.atlas";
+import "src/glad.atlas";
+
+fun main() -> int32 {
+    glfw::Init();
+    glfw::WindowHint(glfw::CONTEXT_VERSION_MAJOR(), 3);
+    glfw::WindowHint(glfw::CONTEXT_VERSION_MINOR(), 3);
+    glfw::WindowHint(glfw::OPENGL_PROFILE(), glfw::OPENGL_CORE_PROFILE());
+
+    let window = glfw::CreateWindow(800, 600, "LearnOpenGL", null, null);
+    if (window == null)
+    {
+        std::println("Failed to create GLFW window");
+        glfw::Terminate();
+        return -1;
+    }
+
+    glfw::MakeContextCurrent(window);
+
+    if (gladLoadGLLoader(glfw::GetProcAddress as fun(*const uint8) -> *unit) == 0)
+    {
+        std::panic("Failed to initialize GLAD");
+    }
+
+    glViewport(0, 0, 800, 600);
+
+    glfw::SetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    while (glfw::WindowShouldClose(window) == 0)
+    {
+        glfw::SwapBuffers(window);
+        glfw::PollEvents();
+    }
+
+    glfw::Terminate();
+    return 0;
+}
+
+fun framebuffer_size_callback(window: *glfw::window, width: int32, height: int32) -> unit
+{
+    glViewport(0, 0, width, height);
+}
