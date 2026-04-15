@@ -9,7 +9,13 @@ public:
 public extern fun gladLoadGL() -> int32;
 public extern fun gladLoadGLLoader(arg_0: fun(*const uint8) -> *unit) -> int32;
 
-// Not in glad namespace cuz I don't wanna do `glad::gl...` all the time
+// [!Note] For the love of God, I need global constants/variables,
+//  and possibilities of making them external
+public fun _GL_COLOR_BUFFER_BIT() -> uint32 {
+    // 0x00004000
+    return 16384;
+}
+
 public extern fun glCullFace(mode: uint32);
 public extern fun glFrontFace(mode: uint32);
 public extern fun glHint(target: uint32, mode: uint32);

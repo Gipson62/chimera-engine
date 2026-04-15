@@ -30,6 +30,11 @@ fun main() -> int32 {
 
     while (glfw::WindowShouldClose(window) == 0)
     {
+        processInputs(window);
+
+        glClearColor(0.2, 0.3, 0.3, 1.0);
+        glClear(_GL_COLOR_BUFFER_BIT());
+        
         glfw::SwapBuffers(window);
         glfw::PollEvents();
     }
@@ -41,4 +46,12 @@ fun main() -> int32 {
 fun framebuffer_size_callback(window: *glfw::window, width: int32, height: int32) -> unit
 {
     glViewport(0, 0, width, height);
+}
+
+fun processInputs(window: *glfw::window)
+{
+    if (glfw::GetKey(window, glfw::KEY::ESCAPE) == glfw::KeyState::Press)
+    {
+        glfw::SetWindowShouldClose(window, true);
+    }
 }
