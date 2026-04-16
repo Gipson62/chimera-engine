@@ -1,14 +1,21 @@
 import "std/io";
+import "std/memory"; // sizeof()
 
 import "src/glfw3.atlas";
 import "src/glad.atlas";
 
 fun main() -> int32 {
+    // Step 1: Initialize GLFW.
+    // GLFW handles window creation, OpenGL context creation, and input/events.
     glfw::Init();
+
+    // Step 2: Tell GLFW which OpenGL context we want.
+    // This requests OpenGL 3.3 Core Profile, matching the LearnOpenGL basics.
     glfw::WindowHint(glfw::CONTEXT_VERSION_MAJOR(), 3);
     glfw::WindowHint(glfw::CONTEXT_VERSION_MINOR(), 3);
     glfw::WindowHint(glfw::OPENGL_PROFILE(), glfw::OPENGL_CORE_PROFILE());
 
+    // Step 3: Create a window and its OpenGL context.
     let window = glfw::CreateWindow(800, 600, "LearnOpenGL", null, null);
     if (window == null)
     {
@@ -17,40 +24,175 @@ fun main() -> int32 {
         return -1;
     }
 
+    // Step 4: Make this context current on the calling thread.
+    // All OpenGL calls affect the currently bound context.
     glfw::MakeContextCurrent(window);
 
+    // Step 5: Register callback for resize events.
+    // OpenGL viewport must be updated when window size changes.
+    glfw::SetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    // Step 6: Load OpenGL function pointers with GLAD.
+    // On most platforms, OpenGL functions are resolved at runtime.
     if (gladLoadGLLoader(glfw::GetProcAddress as fun(*const uint8) -> *unit) == 0)
     {
         std::panic("Failed to initialize GLAD");
     }
 
+    // Step 7: Set initial viewport.
+    // NDC coordinates are mapped to this pixel rectangle.
+    // LearnOpenGL does this once at startup because callback may not fire yet.
     glViewport(0, 0, 800, 600);
 
-    glfw::SetFramebufferSizeCallback(window, framebuffer_size_callback);
+    // Shader compile/link diagnostics buffers.
+    let success: int32 = 0;
+    let infoLog: [uint8; 512] = [0; 512];
 
+    // Step 8: Vertex shader source.
+    // Takes vertex position input and outputs clip-space position.
+    let vertexShaderSource = "#version 330 core\nlayout (location = 0) in vec3 aPos;\nvoid main()\n {\n\tgl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n}";
+
+    // Step 9: Create and compile vertex shader object.
+    let vertexShader: uint32 = glCreateShader(_GL_VERTEX_SHADER());
+
+    glShaderSource(vertexShader, 1, &vertexShaderSource, null);
+    glCompileShader(vertexShader);
+
+    // Always check compile status: shader failures are runtime errors.
+    glGetShaderiv(vertexShader, _GL_COMPILE_STATUS(), &success);
+    if success == 0 {
+        glGetShaderInfoLog(vertexShader, 512, null, &infoLog[0]);
+        std::printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
+    }
+
+    // Step 10: Fragment shader source.
+    // Produces a constant output color for each fragment.
+    let fragmentShaderSource = "#version 330 core\nout vec4 FragColor;\nvoid main()\n{\n\tFragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n}";
+
+    // Step 11: Create and compile fragment shader object.
+    let fragmentShader: uint32 = glCreateShader(_GL_FRAGMENT_SHADER());
+
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, null);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, _GL_COMPILE_STATUS(), &success);
+    if success == 0 {
+        glGetShaderInfoLog(fragmentShader, 512, null, &infoLog[0]);
+        std::printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
+    }
+
+    // Step 12: Link shaders into one executable GPU program.
+    let shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    // Link errors can occur even if both shaders compiled successfully.
+    glGetProgramiv(shaderProgram, _GL_LINK_STATUS(), &success);
+    if success == 0 {
+        glGetProgramInfoLog(shaderProgram, 512, null, &infoLog[0]);
+        std::printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s", infoLog);
+    }
+
+    // After linking, standalone shader objects are no longer needed.
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+
+    // Step 13: CPU-side geometry.
+    // 4 vertices define a quad, and the index buffer splits it into 2 triangles.
+    let vertices_arr: [float32; 12] = [
+         0.5,  0.5, 0.0, // top right
+         0.5, -0.5, 0.0, // bottom right
+        -0.5, -0.5, 0.0, // bottom left
+        -0.5,  0.5, 0.0  // top left
+    ];
+    let vertices: *float32 = &vertices_arr[0];
+    let indices_arr: [uint32; 6] = [
+        (0 as uint32), (1 as uint32), (3 as uint32),
+        (1 as uint32), (2 as uint32), (3 as uint32)
+    ];
+    let indices: *uint32 = &indices_arr[0];
+
+    // Step 14: Create OpenGL object handles.
+    // VAO stores vertex-input state, VBO stores vertex data, EBO stores indices.
+    let VBO: uint32 = 0;
+    let VAO: uint32 = 0;
+    let EBO: uint32 = 0;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    // Step 15: Bind VAO first so following vertex-input state is captured in it.
+    glBindVertexArray(VAO);
+
+    // Step 16: Upload vertex data to GPU buffer memory.
+    glBindBuffer(_GL_ARRAY_BUFFER(), VBO);
+    glBufferData(_GL_ARRAY_BUFFER(), sizeof<[float32; 12]>(), vertices as *unit, _GL_STATIC_DRAW());
+
+    // Step 17: Upload index data.
+    // EBO binding is VAO state; keep it associated with this VAO.
+    glBindBuffer(_GL_ELEMENT_ARRAY_BUFFER(), EBO);
+    glBufferData(_GL_ELEMENT_ARRAY_BUFFER(), sizeof<[uint32; 6]>(), indices as *unit, _GL_STATIC_DRAW());
+
+    // Step 18: Describe vertex attribute layout for location 0.
+    // Each vertex has 3 float components (x,y,z) tightly packed.
+    glVertexAttribPointer(0, 3, _GL_FLOAT(), _GL_FALSE(), sizeof<[float32; 3]>(), null);
+
+    // Step 19: Enable attribute location 0 for the active VAO.
+    glEnableVertexAttribArray(0);
+
+    // Optional cleanup: unbind VBO target.
+    // The attribute pointer already captured the VBO binding in VAO state.
+    glBindBuffer(_GL_ARRAY_BUFFER(), 0);
+
+    // Optional cleanup: unbind VAO to avoid accidental state edits.
+    glBindVertexArray(0);
+
+
+    // Step 20: Render loop (runs once per frame).
     while (glfw::WindowShouldClose(window) == 0)
     {
+        // Handle per-frame input.
         processInputs(window);
 
+        // Clear framebuffer with background color.
         glClearColor(0.2, 0.3, 0.3, 1.0);
         glClear(_GL_COLOR_BUFFER_BIT());
+
+        // Draw call sequence:
+        // 1) Use linked shader program
+        // 2) Bind VAO that contains vertex/index setup
+        // 3) Draw 6 indexed vertices => 2 triangles
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawElements(_GL_TRIANGLES(), 6, _GL_UNSIGNED_INT(), null);
         
+        // Present frame and process OS events.
         glfw::SwapBuffers(window);
         glfw::PollEvents();
     }
 
+    // Step 21: Explicit cleanup of GPU objects.
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteProgram(shaderProgram);
+
+    // Step 22: Shutdown GLFW and release window/context resources.
     glfw::Terminate();
     return 0;
 }
 
 fun framebuffer_size_callback(window: *glfw::window, width: int32, height: int32) -> unit
 {
+    // Keep viewport in sync with framebuffer size after resize.
     glViewport(0, 0, width, height);
 }
 
 fun processInputs(window: *glfw::window)
 {
-    if (glfw::GetKey(window, glfw::KEY::ESCAPE) == glfw::KeyState::Press)
+    // Usual LearnOpenGL pattern:
+    if glfw::GetKey(window, glfw::KEY::ESCAPE) == glfw::KeyState::Press
     {
         glfw::SetWindowShouldClose(window, true);
     }
