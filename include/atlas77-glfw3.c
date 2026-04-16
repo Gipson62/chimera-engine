@@ -18,7 +18,12 @@ void glfw_InitHint(int hint, int value)
 
 void glfw_InitAllocator(const glfw_allocator *allocator)
 {
+#if defined(__linux__)
+    /* GLFW 3.3 on Linux does not export glfwInitAllocator. */
+    (void)allocator;
+#else
     glfwInitAllocator((GLFWallocator *)allocator);
+#endif
 }
 
 void glfw_GetVersion(int *major, int *minor, int *rev)
@@ -43,12 +48,23 @@ glfw_errorfun glfw_SetErrorCallback(glfw_errorfun callback)
 
 int glfw_GetPlatform(void)
 {
+#if defined(__linux__)
+    /* GLFW 3.3 on Linux does not export glfwGetPlatform. */
+    return 0;
+#else
     return glfwGetPlatform();
+#endif
 }
 
 int glfw_PlatformSupported(int platform)
 {
+#if defined(__linux__)
+    /* GLFW 3.3 on Linux does not export glfwPlatformSupported. */
+    (void)platform;
+    return 0;
+#else
     return glfwPlatformSupported(platform);
+#endif
 }
 
 glfw_monitor **glfw_GetMonitors(int *count)
@@ -163,7 +179,13 @@ void glfw_SetWindowShouldClose(glfw_window *window, int value)
 
 const char *glfw_GetWindowTitle(glfw_window *window)
 {
+#if defined(__linux__)
+    /* GLFW 3.3 on Linux does not export glfwGetWindowTitle. */
+    (void)window;
+    return "";
+#else
     return glfwGetWindowTitle((GLFWwindow *)window);
+#endif
 }
 
 void glfw_SetWindowTitle(glfw_window *window, const char *title)
