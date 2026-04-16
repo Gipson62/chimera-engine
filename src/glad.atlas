@@ -15,6 +15,49 @@ public fun _GL_COLOR_BUFFER_BIT() -> uint32 {
     // 0x00004000
     return 16384;
 }
+public fun _GL_ARRAY_BUFFER() -> uint32 {
+    // 0x8892
+    return 34962;
+}
+public fun _GL_ELEMENT_ARRAY_BUFFER() -> uint32 {
+    // 0x8893
+    return 34963;
+}
+public fun _GL_STATIC_DRAW() -> uint32 {
+    // 0x88E4
+    return 35044;
+}
+public fun _GL_VERTEX_SHADER() -> uint32 {
+    // 0x8B31
+    return 35633;
+}
+public fun _GL_COMPILE_STATUS() -> uint32 {
+    // 0x8B81
+    return 35713;
+}
+public fun _GL_FRAGMENT_SHADER() -> uint32 {
+    // 0x8B30
+    return 35632;
+}
+public fun _GL_LINK_STATUS() -> uint32 {
+    // 0x8B82
+    return 35714;
+}
+public fun _GL_FLOAT() -> uint32 {
+    // 0x1406
+    return 5126;
+}
+public fun _GL_FALSE() -> uint8 {
+    return 0;
+}
+public fun _GL_UNSIGNED_INT() -> uint32 {
+    // 0x1405
+    return 5125;
+}
+public fun _GL_TRIANGLES() -> uint32 {
+    // 0x0004
+    return 4;
+}
 
 public extern fun glCullFace(mode: uint32);
 public extern fun glFrontFace(mode: uint32);
@@ -83,12 +126,12 @@ public extern fun glTexSubImage3D(target: uint32, level: int32, xoffset: int32, 
 public extern fun glCopyTexSubImage3D(target: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, x: int32, y: int32, width: int32, height: int32);
 public extern fun glActiveTexture(texture: uint32);
 public extern fun glSampleCoverage(value: float32, invert: uint8);
-public extern fun glCompressedTexImage3D(target: uint32, level: int32, internalformat: uint32, width: int32, height: int32, depth: int32, border: int32, imageSize: int32, data: *unit);
-public extern fun glCompressedTexImage2D(target: uint32, level: int32, internalformat: uint32, width: int32, height: int32, border: int32, imageSize: int32, data: *unit);
-public extern fun glCompressedTexImage1D(target: uint32, level: int32, internalformat: uint32, width: int32, border: int32, imageSize: int32, data: *unit);
-public extern fun glCompressedTexSubImage3D(target: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, imageSize: int32, data: *unit);
-public extern fun glCompressedTexSubImage2D(target: uint32, level: int32, xoffset: int32, yoffset: int32, width: int32, height: int32, format: uint32, imageSize: int32, data: *unit);
-public extern fun glCompressedTexSubImage1D(target: uint32, level: int32, xoffset: int32, width: int32, format: uint32, imageSize: int32, data: *unit);
+public extern fun glCompressedTexImage3D(target: uint32, level: int32, internalformat: uint32, width: int32, height: int32, depth: int32, border: int32, imageSize: uint32, data: *unit);
+public extern fun glCompressedTexImage2D(target: uint32, level: int32, internalformat: uint32, width: int32, height: int32, border: int32, imageSize: uint32, data: *unit);
+public extern fun glCompressedTexImage1D(target: uint32, level: int32, internalformat: uint32, width: int32, border: int32, imageSize: uint32, data: *unit);
+public extern fun glCompressedTexSubImage3D(target: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, imageSize: uint32, data: *unit);
+public extern fun glCompressedTexSubImage2D(target: uint32, level: int32, xoffset: int32, yoffset: int32, width: int32, height: int32, format: uint32, imageSize: uint32, data: *unit);
+public extern fun glCompressedTexSubImage1D(target: uint32, level: int32, xoffset: int32, width: int32, format: uint32, imageSize: uint32, data: *unit);
 public extern fun glGetCompressedTexImage(target: uint32, level: int32, img: *unit);
 public extern fun glBlendFuncSeparate(sfactorRGB: uint32, dfactorRGB: uint32, sfactorAlpha: uint32, dfactorAlpha: uint32);
 public extern fun glMultiDrawArrays(mode: uint32, first: *int32, count: *int32, drawcount: int32);
@@ -111,9 +154,9 @@ public extern fun glBindBuffer(target: uint32, buffer: uint32);
 public extern fun glDeleteBuffers(n: int32, buffers: *uint32);
 public extern fun glGenBuffers(n: int32, buffers: *uint32);
 public extern fun glIsBuffer(buffer: uint32) -> uint8;
-public extern fun glBufferData(target: uint32, size: int64, data: *unit, usage: uint32);
-public extern fun glBufferSubData(target: uint32, offset: int64, size: int64, data: *unit);
-public extern fun glGetBufferSubData(target: uint32, offset: int64, size: int64, data: *unit);
+public extern fun glBufferData(target: uint32, size: uint64, data: *unit, usage: uint32);
+public extern fun glBufferSubData(target: uint32, offset: int64, size: uint64, data: *unit);
+public extern fun glGetBufferSubData(target: uint32, offset: int64, size: uint64, data: *unit);
 public extern fun glMapBuffer(target: uint32, access: uint32) -> *unit;
 public extern fun glUnmapBuffer(target: uint32) -> uint8;
 public extern fun glGetBufferParameteriv(target: uint32, pname: uint32, params: *int32);
@@ -133,15 +176,15 @@ public extern fun glDeleteShader(shader: uint32);
 public extern fun glDetachShader(program: uint32, shader: uint32);
 public extern fun glDisableVertexAttribArray(index: uint32);
 public extern fun glEnableVertexAttribArray(index: uint32);
-public extern fun glGetActiveAttrib(program: uint32, index: uint32, bufSize: int32, length: *int32, size: *int32, type: *uint32, name: *uint8);
-public extern fun glGetActiveUniform(program: uint32, index: uint32, bufSize: int32, length: *int32, size: *int32, type: *uint32, name: *uint8);
+public extern fun glGetActiveAttrib(program: uint32, index: uint32, bufSize: uint32, length: *int32, size: *int32, type: *uint32, name: *uint8);
+public extern fun glGetActiveUniform(program: uint32, index: uint32, bufSize: uint32, length: *int32, size: *int32, type: *uint32, name: *uint8);
 public extern fun glGetAttachedShaders(program: uint32, maxCount: int32, count: *int32, shaders: *uint32);
 public extern fun glGetAttribLocation(program: uint32, name: *uint8) -> int32;
 public extern fun glGetProgramiv(program: uint32, pname: uint32, params: *int32);
-public extern fun glGetProgramInfoLog(program: uint32, bufSize: int32, length: *int32, infoLog: *uint8);
+public extern fun glGetProgramInfoLog(program: uint32, bufSize: uint32, length: *int32, infoLog: *uint8);
 public extern fun glGetShaderiv(shader: uint32, pname: uint32, params: *int32);
-public extern fun glGetShaderInfoLog(shader: uint32, bufSize: int32, length: *int32, infoLog: *uint8);
-public extern fun glGetShaderSource(shader: uint32, bufSize: int32, length: *int32, source: *uint8);
+public extern fun glGetShaderInfoLog(shader: uint32, bufSize: uint32, length: *int32, infoLog: *uint8);
+public extern fun glGetShaderSource(shader: uint32, bufSize: uint32, length: *int32, source: *uint8);
 public extern fun glGetUniformLocation(program: uint32, name: *uint8) -> int32;
 public extern fun glGetUniformfv(program: uint32, location: int32, params: *float32);
 public extern fun glGetUniformiv(program: uint32, location: int32, params: *int32);
@@ -210,7 +253,7 @@ public extern fun glVertexAttrib4sv(index: uint32, v: *int16);
 public extern fun glVertexAttrib4ubv(index: uint32, v: *uint8);
 public extern fun glVertexAttrib4uiv(index: uint32, v: *uint32);
 public extern fun glVertexAttrib4usv(index: uint32, v: *uint16);
-public extern fun glVertexAttribPointer(index: uint32, size: int32, type: uint32, normalized: uint8, stride: int32, pointer: *unit);
+public extern fun glVertexAttribPointer(index: uint32, size: uint32, type: uint32, normalized: uint8, stride: uint64, pointer: *unit);
 public extern fun glUniformMatrix2x3fv(location: int32, count: int32, transpose: uint8, value: *float32);
 public extern fun glUniformMatrix3x2fv(location: int32, count: int32, transpose: uint8, value: *float32);
 public extern fun glUniformMatrix2x4fv(location: int32, count: int32, transpose: uint8, value: *float32);
@@ -225,14 +268,14 @@ public extern fun glDisablei(target: uint32, index: uint32);
 public extern fun glIsEnabledi(target: uint32, index: uint32) -> uint8;
 public extern fun glBeginTransformFeedback(primitiveMode: uint32);
 public extern fun glEndTransformFeedback();
-public extern fun glBindBufferRange(target: uint32, index: uint32, buffer: uint32, offset: int64, size: int64);
+public extern fun glBindBufferRange(target: uint32, index: uint32, buffer: uint32, offset: int64, size: uint64);
 public extern fun glBindBufferBase(target: uint32, index: uint32, buffer: uint32);
 public extern fun glTransformFeedbackVaryings(program: uint32, count: int32, varyings: **uint8, bufferMode: uint32);
-public extern fun glGetTransformFeedbackVarying(program: uint32, index: uint32, bufSize: int32, length: *int32, size: *int32, type: *uint32, name: *uint8);
+public extern fun glGetTransformFeedbackVarying(program: uint32, index: uint32, bufSize: uint32, length: *int32, size: *int32, type: *uint32, name: *uint8);
 public extern fun glClampColor(target: uint32, clamp: uint32);
 public extern fun glBeginConditionalRender(id: uint32, mode: uint32);
 public extern fun glEndConditionalRender();
-public extern fun glVertexAttribIPointer(index: uint32, size: int32, type: uint32, stride: int32, pointer: *unit);
+public extern fun glVertexAttribIPointer(index: uint32, size: uint32, type: uint32, stride: int32, pointer: *unit);
 public extern fun glGetVertexAttribIiv(index: uint32, pname: uint32, params: *int32);
 public extern fun glGetVertexAttribIuiv(index: uint32, pname: uint32, params: *uint32);
 public extern fun glVertexAttribI1i(index: uint32, x: int32);
@@ -305,13 +348,13 @@ public extern fun glDrawArraysInstanced(mode: uint32, first: int32, count: int32
 public extern fun glDrawElementsInstanced(mode: uint32, count: int32, type: uint32, indices: *unit, instancecount: int32);
 public extern fun glTexBuffer(target: uint32, internalformat: uint32, buffer: uint32);
 public extern fun glPrimitiveRestartIndex(index: uint32);
-public extern fun glCopyBufferSubData(readTarget: uint32, writeTarget: uint32, readOffset: int64, writeOffset: int64, size: int64);
+public extern fun glCopyBufferSubData(readTarget: uint32, writeTarget: uint32, readOffset: int64, writeOffset: int64, size: uint64);
 public extern fun glGetUniformIndices(program: uint32, uniformCount: int32, uniformNames: **uint8, uniformIndices: *uint32);
 public extern fun glGetActiveUniformsiv(program: uint32, uniformCount: int32, uniformIndices: *uint32, pname: uint32, params: *int32);
-public extern fun glGetActiveUniformName(program: uint32, uniformIndex: uint32, bufSize: int32, length: *int32, uniformName: *uint8);
+public extern fun glGetActiveUniformName(program: uint32, uniformIndex: uint32, bufSize: uint32, length: *int32, uniformName: *uint8);
 public extern fun glGetUniformBlockIndex(program: uint32, uniformBlockName: *uint8) -> uint32;
 public extern fun glGetActiveUniformBlockiv(program: uint32, uniformBlockIndex: uint32, pname: uint32, params: *int32);
-public extern fun glGetActiveUniformBlockName(program: uint32, uniformBlockIndex: uint32, bufSize: int32, length: *int32, uniformBlockName: *uint8);
+public extern fun glGetActiveUniformBlockName(program: uint32, uniformBlockIndex: uint32, bufSize: uint32, length: *int32, uniformBlockName: *uint8);
 public extern fun glUniformBlockBinding(program: uint32, uniformBlockIndex: uint32, uniformBlockBinding: uint32);
 public extern fun glDrawElementsBaseVertex(mode: uint32, count: int32, type: uint32, indices: *unit, basevertex: int32);
 public extern fun glDrawRangeElementsBaseVertex(mode: uint32, start: uint32, end: uint32, count: int32, type: uint32, indices: *unit, basevertex: int32);
@@ -418,8 +461,8 @@ public extern fun glGetUniformdv(program: uint32, location: int32, params: *floa
 public extern fun glGetSubroutineUniformLocation(program: uint32, shadertype: uint32, name: *uint8) -> int32;
 public extern fun glGetSubroutineIndex(program: uint32, shadertype: uint32, name: *uint8) -> uint32;
 public extern fun glGetActiveSubroutineUniformiv(program: uint32, shadertype: uint32, index: uint32, pname: uint32, values: *int32);
-public extern fun glGetActiveSubroutineUniformName(program: uint32, shadertype: uint32, index: uint32, bufSize: int32, length: *int32, name: *uint8);
-public extern fun glGetActiveSubroutineName(program: uint32, shadertype: uint32, index: uint32, bufSize: int32, length: *int32, name: *uint8);
+public extern fun glGetActiveSubroutineUniformName(program: uint32, shadertype: uint32, index: uint32, bufSize: uint32, length: *int32, name: *uint8);
+public extern fun glGetActiveSubroutineName(program: uint32, shadertype: uint32, index: uint32, bufSize: uint32, length: *int32, name: *uint8);
 public extern fun glUniformSubroutinesuiv(shadertype: uint32, count: int32, indices: *uint32);
 public extern fun glGetUniformSubroutineuiv(shadertype: uint32, location: int32, params: *uint32);
 public extern fun glGetProgramStageiv(program: uint32, shadertype: uint32, pname: uint32, values: *int32);
@@ -441,7 +484,7 @@ public extern fun glShaderBinary(count: int32, shaders: *uint32, binaryFormat: u
 public extern fun glGetShaderPrecisionFormat(shadertype: uint32, precisiontype: uint32, range: *int32, precision: *int32);
 public extern fun glDepthRangef(n: float32, f: float32);
 public extern fun glClearDepthf(d: float32);
-public extern fun glGetProgramBinary(program: uint32, bufSize: int32, length: *int32, binaryFormat: *uint32, binary: *unit);
+public extern fun glGetProgramBinary(program: uint32, bufSize: uint32, length: *int32, binaryFormat: *uint32, binary: *unit);
 public extern fun glProgramBinary(program: uint32, binaryFormat: uint32, binary: *unit, length: int32);
 public extern fun glProgramParameteri(program: uint32, pname: uint32, value: int32);
 public extern fun glUseProgramStages(pipeline: uint32, stages: uint32, program: uint32);
@@ -503,7 +546,7 @@ public extern fun glProgramUniformMatrix4x2dv(program: uint32, location: int32, 
 public extern fun glProgramUniformMatrix3x4dv(program: uint32, location: int32, count: int32, transpose: uint8, value: *float64);
 public extern fun glProgramUniformMatrix4x3dv(program: uint32, location: int32, count: int32, transpose: uint8, value: *float64);
 public extern fun glValidateProgramPipeline(pipeline: uint32);
-public extern fun glGetProgramPipelineInfoLog(pipeline: uint32, bufSize: int32, length: *int32, infoLog: *uint8);
+public extern fun glGetProgramPipelineInfoLog(pipeline: uint32, bufSize: uint32, length: *int32, infoLog: *uint8);
 public extern fun glVertexAttribL1d(index: uint32, x: float64);
 public extern fun glVertexAttribL2d(index: uint32, x: float64, y: float64);
 public extern fun glVertexAttribL3d(index: uint32, x: float64, y: float64, z: float64);
@@ -512,7 +555,7 @@ public extern fun glVertexAttribL1dv(index: uint32, v: *float64);
 public extern fun glVertexAttribL2dv(index: uint32, v: *float64);
 public extern fun glVertexAttribL3dv(index: uint32, v: *float64);
 public extern fun glVertexAttribL4dv(index: uint32, v: *float64);
-public extern fun glVertexAttribLPointer(index: uint32, size: int32, type: uint32, stride: int32, pointer: *unit);
+public extern fun glVertexAttribLPointer(index: uint32, size: uint32, type: uint32, stride: int32, pointer: *unit);
 public extern fun glGetVertexAttribLdv(index: uint32, pname: uint32, params: *float64);
 public extern fun glViewportArrayv(first: uint32, count: int32, v: *float32);
 public extern fun glViewportIndexedf(index: uint32, x: float32, y: float32, w: float32, h: float32);
@@ -537,7 +580,7 @@ public extern fun glTexStorage3D(target: uint32, levels: int32, internalformat: 
 public extern fun glDrawTransformFeedbackInstanced(mode: uint32, id: uint32, instancecount: int32);
 public extern fun glDrawTransformFeedbackStreamInstanced(mode: uint32, id: uint32, stream: uint32, instancecount: int32);
 public extern fun glClearBufferData(target: uint32, internalformat: uint32, format: uint32, type: uint32, data: *unit);
-public extern fun glClearBufferSubData(target: uint32, internalformat: uint32, offset: int64, size: int64, format: uint32, type: uint32, data: *unit);
+public extern fun glClearBufferSubData(target: uint32, internalformat: uint32, offset: int64, size: uint64, format: uint32, type: uint32, data: *unit);
 public extern fun glDispatchCompute(num_groups_x: uint32, num_groups_y: uint32, num_groups_z: uint32);
 public extern fun glDispatchComputeIndirect(indirect: int64);
 public extern fun glCopyImageSubData(srcName: uint32, srcTarget: uint32, srcLevel: int32, srcX: int32, srcY: int32, srcZ: int32, dstName: uint32, dstTarget: uint32, dstLevel: int32, dstX: int32, dstY: int32, dstZ: int32, srcWidth: int32, srcHeight: int32, srcDepth: int32);
@@ -554,33 +597,33 @@ public extern fun glMultiDrawArraysIndirect(mode: uint32, indirect: *unit, drawc
 public extern fun glMultiDrawElementsIndirect(mode: uint32, type: uint32, indirect: *unit, drawcount: int32, stride: int32);
 public extern fun glGetProgramInterfaceiv(program: uint32, programInterface: uint32, pname: uint32, params: *int32);
 public extern fun glGetProgramResourceIndex(program: uint32, programInterface: uint32, name: *uint8) -> uint32;
-public extern fun glGetProgramResourceName(program: uint32, programInterface: uint32, index: uint32, bufSize: int32, length: *int32, name: *uint8);
+public extern fun glGetProgramResourceName(program: uint32, programInterface: uint32, index: uint32, bufSize: uint32, length: *int32, name: *uint8);
 public extern fun glGetProgramResourceiv(program: uint32, programInterface: uint32, index: uint32, propCount: int32, props: *uint32, count: int32, length: *int32, params: *int32);
 public extern fun glGetProgramResourceLocation(program: uint32, programInterface: uint32, name: *uint8) -> int32;
 public extern fun glGetProgramResourceLocationIndex(program: uint32, programInterface: uint32, name: *uint8) -> int32;
 public extern fun glShaderStorageBlockBinding(program: uint32, storageBlockIndex: uint32, storageBlockBinding: uint32);
-public extern fun glTexBufferRange(target: uint32, internalformat: uint32, buffer: uint32, offset: int64, size: int64);
+public extern fun glTexBufferRange(target: uint32, internalformat: uint32, buffer: uint32, offset: int64, size: uint64);
 public extern fun glTexStorage2DMultisample(target: uint32, samples: int32, internalformat: uint32, width: int32, height: int32, fixedsamplelocations: uint8);
 public extern fun glTexStorage3DMultisample(target: uint32, samples: int32, internalformat: uint32, width: int32, height: int32, depth: int32, fixedsamplelocations: uint8);
 public extern fun glTextureView(texture: uint32, target: uint32, origtexture: uint32, internalformat: uint32, minlevel: uint32, numlevels: uint32, minlayer: uint32, numlayers: uint32);
 public extern fun glBindVertexBuffer(bindingindex: uint32, buffer: uint32, offset: int64, stride: int32);
-public extern fun glVertexAttribFormat(attribindex: uint32, size: int32, type: uint32, normalized: uint8, relativeoffset: uint32);
-public extern fun glVertexAttribIFormat(attribindex: uint32, size: int32, type: uint32, relativeoffset: uint32);
-public extern fun glVertexAttribLFormat(attribindex: uint32, size: int32, type: uint32, relativeoffset: uint32);
+public extern fun glVertexAttribFormat(attribindex: uint32, size: uint32, type: uint32, normalized: uint8, relativeoffset: uint32);
+public extern fun glVertexAttribIFormat(attribindex: uint32, size: uint32, type: uint32, relativeoffset: uint32);
+public extern fun glVertexAttribLFormat(attribindex: uint32, size: uint32, type: uint32, relativeoffset: uint32);
 public extern fun glVertexAttribBinding(attribindex: uint32, bindingindex: uint32);
 public extern fun glVertexBindingDivisor(bindingindex: uint32, divisor: uint32);
 public extern fun glDebugMessageControl(source: uint32, type: uint32, severity: uint32, count: int32, ids: *uint32, enabled: uint8);
 public extern fun glDebugMessageInsert(source: uint32, type: uint32, id: uint32, severity: uint32, length: int32, buf: *uint8);
 public extern fun glDebugMessageCallback(callback: fun(uint32, uint32, uint32, uint32, int32, *uint8, *unit) -> unit, userParam: *unit);
-public extern fun glGetDebugMessageLog(count: uint32, bufSize: int32, sources: *uint32, types: *uint32, ids: *uint32, severities: *uint32, lengths: *int32, messageLog: *uint8) -> uint32;
+public extern fun glGetDebugMessageLog(count: uint32, bufSize: uint32, sources: *uint32, types: *uint32, ids: *uint32, severities: *uint32, lengths: *int32, messageLog: *uint8) -> uint32;
 public extern fun glPushDebugGroup(source: uint32, id: uint32, length: int32, message: *uint8);
 public extern fun glPopDebugGroup();
 public extern fun glObjectLabel(identifier: uint32, name: uint32, length: int32, label: *uint8);
-public extern fun glGetObjectLabel(identifier: uint32, name: uint32, bufSize: int32, length: *int32, label: *uint8);
+public extern fun glGetObjectLabel(identifier: uint32, name: uint32, bufSize: uint32, length: *int32, label: *uint8);
 public extern fun glObjectPtrLabel(ptr: *unit, length: int32, label: *uint8);
-public extern fun glGetObjectPtrLabel(ptr: *unit, bufSize: int32, length: *int32, label: *uint8);
+public extern fun glGetObjectPtrLabel(ptr: *unit, bufSize: uint32, length: *int32, label: *uint8);
 public extern fun glGetPointerv(pname: uint32, params: **unit);
-public extern fun glBufferStorage(target: uint32, size: int64, data: *unit, flags: uint32);
+public extern fun glBufferStorage(target: uint32, size: uint64, data: *unit, flags: uint32);
 public extern fun glClearTexImage(texture: uint32, level: int32, format: uint32, type: uint32, data: *unit);
 public extern fun glClearTexSubImage(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, type: uint32, data: *unit);
 public extern fun glBindBuffersBase(target: uint32, first: uint32, count: int32, buffers: *uint32);
@@ -592,17 +635,17 @@ public extern fun glBindVertexBuffers(first: uint32, count: int32, buffers: *uin
 public extern fun glClipControl(origin: uint32, depth: uint32);
 public extern fun glCreateTransformFeedbacks(n: int32, ids: *uint32);
 public extern fun glTransformFeedbackBufferBase(xfb: uint32, index: uint32, buffer: uint32);
-public extern fun glTransformFeedbackBufferRange(xfb: uint32, index: uint32, buffer: uint32, offset: int64, size: int64);
+public extern fun glTransformFeedbackBufferRange(xfb: uint32, index: uint32, buffer: uint32, offset: int64, size: uint64);
 public extern fun glGetTransformFeedbackiv(xfb: uint32, pname: uint32, param: *int32);
 public extern fun glGetTransformFeedbacki_v(xfb: uint32, pname: uint32, index: uint32, param: *int32);
 public extern fun glGetTransformFeedbacki64_v(xfb: uint32, pname: uint32, index: uint32, param: *int64);
 public extern fun glCreateBuffers(n: int32, buffers: *uint32);
-public extern fun glNamedBufferStorage(buffer: uint32, size: int64, data: *unit, flags: uint32);
-public extern fun glNamedBufferData(buffer: uint32, size: int64, data: *unit, usage: uint32);
-public extern fun glNamedBufferSubData(buffer: uint32, offset: int64, size: int64, data: *unit);
-public extern fun glCopyNamedBufferSubData(readBuffer: uint32, writeBuffer: uint32, readOffset: int64, writeOffset: int64, size: int64);
+public extern fun glNamedBufferStorage(buffer: uint32, size: uint64, data: *unit, flags: uint32);
+public extern fun glNamedBufferData(buffer: uint32, size: uint64, data: *unit, usage: uint32);
+public extern fun glNamedBufferSubData(buffer: uint32, offset: int64, size: uint64, data: *unit);
+public extern fun glCopyNamedBufferSubData(readBuffer: uint32, writeBuffer: uint32, readOffset: int64, writeOffset: int64, size: uint64);
 public extern fun glClearNamedBufferData(buffer: uint32, internalformat: uint32, format: uint32, type: uint32, data: *unit);
-public extern fun glClearNamedBufferSubData(buffer: uint32, internalformat: uint32, offset: int64, size: int64, format: uint32, type: uint32, data: *unit);
+public extern fun glClearNamedBufferSubData(buffer: uint32, internalformat: uint32, offset: int64, size: uint64, format: uint32, type: uint32, data: *unit);
 public extern fun glMapNamedBuffer(buffer: uint32, access: uint32) -> *unit;
 public extern fun glMapNamedBufferRange(buffer: uint32, offset: int64, length: int64, access: uint32) -> *unit;
 public extern fun glUnmapNamedBuffer(buffer: uint32) -> uint8;
@@ -610,7 +653,7 @@ public extern fun glFlushMappedNamedBufferRange(buffer: uint32, offset: int64, l
 public extern fun glGetNamedBufferParameteriv(buffer: uint32, pname: uint32, params: *int32);
 public extern fun glGetNamedBufferParameteri64v(buffer: uint32, pname: uint32, params: *int64);
 public extern fun glGetNamedBufferPointerv(buffer: uint32, pname: uint32, params: **unit);
-public extern fun glGetNamedBufferSubData(buffer: uint32, offset: int64, size: int64, data: *unit);
+public extern fun glGetNamedBufferSubData(buffer: uint32, offset: int64, size: uint64, data: *unit);
 public extern fun glCreateFramebuffers(n: int32, framebuffers: *uint32);
 public extern fun glNamedFramebufferRenderbuffer(framebuffer: uint32, attachment: uint32, renderbuffertarget: uint32, renderbuffer: uint32);
 public extern fun glNamedFramebufferParameteri(framebuffer: uint32, pname: uint32, param: int32);
@@ -635,7 +678,7 @@ public extern fun glNamedRenderbufferStorageMultisample(renderbuffer: uint32, sa
 public extern fun glGetNamedRenderbufferParameteriv(renderbuffer: uint32, pname: uint32, params: *int32);
 public extern fun glCreateTextures(target: uint32, n: int32, textures: *uint32);
 public extern fun glTextureBuffer(texture: uint32, internalformat: uint32, buffer: uint32);
-public extern fun glTextureBufferRange(texture: uint32, internalformat: uint32, buffer: uint32, offset: int64, size: int64);
+public extern fun glTextureBufferRange(texture: uint32, internalformat: uint32, buffer: uint32, offset: int64, size: uint64);
 public extern fun glTextureStorage1D(texture: uint32, levels: int32, internalformat: uint32, width: int32);
 public extern fun glTextureStorage2D(texture: uint32, levels: int32, internalformat: uint32, width: int32, height: int32);
 public extern fun glTextureStorage3D(texture: uint32, levels: int32, internalformat: uint32, width: int32, height: int32, depth: int32);
@@ -644,9 +687,9 @@ public extern fun glTextureStorage3DMultisample(texture: uint32, samples: int32,
 public extern fun glTextureSubImage1D(texture: uint32, level: int32, xoffset: int32, width: int32, format: uint32, type: uint32, pixels: *unit);
 public extern fun glTextureSubImage2D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, width: int32, height: int32, format: uint32, type: uint32, pixels: *unit);
 public extern fun glTextureSubImage3D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, type: uint32, pixels: *unit);
-public extern fun glCompressedTextureSubImage1D(texture: uint32, level: int32, xoffset: int32, width: int32, format: uint32, imageSize: int32, data: *unit);
-public extern fun glCompressedTextureSubImage2D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, width: int32, height: int32, format: uint32, imageSize: int32, data: *unit);
-public extern fun glCompressedTextureSubImage3D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, imageSize: int32, data: *unit);
+public extern fun glCompressedTextureSubImage1D(texture: uint32, level: int32, xoffset: int32, width: int32, format: uint32, imageSize: uint32, data: *unit);
+public extern fun glCompressedTextureSubImage2D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, width: int32, height: int32, format: uint32, imageSize: uint32, data: *unit);
+public extern fun glCompressedTextureSubImage3D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, imageSize: uint32, data: *unit);
 public extern fun glCopyTextureSubImage1D(texture: uint32, level: int32, xoffset: int32, x: int32, y: int32, width: int32);
 public extern fun glCopyTextureSubImage2D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, x: int32, y: int32, width: int32, height: int32);
 public extern fun glCopyTextureSubImage3D(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, x: int32, y: int32, width: int32, height: int32);
@@ -658,8 +701,8 @@ public extern fun glTextureParameterIuiv(texture: uint32, pname: uint32, params:
 public extern fun glTextureParameteriv(texture: uint32, pname: uint32, param: *int32);
 public extern fun glGenerateTextureMipmap(texture: uint32);
 public extern fun glBindTextureUnit(unit_: uint32, texture: uint32);
-public extern fun glGetTextureImage(texture: uint32, level: int32, format: uint32, type: uint32, bufSize: int32, pixels: *unit);
-public extern fun glGetCompressedTextureImage(texture: uint32, level: int32, bufSize: int32, pixels: *unit);
+public extern fun glGetTextureImage(texture: uint32, level: int32, format: uint32, type: uint32, bufSize: uint32, pixels: *unit);
+public extern fun glGetCompressedTextureImage(texture: uint32, level: int32, bufSize: uint32, pixels: *unit);
 public extern fun glGetTextureLevelParameterfv(texture: uint32, level: int32, pname: uint32, params: *float32);
 public extern fun glGetTextureLevelParameteriv(texture: uint32, level: int32, pname: uint32, params: *int32);
 public extern fun glGetTextureParameterfv(texture: uint32, pname: uint32, params: *float32);
@@ -673,9 +716,9 @@ public extern fun glVertexArrayElementBuffer(vaobj: uint32, buffer: uint32);
 public extern fun glVertexArrayVertexBuffer(vaobj: uint32, bindingindex: uint32, buffer: uint32, offset: int64, stride: int32);
 public extern fun glVertexArrayVertexBuffers(vaobj: uint32, first: uint32, count: int32, buffers: *uint32, offsets: *int64, strides: *int32);
 public extern fun glVertexArrayAttribBinding(vaobj: uint32, attribindex: uint32, bindingindex: uint32);
-public extern fun glVertexArrayAttribFormat(vaobj: uint32, attribindex: uint32, size: int32, type: uint32, normalized: uint8, relativeoffset: uint32);
-public extern fun glVertexArrayAttribIFormat(vaobj: uint32, attribindex: uint32, size: int32, type: uint32, relativeoffset: uint32);
-public extern fun glVertexArrayAttribLFormat(vaobj: uint32, attribindex: uint32, size: int32, type: uint32, relativeoffset: uint32);
+public extern fun glVertexArrayAttribFormat(vaobj: uint32, attribindex: uint32, size: uint32, type: uint32, normalized: uint8, relativeoffset: uint32);
+public extern fun glVertexArrayAttribIFormat(vaobj: uint32, attribindex: uint32, size: uint32, type: uint32, relativeoffset: uint32);
+public extern fun glVertexArrayAttribLFormat(vaobj: uint32, attribindex: uint32, size: uint32, type: uint32, relativeoffset: uint32);
 public extern fun glVertexArrayBindingDivisor(vaobj: uint32, bindingindex: uint32, divisor: uint32);
 public extern fun glGetVertexArrayiv(vaobj: uint32, pname: uint32, param: *int32);
 public extern fun glGetVertexArrayIndexediv(vaobj: uint32, index: uint32, pname: uint32, param: *int32);
@@ -688,28 +731,28 @@ public extern fun glGetQueryBufferObjectiv(id: uint32, buffer: uint32, pname: ui
 public extern fun glGetQueryBufferObjectui64v(id: uint32, buffer: uint32, pname: uint32, offset: int64);
 public extern fun glGetQueryBufferObjectuiv(id: uint32, buffer: uint32, pname: uint32, offset: int64);
 public extern fun glMemoryBarrierByRegion(barriers: uint32);
-public extern fun glGetTextureSubImage(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, type: uint32, bufSize: int32, pixels: *unit);
-public extern fun glGetCompressedTextureSubImage(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, bufSize: int32, pixels: *unit);
+public extern fun glGetTextureSubImage(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, format: uint32, type: uint32, bufSize: uint32, pixels: *unit);
+public extern fun glGetCompressedTextureSubImage(texture: uint32, level: int32, xoffset: int32, yoffset: int32, zoffset: int32, width: int32, height: int32, depth: int32, bufSize: uint32, pixels: *unit);
 public extern fun glGetGraphicsResetStatus() -> uint32;
-public extern fun glGetnCompressedTexImage(target: uint32, lod: int32, bufSize: int32, pixels: *unit);
-public extern fun glGetnTexImage(target: uint32, level: int32, format: uint32, type: uint32, bufSize: int32, pixels: *unit);
-public extern fun glGetnUniformdv(program: uint32, location: int32, bufSize: int32, params: *float64);
-public extern fun glGetnUniformfv(program: uint32, location: int32, bufSize: int32, params: *float32);
-public extern fun glGetnUniformiv(program: uint32, location: int32, bufSize: int32, params: *int32);
-public extern fun glGetnUniformuiv(program: uint32, location: int32, bufSize: int32, params: *uint32);
-public extern fun glReadnPixels(x: int32, y: int32, width: int32, height: int32, format: uint32, type: uint32, bufSize: int32, data: *unit);
-public extern fun glGetnMapdv(target: uint32, query: uint32, bufSize: int32, v: *float64);
-public extern fun glGetnMapfv(target: uint32, query: uint32, bufSize: int32, v: *float32);
-public extern fun glGetnMapiv(target: uint32, query: uint32, bufSize: int32, v: *int32);
-public extern fun glGetnPixelMapfv(map: uint32, bufSize: int32, values: *float32);
-public extern fun glGetnPixelMapuiv(map: uint32, bufSize: int32, values: *uint32);
-public extern fun glGetnPixelMapusv(map: uint32, bufSize: int32, values: *uint16);
-public extern fun glGetnPolygonStipple(bufSize: int32, pattern: *uint8);
-public extern fun glGetnColorTable(target: uint32, format: uint32, type: uint32, bufSize: int32, table: *unit);
-public extern fun glGetnConvolutionFilter(target: uint32, format: uint32, type: uint32, bufSize: int32, image: *unit);
-public extern fun glGetnSeparableFilter(target: uint32, format: uint32, type: uint32, rowBufSize: int32, row: *unit, columnBufSize: int32, column: *unit, span: *unit);
-public extern fun glGetnHistogram(target: uint32, reset: uint8, format: uint32, type: uint32, bufSize: int32, values: *unit);
-public extern fun glGetnMinmax(target: uint32, reset: uint8, format: uint32, type: uint32, bufSize: int32, values: *unit);
+public extern fun glGetnCompressedTexImage(target: uint32, lod: int32, bufSize: uint32, pixels: *unit);
+public extern fun glGetnTexImage(target: uint32, level: int32, format: uint32, type: uint32, bufSize: uint32, pixels: *unit);
+public extern fun glGetnUniformdv(program: uint32, location: int32, bufSize: uint32, params: *float64);
+public extern fun glGetnUniformfv(program: uint32, location: int32, bufSize: uint32, params: *float32);
+public extern fun glGetnUniformiv(program: uint32, location: int32, bufSize: uint32, params: *int32);
+public extern fun glGetnUniformuiv(program: uint32, location: int32, bufSize: uint32, params: *uint32);
+public extern fun glReadnPixels(x: int32, y: int32, width: int32, height: int32, format: uint32, type: uint32, bufSize: uint32, data: *unit);
+public extern fun glGetnMapdv(target: uint32, query: uint32, bufSize: uint32, v: *float64);
+public extern fun glGetnMapfv(target: uint32, query: uint32, bufSize: uint32, v: *float32);
+public extern fun glGetnMapiv(target: uint32, query: uint32, bufSize: uint32, v: *int32);
+public extern fun glGetnPixelMapfv(map: uint32, bufSize: uint32, values: *float32);
+public extern fun glGetnPixelMapuiv(map: uint32, bufSize: uint32, values: *uint32);
+public extern fun glGetnPixelMapusv(map: uint32, bufSize: uint32, values: *uint16);
+public extern fun glGetnPolygonStipple(bufSize: uint32, pattern: *uint8);
+public extern fun glGetnColorTable(target: uint32, format: uint32, type: uint32, bufSize: uint32, table: *unit);
+public extern fun glGetnConvolutionFilter(target: uint32, format: uint32, type: uint32, bufSize: uint32, image: *unit);
+public extern fun glGetnSeparableFilter(target: uint32, format: uint32, type: uint32, rowBufSize: uint32, row: *unit, columnBufSize: uint32, column: *unit, span: *unit);
+public extern fun glGetnHistogram(target: uint32, reset: uint8, format: uint32, type: uint32, bufSize: uint32, values: *unit);
+public extern fun glGetnMinmax(target: uint32, reset: uint8, format: uint32, type: uint32, bufSize: uint32, values: *unit);
 public extern fun glTextureBarrier();
 public extern fun glSpecializeShader(shader: uint32, pEntryPoint: *uint8, numSpecializationConstants: uint32, pConstantIndex: *uint32, pConstantValue: *uint32);
 public extern fun glMultiDrawArraysIndirectCount(mode: uint32, indirect: *unit, drawcount: int64, maxdrawcount: int32, stride: int32);
