@@ -1,0 +1,122 @@
+import "src/ecs/flecs.atlas";
+import "std/optional";
+
+public struct World
+{
+  private:
+    world: *flecs::ecs_world_t;
+  public:
+    fun new() -> World {
+        return World {
+            .world = flecs::ecs_init(),
+        };
+    }
+    ~World() {
+        flecs::ecs_fini(this->world);
+    }
+    // Only use when the bindings are unsufficient.
+    fun get_raw_ptr(*this) -> *flecs::ecs_world_t {
+        return this->world;
+    }
+    fun entity(*this) -> EntityView {
+        return EntityView {
+            .id = Entity { 
+                .id = flecs::ecs_entity_init(
+                    this->world, 
+                    &flecs::ecs_entity_desc_t::default()
+                ),
+            },
+            .world = this,
+        };
+    }
+    fun entity_named(*this, name: str) -> EntityView {
+        return EntityView {
+            .id = Entity { 
+                .id = flecs::ecs_entity_init(
+                    this->world, 
+                    &flecs::ecs_entity_desc_t::with_name(name)
+                ),
+            },
+            .world = this,
+        };
+    }
+    fun delete_entity(*this, entity: Entity) {
+        flecs::ecs_delete(this->world, entity.id);
+    }
+    fun is_entity_alive(*const this, entity: Entity) -> bool {
+        return flecs::ecs_is_alive(this->world, entity.id);
+    }
+    fun is_entity_valid(*const this, entity: Entity) -> bool {
+        return flecs::ecs_is_valid(this->world, entity.id);
+    }
+    fun lookup(*const this, name: str) -> std::optional<Entity> {
+        let id = flecs::ecs_lookup(this->world, name);
+        if (id == 0) {
+            return std::optional<Entity>::empty();
+        }
+        return std::optional<Entity>::of(Entity {
+            .id = id,
+        });
+    }
+    fun register_component<T>(*this, name: str) -> ComponentHandle<T> {
+        let entity_desc = flecs::ecs_entity_desc_t::with_name(name);
+        let entity = flecs::ecs_entity_init(this->world, entity_desc);
+
+        let desc = flecs::ecs_component_desc_t::default();
+        desc.entity = entity;
+        desc.size = size_of<T>();
+        desc.alignment = align_of<T>();
+
+        let id = flecs::ecs_component_init(this->world, desc);
+        return ComponentHandle<T> {
+            .id = id,
+        };
+    }
+}
+
+public struct Entity 
+{
+  public:
+    id: uint64;
+    fun get_view(*const this, world: *World) -> EntityView {
+        return EntityView {
+            .id = this,
+            .world = world,
+        };
+    }
+}
+
+public struct EntityView
+{
+  public:
+    id: Entity;
+    world: *World;
+    fun drop(*this) {
+        flecs::ecs_delete(this->world->get_raw_ptr(), this->id.id);
+    }
+    fun is_alive(*const this) -> bool {
+        return this->world->is_entity_alive(this->id);
+    }
+    fun is_valid(*const this) -> bool {
+        return this->world->is_entity_valid(this->id);
+    }
+    fun get_name(*this) -> *const uint8 {
+        return flecs::ecs_get_name(this->world->get_raw_ptr(), this->id.id);
+    }
+    fun add_component<T>(*this, component: ComponentHandle<T>) {
+        flecs::ecs_add_id(this->world->get_raw_ptr(), this->id.id, component.id);
+    }
+}
+
+public struct ComponentHandle<T>
+{
+  public:
+    id: uint64;
+}
+
+fun main() -> int32 {
+    let world = World::new();
+    let entity = world.entity_named("MyEntity");
+    std::printf("Entity name: %s\n", entity.get_name());
+    return 0;
+}

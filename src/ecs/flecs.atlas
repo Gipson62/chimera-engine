@@ -1,0 +1,2824 @@
+namespace flecs {
+    public extern struct ecs_allocator_t
+    {
+    public:
+    }
+
+    public extern struct ecs_type_t
+    {
+    public:
+        array: *flecs::ecs_id_t;
+        count: int32;
+    }
+
+    public extern struct ecs_world_t
+    {
+    public:
+    }
+
+    public extern struct ecs_stage_t
+    {
+    public:
+    }
+
+    public extern struct ecs_table_t
+    {
+    public:
+    }
+
+    public extern struct ecs_term_t
+    {
+    public:
+    }
+
+    public extern struct ecs_query_t
+    {
+    public:
+    }
+
+    public extern struct ecs_observer_t
+    {
+    public:
+    }
+
+    public extern struct ecs_observable_t
+    {
+    public:
+    }
+
+    public extern struct ecs_iter_t
+    {
+    public:
+    }
+
+    public extern struct ecs_ref_t
+    {
+    public:
+    }
+
+    public extern struct ecs_type_hooks_t
+    {
+    public:
+        // Opaque type. Unrelevant for this wrapper.
+    }
+
+    public extern struct ecs_type_info_t
+    {
+    public:
+        size: int32;
+        alignment: int32;
+        hooks: *flecs::ecs_type_hooks_t;
+        component: uint64;
+        name: *const uint8;
+    }
+
+    public extern struct ecs_record_t
+    {
+    public:
+    }
+
+    public extern struct ecs_component_record_t
+    {
+    public:
+    }
+
+    public extern struct ecs_mixins_t
+    {
+    public:
+    }
+
+    public extern struct ecs_header_t
+    {
+    public:
+        type: int32;
+        refcount: int32;
+        mixins: *flecs::ecs_mixins_t;
+    }
+
+    public extern struct ecs_table_record_t
+    {
+    public:
+    }
+
+    public extern struct ecs_vec_t
+    {
+    public:
+        array: *unit;
+        count: int32;
+        size: int32;
+    }
+
+    public extern struct ecs_sparse_page_t
+    {
+    public:
+        sparse: *int32;
+        data: *unit;
+    }
+
+    public extern struct ecs_sparse_t
+    {
+    public:
+        dense: flecs::ecs_vec_t;
+        pages: flecs::ecs_vec_t;
+        size: int32;
+        count: int32;
+        max_id: flecs::uint64_t;
+        allocator: *flecs::ecs_allocator_t;
+        page_allocator: *flecs::ecs_block_allocator_t;
+    }
+
+    public extern struct ecs_map_t
+    {
+    public:
+    }
+
+    public extern struct ecs_block_allocator_block_t
+    {
+    public:
+        memory: *unit;
+        next: *flecs::ecs_block_allocator_block_t;
+    }
+
+    public extern struct ecs_block_allocator_chunk_header_t
+    {
+    public:
+        next: *flecs::ecs_block_allocator_chunk_header_t;
+    }
+
+    public extern struct ecs_block_allocator_t
+    {
+    public:
+        data_size: int32;
+        chunk_size: int32;
+        chunks_per_block: int32;
+        block_size: int32;
+        head: *flecs::ecs_block_allocator_chunk_header_t;
+        block_head: *flecs::ecs_block_allocator_block_t;
+    }
+
+    public extern struct ecs_stack_page_t
+    {
+    public:
+        data: *unit;
+        next: *flecs::ecs_stack_page_t;
+        sp: flecs::int16_t;
+        id: uint32;
+    }
+
+    public extern struct ecs_stack_cursor_t
+    {
+    public:
+        prev: *flecs::ecs_stack_cursor_t;
+        page: *flecs::ecs_stack_page_t;
+        sp: flecs::int16_t;
+        is_free: bool;
+        owner: *flecs::ecs_stack_t;
+    }
+
+    public extern struct ecs_stack_t
+    {
+    public:
+        first: *flecs::ecs_stack_page_t;
+        tail_page: *flecs::ecs_stack_page_t;
+        tail_cursor: *flecs::ecs_stack_cursor_t;
+        cursor_count: int32;
+    }
+
+    public extern struct ecs_bucket_entry_t
+    {
+    public:
+        key: flecs::ecs_map_key_t;
+        value: flecs::ecs_map_val_t;
+        next: *flecs::ecs_bucket_entry_t;
+    }
+
+    public extern struct ecs_bucket_t
+    {
+    public:
+        first: *flecs::ecs_bucket_entry_t;
+    }
+
+    public extern struct ecs_map_iter_t
+    {
+    public:
+        map: *flecs::ecs_map_t;
+        bucket: *flecs::ecs_bucket_t;
+        entry: *flecs::ecs_bucket_entry_t;
+        res: *flecs::ecs_map_data_t;
+        change_count: int32;
+    }
+
+    public extern struct ecs_strbuf_list_elem
+    {
+    public:
+        count: int32;
+        separator: *uint8;
+    }
+
+    public extern struct ecs_strbuf_t
+    {
+    public:
+        content: *uint8;
+        length: int32;
+        size: int32;
+        list_stack: flecs::ecs_strbuf_list_elem;
+        list_sp: int32;
+        small_string: uint8;
+    }
+
+    public extern struct ecs_time_t
+    {
+    public:
+        sec: uint32;
+        nanosec: uint32;
+    }
+
+    public extern struct ecs_os_api_t
+    {
+    public:
+        init_: flecs::ecs_os_api_init_t;
+        fini_: flecs::ecs_os_api_fini_t;
+        malloc_: flecs::ecs_os_api_malloc_t;
+        realloc_: flecs::ecs_os_api_realloc_t;
+        calloc_: flecs::ecs_os_api_calloc_t;
+        free_: flecs::ecs_os_api_free_t;
+        strdup_: flecs::ecs_os_api_strdup_t;
+        thread_new_: flecs::ecs_os_api_thread_new_t;
+        thread_join_: flecs::ecs_os_api_thread_join_t;
+        thread_self_: flecs::ecs_os_api_thread_self_t;
+        task_new_: flecs::ecs_os_api_thread_new_t;
+        task_join_: flecs::ecs_os_api_thread_join_t;
+        ainc_: flecs::ecs_os_api_ainc_t;
+        adec_: flecs::ecs_os_api_ainc_t;
+        lainc_: flecs::ecs_os_api_lainc_t;
+        ladec_: flecs::ecs_os_api_lainc_t;
+        mutex_new_: flecs::ecs_os_api_mutex_new_t;
+        mutex_free_: flecs::ecs_os_api_mutex_free_t;
+        mutex_lock_: flecs::ecs_os_api_mutex_lock_t;
+        mutex_unlock_: flecs::ecs_os_api_mutex_lock_t;
+        cond_new_: flecs::ecs_os_api_cond_new_t;
+        cond_free_: flecs::ecs_os_api_cond_free_t;
+        cond_signal_: flecs::ecs_os_api_cond_signal_t;
+        cond_broadcast_: flecs::ecs_os_api_cond_broadcast_t;
+        cond_wait_: flecs::ecs_os_api_cond_wait_t;
+        sleep_: flecs::ecs_os_api_sleep_t;
+        now_: flecs::ecs_os_api_now_t;
+        get_time_: flecs::ecs_os_api_get_time_t;
+        log_: flecs::ecs_os_api_log_t;
+        abort_: flecs::ecs_os_api_abort_t;
+        dlopen_: flecs::ecs_os_api_dlopen_t;
+        dlproc_: flecs::ecs_os_api_dlproc_t;
+        dlclose_: flecs::ecs_os_api_dlclose_t;
+        module_to_dl_: flecs::ecs_os_api_module_to_path_t;
+        module_to_etc_: flecs::ecs_os_api_module_to_path_t;
+        perf_trace_push_: flecs::ecs_os_api_perf_trace_t;
+        perf_trace_pop_: flecs::ecs_os_api_perf_trace_t;
+        log_level_: int32;
+        log_indent_: int32;
+        log_last_error_: int32;
+        log_last_timestamp_: int64;
+        flags_: flecs::ecs_flags32_t;
+        log_out_: *unit;
+    }
+
+    public extern struct ecs_term_ref_t
+    {
+    public:
+        id: uint64;
+        name: *uint8;
+    }
+
+    public extern struct ecs_data_t
+    {
+    public:
+    }
+
+    public extern struct ecs_query_cache_match_t
+    {
+    public:
+    }
+
+    public extern struct ecs_query_cache_group_t
+    {
+    public:
+    }
+
+    public extern struct ecs_event_record_t
+    {
+    public:
+        any: *flecs::ecs_event_id_record_t;
+        wildcard: *flecs::ecs_event_id_record_t;
+        wildcard_pair: *flecs::ecs_event_id_record_t;
+        event_ids: flecs::ecs_map_t;
+        event: uint64;
+    }
+
+    public extern struct ecs_table_range_t
+    {
+    public:
+        table: *flecs::ecs_table_t;
+        offset: int32;
+        count: int32;
+    }
+
+    public extern struct ecs_var_t
+    {
+    public:
+        range: flecs::ecs_table_range_t;
+        entity: uint64;
+    }
+
+    public extern struct ecs_page_iter_t
+    {
+    public:
+        offset: int32;
+        limit: int32;
+        remaining: int32;
+    }
+
+    public extern struct ecs_worker_iter_t
+    {
+    public:
+        index: int32;
+        count: int32;
+    }
+
+    public extern struct ecs_table_cache_iter_t
+    {
+    public:
+        cur: *flecs::ecs_table_cache_hdr_t;
+        next: *flecs::ecs_table_cache_hdr_t;
+        iter_fill: bool;
+        iter_empty: bool;
+    }
+
+    public extern struct ecs_each_iter_t
+    {
+    public:
+        it: flecs::ecs_table_cache_iter_t;
+        ids: flecs::ecs_id_t;
+        sources: uint64;
+        sizes: int32;
+        columns: int32;
+        trs: *flecs::ecs_table_record_t;
+    }
+
+    public extern struct ecs_query_op_profile_t
+    {
+    public:
+        count: int32;
+    }
+
+    public extern struct ecs_query_iter_t
+    {
+    public:
+        vars: *flecs::ecs_var_t;
+        query_vars: *flecs::ecs_query_var_t;
+        ops: *flecs::ecs_query_op_t;
+        op_ctx: *flecs::ecs_query_op_ctx_t;
+        written: *flecs::uint64_t;
+        group: *flecs::ecs_query_cache_group_t;
+        tables: *flecs::ecs_vec_t;
+        all_tables: *flecs::ecs_vec_t;
+        elem: *flecs::ecs_query_cache_match_t;
+        cur: int32;
+        all_cur: int32;
+        profile: *flecs::ecs_query_op_profile_t;
+        op: flecs::int16_t;
+        iter_single_group: bool;
+    }
+
+    public extern struct ecs_iter_private_t
+    {
+    public:
+        iter: unit;
+        entity_iter: *unit;
+        stack_cursor: *flecs::ecs_stack_cursor_t;
+    }
+
+    public extern struct ecs_commands_t
+    {
+    public:
+        queue: flecs::ecs_vec_t;
+        stack: flecs::ecs_stack_t;
+        entries: flecs::ecs_sparse_t;
+    }
+
+    public extern struct ecs_suspend_readonly_state_t
+    {
+    public:
+        is_readonly: bool;
+        is_deferred: bool;
+        cmd_flushing: bool;
+        defer_count: int32;
+        scope: uint64;
+        with: uint64;
+        cmd_stack: flecs::ecs_commands_t;
+        cmd: *flecs::ecs_commands_t;
+        stage: *flecs::ecs_stage_t;
+    }
+
+    public extern struct ecs_hm_bucket_t
+    {
+    public:
+        keys: flecs::ecs_vec_t;
+        values: flecs::ecs_vec_t;
+    }
+
+    public extern struct ecs_hashmap_t
+    {
+    public:
+        hash: flecs::ecs_hash_value_action_t;
+        compare: flecs::ecs_compare_action_t;
+        key_size: int32;
+        value_size: int32;
+        impl: flecs::ecs_map_t;
+    }
+
+    public extern struct flecs_hashmap_iter_t
+    {
+    public:
+        it: flecs::ecs_map_iter_t;
+        bucket: *flecs::ecs_hm_bucket_t;
+        index: int32;
+    }
+
+    public extern struct flecs_hashmap_result_t
+    {
+    public:
+        key: *unit;
+        value: *unit;
+        hash: flecs::uint64_t;
+    }
+
+    public extern struct ecs_table_cache_hdr_t
+    {
+    public:
+        cr: *flecs::ecs_component_record_t;
+        table: *flecs::ecs_table_t;
+        prev: *flecs::ecs_table_cache_hdr_t;
+        next: *flecs::ecs_table_cache_hdr_t;
+    }
+
+    public extern struct ecs_table_diff_t
+    {
+    public:
+        added: flecs::ecs_type_t;
+        removed: flecs::ecs_type_t;
+        added_flags: flecs::ecs_flags32_t;
+        removed_flags: flecs::ecs_flags32_t;
+    }
+
+    public extern struct ecs_parent_record_t
+    {
+    public:
+        entity: uint32;
+        count: int32;
+    }
+
+    public extern struct ecs_table_records_t
+    {
+    public:
+        array: *flecs::ecs_table_record_t;
+        count: int32;
+    }
+
+    public extern struct ecs_value_t
+    {
+    public:
+        type: uint64;
+        ptr: *unit;
+    }
+
+    public extern struct ecs_entity_desc_t
+    {
+    public:
+        _canary: int32;
+        id: uint64;
+        parent: uint64;
+        name: *uint8;
+        sep: *uint8;
+        root_sep: *uint8;
+        symbol: *uint8;
+        use_low_id: bool;
+        add: *flecs::ecs_id_t;
+        set: *flecs::ecs_value_t;
+        add_expr: *uint8;
+        fun default() -> flecs::ecs_entity_desc_t {
+            return flecs::ecs_entity_desc_t {
+                ._canary = 0,
+                .id = 0,
+                .parent = 0,
+                .name = null,
+                .sep = null,
+                .root_sep = null,
+                .symbol = null,
+                .use_low_id = false,
+                .add = null,
+                .set = null,
+                .add_expr = null
+            };
+        }
+        fun with_name(name: *uint8) -> flecs::ecs_entity_desc_t {
+            return flecs::ecs_entity_desc_t {
+                ._canary = 0,
+                .id = 0,
+                .parent = 0,
+                .name = name,
+                .sep = null,
+                .root_sep = null,
+                .symbol = null,
+                .use_low_id = false,
+                .add = null,
+                .set = null,
+                .add_expr = null
+            };
+        }
+    }
+
+    public extern struct ecs_bulk_desc_t
+    {
+    public:
+        _canary: int32;
+        entities: *uint64;
+        count: int32;
+        ids: flecs::ecs_id_t;
+        data: **unit;
+        table: *flecs::ecs_table_t;
+    }
+
+    public extern struct ecs_component_desc_t
+    {
+    public:
+        _canary: int32;
+        entity: uint64;
+        type: flecs::ecs_type_info_t;
+        fun default() -> flecs::ecs_component_desc_t {
+            return flecs::ecs_component_desc_t {
+                ._canary = 0,
+                .entity = 0,
+                .type = flecs::ecs_type_info_t {
+                    .size = 0,
+                    .alignment = 0,
+                    .hooks = null,
+                    .component = 0,
+                    .name = null
+                }
+            };
+        }
+    }
+
+    public extern struct ecs_query_desc_t
+    {
+    public:
+        _canary: int32;
+        terms: flecs::ecs_term_t;
+        expr: *uint8;
+        cache_kind: flecs::ecs_query_cache_kind_t;
+        flags: flecs::ecs_flags32_t;
+        order_by_callback: flecs::ecs_order_by_action_t;
+        order_by_table_callback: flecs::ecs_sort_table_action_t;
+        order_by: uint64;
+        group_by: flecs::ecs_id_t;
+        group_by_callback: flecs::ecs_group_by_action_t;
+        on_group_create: flecs::ecs_group_create_action_t;
+        on_group_delete: flecs::ecs_group_delete_action_t;
+        group_by_ctx: *unit;
+        group_by_ctx_free: flecs::ecs_ctx_free_t;
+        ctx: *unit;
+        binding_ctx: *unit;
+        ctx_free: flecs::ecs_ctx_free_t;
+        binding_ctx_free: flecs::ecs_ctx_free_t;
+        entity: uint64;
+    }
+
+    public extern struct ecs_observer_desc_t
+    {
+    public:
+        _canary: int32;
+        entity: uint64;
+        query: flecs::ecs_query_desc_t;
+        events: uint64;
+        yield_existing: bool;
+        global_observer: bool;
+        callback: flecs::ecs_iter_action_t;
+        run: flecs::ecs_run_action_t;
+        ctx: *unit;
+        ctx_free: flecs::ecs_ctx_free_t;
+        callback_ctx: *unit;
+        callback_ctx_free: flecs::ecs_ctx_free_t;
+        run_ctx: *unit;
+        run_ctx_free: flecs::ecs_ctx_free_t;
+        last_event_id: *int32;
+        term_index_: flecs::int8_t;
+        flags_: flecs::ecs_flags32_t;
+    }
+
+    public extern struct ecs_event_desc_t
+    {
+    public:
+        event: uint64;
+        ids: *flecs::ecs_type_t;
+        table: *flecs::ecs_table_t;
+        other_table: *flecs::ecs_table_t;
+        offset: int32;
+        count: int32;
+        entity: uint64;
+        param: *unit;
+        const_param: *unit;
+        observable: *flecs::ecs_poly_t;
+        flags: flecs::ecs_flags32_t;
+    }
+
+    public extern struct ecs_build_info_t
+    {
+    public:
+        compiler: *uint8;
+        addons: **uint8;
+        flags: **uint8;
+        version: *uint8;
+        version_major: flecs::int16_t;
+        version_minor: flecs::int16_t;
+        version_patch: flecs::int16_t;
+        debug: bool;
+        sanitize: bool;
+        perf_trace: bool;
+    }
+
+    public extern struct ecs_world_info_t
+    {
+    public:
+        last_component_id: uint64;
+        delta_time_raw: float32;
+        delta_time: float32;
+        time_scale: float32;
+        target_fps: float32;
+        frame_time_total: float32;
+        system_time_total: float32;
+        emit_time_total: float32;
+        merge_time_total: float32;
+        rematch_time_total: float32;
+        world_time_total: float64;
+        world_time_total_raw: float64;
+        frame_count_total: int64;
+        merge_count_total: int64;
+        eval_comp_monitors_total: int64;
+        rematch_count_total: int64;
+        id_create_total: int64;
+        id_delete_total: int64;
+        table_create_total: int64;
+        table_delete_total: int64;
+        pipeline_build_count_total: int64;
+        systems_ran_total: int64;
+        observers_ran_total: int64;
+        queries_ran_total: int64;
+        tag_id_count: int32;
+        component_id_count: int32;
+        pair_id_count: int32;
+        table_count: int32;
+        creation_time: uint32;
+        cmd: unit;
+        name_prefix: *uint8;
+    }
+
+    public extern struct ecs_query_group_info_t
+    {
+    public:
+        id: flecs::uint64_t;
+        match_count: int32;
+        table_count: int32;
+        ctx: *unit;
+    }
+
+    public extern struct ecs_entity_range_t
+    {
+    public:
+        min: uint32;
+        max: uint32;
+        cur: uint32;
+        recycled: flecs::ecs_vec_t;
+    }
+
+    public extern struct EcsIdentifier
+    {
+    public:
+        value: *uint8;
+        length: int32;
+        hash: flecs::uint64_t;
+        index_hash: flecs::uint64_t;
+        index: *flecs::ecs_hashmap_t;
+    }
+
+    public extern struct EcsComponent
+    {
+    public:
+        size: int32;
+        alignment: int32;
+    }
+
+    public extern struct EcsPoly
+    {
+    public:
+        poly: *flecs::ecs_poly_t;
+    }
+
+    public extern struct EcsDefaultChildComponent
+    {
+    public:
+        component: flecs::ecs_id_t;
+    }
+
+    public extern struct EcsParent
+    {
+    public:
+        value: uint64;
+    }
+
+    public extern struct ecs_tree_spawner_child_t
+    {
+    public:
+        child_name: *uint8;
+        table: *flecs::ecs_table_t;
+        child: uint32;
+        parent_index: int32;
+    }
+
+    public extern struct ecs_tree_spawner_t
+    {
+    public:
+        children: flecs::ecs_vec_t;
+    }
+
+    public extern struct EcsTreeSpawner
+    {
+    public:
+        data: flecs::ecs_tree_spawner_t;
+    }
+
+    public extern struct ecs_entities_t
+    {
+    public:
+        ids: *uint64;
+        count: int32;
+        alive_count: int32;
+    }
+
+    public extern struct ecs_delete_empty_tables_desc_t
+    {
+    public:
+        clear_generation: flecs::uint16_t;
+        delete_generation: flecs::uint16_t;
+        time_budget_seconds: float64;
+        offset: int32;
+    }
+
+    public extern struct ecs_query_count_t
+    {
+    public:
+        results: int32;
+        entities: int32;
+        tables: int32;
+    }
+
+    public extern struct ecs_app_desc_t
+    {
+    public:
+        target_fps: float32;
+        delta_time: float32;
+        threads: int32;
+        frames: int32;
+        enable_rest: bool;
+        enable_stats: bool;
+        port: flecs::uint16_t;
+        init: flecs::ecs_app_init_action_t;
+        ctx: *unit;
+    }
+
+    public extern struct ecs_http_server_t
+    {
+    public:
+    }
+
+    public extern struct ecs_http_connection_t
+    {
+    public:
+        id: flecs::uint64_t;
+        server: *flecs::ecs_http_server_t;
+        host: uint8;
+        port: uint8;
+    }
+
+    public extern struct ecs_http_key_value_t
+    {
+    public:
+        key: *uint8;
+        value: *uint8;
+    }
+
+    public extern struct ecs_http_request_t
+    {
+    public:
+        id: flecs::uint64_t;
+        method: flecs::ecs_http_method_t;
+        path: *uint8;
+        body: *uint8;
+        headers: flecs::ecs_http_key_value_t;
+        params: flecs::ecs_http_key_value_t;
+        header_count: int32;
+        param_count: int32;
+        conn: *flecs::ecs_http_connection_t;
+    }
+
+    public extern struct ecs_http_reply_t
+    {
+    public:
+        code: int32;
+        body: flecs::ecs_strbuf_t;
+        status: *uint8;
+        content_type: *uint8;
+        headers: flecs::ecs_strbuf_t;
+    }
+
+    public extern struct ecs_http_server_desc_t
+    {
+    public:
+        callback: flecs::ecs_http_reply_action_t;
+        ctx: *unit;
+        port: flecs::uint16_t;
+        ipaddr: *uint8;
+        send_queue_wait_ms: int32;
+        cache_timeout: float64;
+        cache_purge_timeout: float64;
+    }
+
+    public extern struct ecs_rest_ctx_t
+    {
+    public:
+        world: *flecs::ecs_world_t;
+        srv: *flecs::ecs_http_server_t;
+        rc: int32;
+        cmd_captures: flecs::ecs_map_t;
+        last_time: float64;
+    }
+
+    public extern struct EcsRest
+    {
+    public:
+        port: flecs::uint16_t;
+        ipaddr: *uint8;
+        impl: *flecs::ecs_rest_ctx_t;
+    }
+
+    public extern struct EcsTimer
+    {
+    public:
+        timeout: float32;
+        time: float32;
+        overshoot: float32;
+        fired_count: int32;
+        active: bool;
+        single_shot: bool;
+    }
+
+    public extern struct EcsRateFilter
+    {
+    public:
+        src: uint64;
+        rate: int32;
+        tick_count: int32;
+        time_elapsed: float32;
+    }
+
+    public extern struct ecs_pipeline_desc_t
+    {
+    public:
+        entity: uint64;
+        query: flecs::ecs_query_desc_t;
+    }
+
+    public extern struct EcsTickSource
+    {
+    public:
+        tick: bool;
+        time_elapsed: float32;
+    }
+
+    public extern struct ecs_system_desc_t
+    {
+    public:
+        _canary: int32;
+        entity: uint64;
+        query: flecs::ecs_query_desc_t;
+        phase: uint64;
+        callback: flecs::ecs_iter_action_t;
+        run: flecs::ecs_run_action_t;
+        ctx: *unit;
+        ctx_free: flecs::ecs_ctx_free_t;
+        callback_ctx: *unit;
+        callback_ctx_free: flecs::ecs_ctx_free_t;
+        run_ctx: *unit;
+        run_ctx_free: flecs::ecs_ctx_free_t;
+        interval: float32;
+        rate: int32;
+        tick_source: uint64;
+        multi_threaded: bool;
+        immediate: bool;
+    }
+
+    public extern struct ecs_system_t
+    {
+    public:
+        hdr: flecs::ecs_header_t;
+        run: flecs::ecs_run_action_t;
+        action: flecs::ecs_iter_action_t;
+        query: *flecs::ecs_query_t;
+        group_id: flecs::uint64_t;
+        group_id_set: bool;
+        tick_source: uint64;
+        multi_threaded: bool;
+        immediate: bool;
+        name: *uint8;
+        ctx: *unit;
+        callback_ctx: *unit;
+        run_ctx: *unit;
+        ctx_free: flecs::ecs_ctx_free_t;
+        callback_ctx_free: flecs::ecs_ctx_free_t;
+        run_ctx_free: flecs::ecs_ctx_free_t;
+        time_spent: float32;
+        time_passed: float32;
+        last_frame: int64;
+        dtor: flecs::flecs_poly_dtor_t;
+    }
+
+    public extern struct ecs_gauge_t
+    {
+    public:
+        avg: float32;
+        min: float32;
+        max: float32;
+    }
+
+    public extern struct ecs_counter_t
+    {
+    public:
+        rate: flecs::ecs_gauge_t;
+        value: float64;
+    }
+
+    public extern union ecs_metric_t
+    {
+    public:
+        gauge: flecs::ecs_gauge_t;
+        counter: flecs::ecs_counter_t;
+    }
+
+    public extern struct ecs_world_stats_t
+    {
+    public:
+        first_: int64;
+        entities: unit;
+        components: unit;
+        tables: unit;
+        queries: unit;
+        commands: unit;
+        frame: unit;
+        performance: unit;
+        memory: unit;
+        http: unit;
+        last_: int64;
+        t: int32;
+    }
+
+    public extern struct ecs_query_stats_t
+    {
+    public:
+        first_: int64;
+        result_count: flecs::ecs_metric_t;
+        matched_table_count: flecs::ecs_metric_t;
+        matched_entity_count: flecs::ecs_metric_t;
+        last_: int64;
+        t: int32;
+    }
+
+    public extern struct ecs_system_stats_t
+    {
+    public:
+        first_: int64;
+        time_spent: flecs::ecs_metric_t;
+        last_: int64;
+        task: bool;
+        query: flecs::ecs_query_stats_t;
+    }
+
+    public extern struct ecs_sync_stats_t
+    {
+    public:
+        first_: int64;
+        time_spent: flecs::ecs_metric_t;
+        commands_enqueued: flecs::ecs_metric_t;
+        last_: int64;
+        system_count: int32;
+        multi_threaded: bool;
+        immediate: bool;
+    }
+
+    public extern struct ecs_pipeline_stats_t
+    {
+    public:
+        canary_: flecs::int8_t;
+        systems: flecs::ecs_vec_t;
+        sync_points: flecs::ecs_vec_t;
+        t: int32;
+        system_count: int32;
+        active_system_count: int32;
+        rebuild_count: int32;
+    }
+
+    public extern struct EcsStatsHeader
+    {
+    public:
+        elapsed: float32;
+        reduce_count: int32;
+    }
+
+    public extern struct EcsWorldStats
+    {
+    public:
+        hdr: flecs::EcsStatsHeader;
+        stats: *flecs::ecs_world_stats_t;
+    }
+
+    public extern struct EcsSystemStats
+    {
+    public:
+        hdr: flecs::EcsStatsHeader;
+        stats: flecs::ecs_map_t;
+    }
+
+    public extern struct EcsPipelineStats
+    {
+    public:
+        hdr: flecs::EcsStatsHeader;
+        stats: flecs::ecs_map_t;
+    }
+
+    public extern struct EcsWorldSummary
+    {
+    public:
+        target_fps: float64;
+        time_scale: float64;
+        fps: float64;
+        frame_time_total: float64;
+        system_time_total: float64;
+        merge_time_total: float64;
+        entity_count: int64;
+        table_count: int64;
+        frame_count: int64;
+        command_count: int64;
+        merge_count: int64;
+        systems_ran_total: int64;
+        observers_ran_total: int64;
+        queries_ran_total: int64;
+        tag_count: int32;
+        component_count: int32;
+        pair_count: int32;
+        frame_time_frame: float64;
+        system_time_frame: float64;
+        merge_time_frame: float64;
+        merge_count_frame: int64;
+        systems_ran_frame: int64;
+        observers_ran_frame: int64;
+        queries_ran_frame: int64;
+        command_count_frame: int64;
+        simulation_time: float64;
+        uptime: uint32;
+        build_info: flecs::ecs_build_info_t;
+    }
+
+    public extern struct ecs_entities_memory_t
+    {
+    public:
+        alive_count: int32;
+        not_alive_count: int32;
+        bytes_entity_index: int32;
+        bytes_names: int32;
+        bytes_doc_strings: int32;
+    }
+
+    public extern struct ecs_component_memory_t
+    {
+    public:
+        instances: int32;
+        bytes_table_components: int32;
+        bytes_table_components_unused: int32;
+        bytes_toggle_bitsets: int32;
+        bytes_sparse_components: int32;
+    }
+
+    public extern struct ecs_component_index_memory_t
+    {
+    public:
+        count: int32;
+        bytes_component_record: int32;
+        bytes_table_cache: int32;
+        bytes_name_index: int32;
+        bytes_ordered_children: int32;
+        bytes_children_table_map: int32;
+        bytes_reachable_cache: int32;
+    }
+
+    public extern struct ecs_query_memory_t
+    {
+    public:
+        count: int32;
+        cached_count: int32;
+        bytes_query: int32;
+        bytes_cache: int32;
+        bytes_group_by: int32;
+        bytes_order_by: int32;
+        bytes_plan: int32;
+        bytes_terms: int32;
+        bytes_misc: int32;
+    }
+
+    public extern struct ecs_table_memory_t
+    {
+    public:
+        count: int32;
+        empty_count: int32;
+        column_count: int32;
+        bytes_table: int32;
+        bytes_type: int32;
+        bytes_entities: int32;
+        bytes_overrides: int32;
+        bytes_column_map: int32;
+        bytes_component_map: int32;
+        bytes_dirty_state: int32;
+        bytes_edges: int32;
+    }
+
+    public extern struct ecs_table_histogram_t
+    {
+    public:
+        entity_counts: int32;
+    }
+
+    public extern struct ecs_misc_memory_t
+    {
+    public:
+        bytes_world: int32;
+        bytes_observers: int32;
+        bytes_systems: int32;
+        bytes_pipelines: int32;
+        bytes_table_lookup: int32;
+        bytes_component_record_lookup: int32;
+        bytes_locked_components: int32;
+        bytes_type_info: int32;
+        bytes_commands: int32;
+        bytes_rematch_monitor: int32;
+        bytes_component_ids: int32;
+        bytes_reflection: int32;
+        bytes_tree_spawner: int32;
+        bytes_prefab_child_indices: int32;
+        bytes_stats: int32;
+        bytes_rest: int32;
+    }
+
+    public extern struct ecs_allocator_memory_t
+    {
+    public:
+        bytes_graph_edge: int32;
+        bytes_component_record: int32;
+        bytes_pair_record: int32;
+        bytes_table_diff: int32;
+        bytes_sparse_chunk: int32;
+        bytes_allocator: int32;
+        bytes_stack_allocator: int32;
+        bytes_cmd_entry_chunk: int32;
+        bytes_query_impl: int32;
+        bytes_query_cache: int32;
+        bytes_misc: int32;
+    }
+
+    public extern struct EcsWorldMemory
+    {
+    public:
+        entities: flecs::ecs_entities_memory_t;
+        components: flecs::ecs_component_memory_t;
+        component_index: flecs::ecs_component_index_memory_t;
+        queries: flecs::ecs_query_memory_t;
+        tables: flecs::ecs_table_memory_t;
+        table_histogram: flecs::ecs_table_histogram_t;
+        misc: flecs::ecs_misc_memory_t;
+        allocators: flecs::ecs_allocator_memory_t;
+        collection_time: float64;
+    }
+
+    public extern struct EcsMetricValue
+    {
+    public:
+        value: float64;
+    }
+
+    public extern struct EcsMetricSource
+    {
+    public:
+        entity: uint64;
+    }
+
+    public extern struct ecs_metric_desc_t
+    {
+    public:
+        _canary: int32;
+        entity: uint64;
+        member: uint64;
+        dotmember: *uint8;
+        id: flecs::ecs_id_t;
+        targets: bool;
+        kind: uint64;
+        brief: *uint8;
+    }
+
+    public extern struct EcsAlertInstance
+    {
+    public:
+        message: *uint8;
+    }
+
+    public extern struct EcsAlertsActive
+    {
+    public:
+        info_count: int32;
+        warning_count: int32;
+        error_count: int32;
+        alerts: flecs::ecs_map_t;
+    }
+
+    public extern struct ecs_alert_severity_filter_t
+    {
+    public:
+        severity: uint64;
+        with: flecs::ecs_id_t;
+        var: *uint8;
+        _var_index: int32;
+    }
+
+    public extern struct ecs_alert_desc_t
+    {
+    public:
+        _canary: int32;
+        entity: uint64;
+        query: flecs::ecs_query_desc_t;
+        message: *uint8;
+        doc_name: *uint8;
+        brief: *uint8;
+        severity: uint64;
+        severity_filters: flecs::ecs_alert_severity_filter_t;
+        retain_period: float32;
+        member: uint64;
+        id: flecs::ecs_id_t;
+        var: *uint8;
+    }
+
+    public extern struct ecs_from_json_desc_t
+    {
+    public:
+        name: *uint8;
+        expr: *uint8;
+        lookup_action: *uint64;
+        lookup_ctx: *unit;
+        strict: bool;
+    }
+
+    public extern struct ecs_entity_to_json_desc_t
+    {
+    public:
+        serialize_entity_id: bool;
+        serialize_doc: bool;
+        serialize_full_paths: bool;
+        serialize_inherited: bool;
+        serialize_values: bool;
+        serialize_builtin: bool;
+        serialize_type_info: bool;
+        serialize_alerts: bool;
+        serialize_refs: uint64;
+        serialize_matches: bool;
+        component_filter: *bool;
+    }
+
+    public extern struct ecs_iter_to_json_desc_t
+    {
+    public:
+        serialize_entity_ids: bool;
+        serialize_values: bool;
+        serialize_builtin: bool;
+        serialize_doc: bool;
+        serialize_full_paths: bool;
+        serialize_fields: bool;
+        serialize_inherited: bool;
+        serialize_table: bool;
+        serialize_type_info: bool;
+        serialize_field_info: bool;
+        serialize_query_info: bool;
+        serialize_query_plan: bool;
+        serialize_query_profile: bool;
+        dont_serialize_results: bool;
+        serialize_alerts: bool;
+        serialize_refs: uint64;
+        serialize_matches: bool;
+        serialize_parents_before_children: bool;
+        component_filter: *bool;
+        query: *flecs::ecs_poly_t;
+    }
+
+    public extern struct ecs_world_to_json_desc_t
+    {
+    public:
+        serialize_builtin: bool;
+        serialize_modules: bool;
+    }
+
+    public extern struct ecs_script_template_t
+    {
+    public:
+    }
+
+    public extern struct ecs_script_var_t
+    {
+    public:
+        name: *uint8;
+        value: flecs::ecs_value_t;
+        type_info: *flecs::ecs_type_info_t;
+        sp: int32;
+        is_const: bool;
+    }
+
+    public extern struct ecs_script_vars_t
+    {
+    public:
+        parent: *flecs::ecs_script_vars_t;
+        sp: int32;
+        var_index: flecs::ecs_hashmap_t;
+        vars: flecs::ecs_vec_t;
+        world: *flecs::ecs_world_t;
+        stack: *flecs::ecs_stack_t;
+        cursor: *flecs::ecs_stack_cursor_t;
+        allocator: *flecs::ecs_allocator_t;
+    }
+
+    public extern struct ecs_script_t
+    {
+    public:
+        world: *flecs::ecs_world_t;
+        name: *uint8;
+        code: *uint8;
+    }
+
+    public extern struct ecs_script_runtime_t
+    {
+    public:
+    }
+
+    public extern struct EcsScript
+    {
+    public:
+        filename: *uint8;
+        code: *uint8;
+        error: *uint8;
+        script: *flecs::ecs_script_t;
+        template_: *flecs::ecs_script_template_t;
+    }
+
+    public extern struct ecs_function_ctx_t
+    {
+    public:
+        world: *flecs::ecs_world_t;
+        function: uint64;
+        ctx: *unit;
+    }
+
+    public extern struct ecs_script_parameter_t
+    {
+    public:
+        name: *uint8;
+        type: uint64;
+    }
+
+    public extern struct EcsScriptConstVar
+    {
+    public:
+        value: flecs::ecs_value_t;
+        type_info: *flecs::ecs_type_info_t;
+    }
+
+    public extern struct ecs_script_function_t
+    {
+    public:
+        return_type: uint64;
+        params: flecs::ecs_vec_t;
+        callback: flecs::ecs_function_callback_t;
+        vector_callbacks: flecs::ecs_vector_function_callback_t;
+        ctx: *unit;
+    }
+
+    public extern struct ecs_script_eval_desc_t
+    {
+    public:
+        vars: *flecs::ecs_script_vars_t;
+        runtime: *flecs::ecs_script_runtime_t;
+    }
+
+    public extern struct ecs_script_eval_result_t
+    {
+    public:
+        error: *uint8;
+    }
+
+    public extern struct ecs_script_desc_t
+    {
+    public:
+        entity: uint64;
+        filename: *uint8;
+        code: *uint8;
+    }
+
+    public extern struct ecs_expr_eval_desc_t
+    {
+    public:
+        name: *uint8;
+        expr: *uint8;
+        vars: *flecs::ecs_script_vars_t;
+        type: uint64;
+        lookup_action: *uint64;
+        lookup_ctx: *unit;
+        disable_folding: bool;
+        disable_dynamic_variable_binding: bool;
+        allow_unresolved_identifiers: bool;
+        runtime: *flecs::ecs_script_runtime_t;
+        script_visitor: *unit;
+    }
+
+    public extern struct ecs_const_var_desc_t
+    {
+    public:
+        name: *uint8;
+        parent: uint64;
+        type: uint64;
+        value: *unit;
+    }
+
+    public extern struct ecs_vector_fn_callbacks_t
+    {
+    public:
+        i8: flecs::ecs_vector_function_callback_t;
+        i32: flecs::ecs_vector_function_callback_t;
+    }
+
+    public extern struct ecs_function_desc_t
+    {
+    public:
+        name: *uint8;
+        parent: uint64;
+        params: flecs::ecs_script_parameter_t;
+        return_type: uint64;
+        callback: flecs::ecs_function_callback_t;
+        vector_callbacks: flecs::ecs_vector_function_callback_t;
+        ctx: *unit;
+    }
+
+    public extern struct ecs_expr_node_t
+    {
+    public:
+    }
+
+    public extern struct EcsDocDescription
+    {
+    public:
+        value: *uint8;
+    }
+
+    public extern struct EcsType
+    {
+    public:
+        kind: flecs::ecs_type_kind_t;
+        existing: bool;
+        partial: bool;
+    }
+
+    public extern struct EcsPrimitive
+    {
+    public:
+        kind: flecs::ecs_primitive_kind_t;
+    }
+
+    public extern struct EcsMember
+    {
+    public:
+        type: uint64;
+        count: int32;
+        unit_: uint64;
+        offset: int32;
+        use_offset: bool;
+    }
+
+    public extern struct ecs_member_value_range_t
+    {
+    public:
+        min: float64;
+        max: float64;
+    }
+
+    public extern struct EcsMemberRanges
+    {
+    public:
+        value: flecs::ecs_member_value_range_t;
+        warning: flecs::ecs_member_value_range_t;
+        error: flecs::ecs_member_value_range_t;
+    }
+
+    public extern struct ecs_member_t
+    {
+    public:
+        name: *uint8;
+        type: uint64;
+        count: int32;
+        offset: int32;
+        unit_: uint64;
+        use_offset: bool;
+        range: flecs::ecs_member_value_range_t;
+        error_range: flecs::ecs_member_value_range_t;
+        warning_range: flecs::ecs_member_value_range_t;
+        size: int32;
+        member: uint64;
+    }
+
+    public extern struct EcsStruct
+    {
+    public:
+        members: flecs::ecs_vec_t;
+    }
+
+    public extern struct ecs_enum_constant_t
+    {
+    public:
+        name: *uint8;
+        value: int64;
+        value_unsigned: flecs::uint64_t;
+        constant: uint64;
+    }
+
+    public extern struct EcsEnum
+    {
+    public:
+        underlying_type: uint64;
+    }
+
+    public extern struct ecs_bitmask_constant_t
+    {
+    public:
+        name: *uint8;
+        value: flecs::ecs_flags64_t;
+        _unused: int64;
+        constant: uint64;
+    }
+
+    public extern struct EcsBitmask
+    {
+    public:
+        dummy_: int32;
+    }
+
+    public extern struct EcsConstants
+    {
+    public:
+        constants: *flecs::ecs_map_t;
+        ordered_constants: flecs::ecs_vec_t;
+    }
+
+    public extern struct EcsArray
+    {
+    public:
+        type: uint64;
+        count: int32;
+    }
+
+    public extern struct EcsVector
+    {
+    public:
+        type: uint64;
+    }
+
+    public extern struct ecs_serializer_t
+    {
+    public:
+        value: *int32;
+        member: *int32;
+        world: *flecs::ecs_world_t;
+        ctx: *unit;
+    }
+
+    public extern struct EcsOpaque
+    {
+    public:
+        as_type: uint64;
+        serialize: flecs::ecs_meta_serialize_t;
+        serialize_member: flecs::ecs_meta_serialize_member_t;
+        serialize_element: flecs::ecs_meta_serialize_element_t;
+        assign_bool: *unit;
+        assign_char: *unit;
+        assign_int: *unit;
+        assign_uint: *unit;
+        assign_float: *unit;
+        assign_string: *unit;
+        assign_entity: *unit;
+        assign_id: *unit;
+        assign_null: *unit;
+        clear: *unit;
+        ensure_element: **unit;
+        ensure_member: **unit;
+        count: *flecs::size_t;
+        resize: *unit;
+    }
+
+    public extern struct ecs_unit_translation_t
+    {
+    public:
+        factor: int32;
+        power: int32;
+    }
+
+    public extern struct EcsUnit
+    {
+    public:
+        symbol: *uint8;
+        prefix: uint64;
+        base: uint64;
+        over: uint64;
+        translation: flecs::ecs_unit_translation_t;
+    }
+
+    public extern struct EcsUnitPrefix
+    {
+    public:
+        symbol: *uint8;
+        translation: flecs::ecs_unit_translation_t;
+    }
+
+    public extern struct ecs_meta_op_t
+    {
+    public:
+        kind: flecs::ecs_meta_op_kind_t;
+        underlying_kind: flecs::ecs_meta_op_kind_t;
+        offset: int32;
+        name: *uint8;
+        elem_size: int32;
+        op_count: flecs::int16_t;
+        member_index: flecs::int16_t;
+        type: uint64;
+        type_info: *flecs::ecs_type_info_t;
+        is: unit;
+    }
+
+    public extern struct EcsTypeSerializer
+    {
+    public:
+        kind: flecs::ecs_type_kind_t;
+        ops: flecs::ecs_vec_t;
+    }
+
+    public extern struct ecs_meta_scope_t
+    {
+    public:
+        type: uint64;
+        ops: *flecs::ecs_meta_op_t;
+        ops_count: flecs::int16_t;
+        ops_cur: flecs::int16_t;
+        prev_depth: flecs::int16_t;
+        ptr: *unit;
+        opaque: *flecs::EcsOpaque;
+        members: *flecs::ecs_hashmap_t;
+        is_collection: bool;
+        is_empty_scope: bool;
+        is_moved_scope: bool;
+        elem: int32;
+        elem_count: int32;
+    }
+
+    public extern struct ecs_meta_cursor_t
+    {
+    public:
+        world: *flecs::ecs_world_t;
+        scope: flecs::ecs_meta_scope_t;
+        depth: flecs::int16_t;
+        valid: bool;
+        is_primitive_scope: bool;
+        lookup_action: *uint64;
+        lookup_ctx: *unit;
+    }
+
+    public extern struct ecs_primitive_desc_t
+    {
+    public:
+        entity: uint64;
+        kind: flecs::ecs_primitive_kind_t;
+    }
+
+    public extern struct ecs_enum_desc_t
+    {
+    public:
+        entity: uint64;
+        constants: flecs::ecs_enum_constant_t;
+        underlying_type: uint64;
+    }
+
+    public extern struct ecs_bitmask_desc_t
+    {
+    public:
+        entity: uint64;
+        constants: flecs::ecs_bitmask_constant_t;
+    }
+
+    public extern struct ecs_array_desc_t
+    {
+    public:
+        entity: uint64;
+        type: uint64;
+        count: int32;
+    }
+
+    public extern struct ecs_vector_desc_t
+    {
+    public:
+        entity: uint64;
+        type: uint64;
+    }
+
+    public extern struct ecs_struct_desc_t
+    {
+    public:
+        entity: uint64;
+        members: flecs::ecs_member_t;
+        create_member_entities: bool;
+    }
+
+    public extern struct ecs_opaque_desc_t
+    {
+    public:
+        entity: uint64;
+        type: flecs::EcsOpaque;
+    }
+
+    public extern struct ecs_unit_desc_t
+    {
+    public:
+        entity: uint64;
+        symbol: *uint8;
+        quantity: uint64;
+        base: uint64;
+        over: uint64;
+        translation: flecs::ecs_unit_translation_t;
+        prefix: uint64;
+    }
+
+    public extern struct ecs_unit_prefix_desc_t
+    {
+    public:
+        entity: uint64;
+        symbol: *uint8;
+        translation: flecs::ecs_unit_translation_t;
+    }
+
+    public extern struct ecs_cpp_component_desc_t
+    {
+    public:
+        id: uint64;
+        ids_index: int32;
+        name: *uint8;
+        cpp_name: *uint8;
+        cpp_symbol: *uint8;
+        size: flecs::size_t;
+        alignment: flecs::size_t;
+        lifecycle_action: flecs::ecs_cpp_type_action_t;
+        enum_action: flecs::ecs_cpp_type_action_t;
+        is_component: bool;
+        explicit_registration: bool;
+    }
+
+    public extern struct ecs_cpp_get_mut_t
+    {
+    public:
+        world: *flecs::ecs_world_t;
+        stage: *flecs::ecs_stage_t;
+        ptr: *unit;
+        call_modified: bool;
+    }
+
+    public enum ecs_inout_kind_t {
+        EcsInOutDefault;
+        EcsInOutNone;
+        EcsInOutFilter;
+        EcsInOut;
+        EcsIn;
+        EcsOut;
+    }
+
+    public enum ecs_oper_kind_t {
+        EcsAnd;
+        EcsOr;
+        EcsNot;
+        EcsOptional;
+        EcsAndFrom;
+        EcsOrFrom;
+        EcsNotFrom;
+    }
+
+    public enum ecs_query_cache_kind_t {
+        EcsQueryCacheDefault;
+        EcsQueryCacheAuto;
+        EcsQueryCacheAll;
+        EcsQueryCacheNone;
+    }
+
+    public enum ecs_http_method_t {
+        EcsHttpGet;
+        EcsHttpPost;
+        EcsHttpPut;
+        EcsHttpDelete;
+        EcsHttpOptions;
+        EcsHttpMethodUnsupported;
+    }
+
+    public enum ecs_type_kind_t {
+        EcsPrimitiveType;
+        EcsBitmaskType;
+        EcsEnumType;
+        EcsStructType;
+        EcsArrayType;
+        EcsVectorType;
+        EcsOpaqueType;
+        EcsTypeKindLast = 6;
+    }
+
+    public enum ecs_primitive_kind_t {
+        EcsBool = 1;
+        EcsChar;
+        EcsByte;
+        EcsU8;
+        EcsU16;
+        EcsU32;
+        EcsU64;
+        EcsI8;
+        EcsI16;
+        EcsI32;
+        EcsI64;
+        EcsF32;
+        EcsF64;
+        EcsUPtr;
+        EcsIPtr;
+        EcsString;
+        EcsEntity;
+        EcsId;
+        EcsPrimitiveKindLast = 18;
+    }
+
+    public enum ecs_meta_op_kind_t {
+        EcsOpPushStruct;
+        EcsOpPushArray;
+        EcsOpPushVector;
+        EcsOpPop;
+        EcsOpOpaqueStruct;
+        EcsOpOpaqueArray;
+        EcsOpOpaqueVector;
+        EcsOpForward;
+        EcsOpScope;
+        EcsOpOpaqueValue;
+        EcsOpEnum;
+        EcsOpBitmask;
+        EcsOpPrimitive;
+        EcsOpBool;
+        EcsOpChar;
+        EcsOpByte;
+        EcsOpU8;
+        EcsOpU16;
+        EcsOpU32;
+        EcsOpU64;
+        EcsOpI8;
+        EcsOpI16;
+        EcsOpI32;
+        EcsOpI64;
+        EcsOpF32;
+        EcsOpF64;
+        EcsOpUPtr;
+        EcsOpIPtr;
+        EcsOpString;
+        EcsOpEntity;
+        EcsOpId;
+        EcsMetaTypeOpKindLast = 30;
+    }
+
+    public extern fun ecs_vec_init(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32);
+    public extern fun ecs_vec_init_w_dbg_info(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32, type_name: *uint8);
+    public extern fun ecs_vec_init_if(vec: *flecs::ecs_vec_t, size: int32);
+    public extern fun ecs_vec_fini(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32);
+    public extern fun ecs_vec_reset(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32) -> *flecs::ecs_vec_t;
+    public extern fun ecs_vec_clear(vec: *flecs::ecs_vec_t);
+    public extern fun ecs_vec_append(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32) -> *unit;
+    public extern fun ecs_vec_remove(vec: *flecs::ecs_vec_t, size: int32, elem: int32);
+    public extern fun ecs_vec_remove_ordered(v: *flecs::ecs_vec_t, size: int32, index: int32);
+    public extern fun ecs_vec_remove_last(vec: *flecs::ecs_vec_t);
+    public extern fun ecs_vec_copy(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32) -> flecs::ecs_vec_t;
+    public extern fun ecs_vec_copy_shrink(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32) -> flecs::ecs_vec_t;
+    public extern fun ecs_vec_reclaim(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32);
+    public extern fun ecs_vec_set_size(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32);
+    public extern fun ecs_vec_set_min_size(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32);
+    public extern fun ecs_vec_set_min_size_w_type_info(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32, ti: *flecs::ecs_type_info_t);
+    public extern fun ecs_vec_set_min_count(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32);
+    public extern fun ecs_vec_set_min_count_zeromem(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32);
+    public extern fun ecs_vec_set_count(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32);
+    public extern fun ecs_vec_set_count_w_type_info(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32, ti: *flecs::ecs_type_info_t);
+    public extern fun ecs_vec_set_min_count_w_type_info(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32, ti: *flecs::ecs_type_info_t);
+    public extern fun ecs_vec_grow(allocator: *flecs::ecs_allocator_t, vec: *flecs::ecs_vec_t, size: int32, elem_count: int32) -> *unit;
+    public extern fun ecs_vec_count(vec: *flecs::ecs_vec_t) -> int32;
+    public extern fun ecs_vec_size(vec: *flecs::ecs_vec_t) -> int32;
+    public extern fun ecs_vec_get(vec: *flecs::ecs_vec_t, size: int32, index: int32) -> *unit;
+    public extern fun ecs_vec_first(vec: *flecs::ecs_vec_t) -> *unit;
+    public extern fun ecs_vec_last(vec: *flecs::ecs_vec_t, size: int32) -> *unit;
+    public extern fun flecs_sparse_init(result: *flecs::ecs_sparse_t, allocator: *flecs::ecs_allocator_t, page_allocator: *flecs::ecs_block_allocator_t, size: int32);
+    public extern fun flecs_sparse_fini(sparse: *flecs::ecs_sparse_t);
+    public extern fun flecs_sparse_clear(sparse: *flecs::ecs_sparse_t);
+    public extern fun flecs_sparse_add(sparse: *flecs::ecs_sparse_t, elem_size: int32) -> *unit;
+    public extern fun flecs_sparse_last_id(sparse: *flecs::ecs_sparse_t) -> flecs::uint64_t;
+    public extern fun flecs_sparse_new_id(sparse: *flecs::ecs_sparse_t) -> flecs::uint64_t;
+    public extern fun flecs_sparse_remove(sparse: *flecs::ecs_sparse_t, size: int32, id: flecs::uint64_t) -> bool;
+    public extern fun flecs_sparse_remove_w_gen(sparse: *flecs::ecs_sparse_t, size: int32, id: flecs::uint64_t) -> bool;
+    public extern fun flecs_sparse_is_alive(sparse: *flecs::ecs_sparse_t, id: flecs::uint64_t) -> bool;
+    public extern fun flecs_sparse_get_dense(sparse: *flecs::ecs_sparse_t, elem_size: int32, index: int32) -> *unit;
+    public extern fun flecs_sparse_count(sparse: *flecs::ecs_sparse_t) -> int32;
+    public extern fun flecs_sparse_has(sparse: *flecs::ecs_sparse_t, id: flecs::uint64_t) -> bool;
+    public extern fun flecs_sparse_get(sparse: *flecs::ecs_sparse_t, elem_size: int32, id: flecs::uint64_t) -> *unit;
+    public extern fun flecs_sparse_insert(sparse: *flecs::ecs_sparse_t, elem_size: int32, id: flecs::uint64_t) -> *unit;
+    public extern fun flecs_sparse_ensure(sparse: *flecs::ecs_sparse_t, elem_size: int32, id: flecs::uint64_t, is_new: *bool) -> *unit;
+    public extern fun flecs_sparse_ensure_fast(sparse: *flecs::ecs_sparse_t, elem_size: int32, id: flecs::uint64_t) -> *unit;
+    public extern fun flecs_sparse_ids(sparse: *flecs::ecs_sparse_t) -> *flecs::uint64_t;
+    public extern fun flecs_sparse_shrink(sparse: *flecs::ecs_sparse_t);
+    public extern fun ecs_sparse_init(sparse: *flecs::ecs_sparse_t, elem_size: int32);
+    public extern fun ecs_sparse_add(sparse: *flecs::ecs_sparse_t, elem_size: int32) -> *unit;
+    public extern fun ecs_sparse_last_id(sparse: *flecs::ecs_sparse_t) -> flecs::uint64_t;
+    public extern fun ecs_sparse_count(sparse: *flecs::ecs_sparse_t) -> int32;
+    public extern fun ecs_sparse_get_dense(sparse: *flecs::ecs_sparse_t, elem_size: int32, index: int32) -> *unit;
+    public extern fun ecs_sparse_get(sparse: *flecs::ecs_sparse_t, elem_size: int32, id: flecs::uint64_t) -> *unit;
+    public extern fun flecs_ballocator_init(ba: *flecs::ecs_block_allocator_t, size: int32);
+    public extern fun flecs_ballocator_new(size: int32) -> *flecs::ecs_block_allocator_t;
+    public extern fun flecs_ballocator_fini(ba: *flecs::ecs_block_allocator_t);
+    public extern fun flecs_ballocator_free(ba: *flecs::ecs_block_allocator_t);
+    public extern fun flecs_balloc(allocator: *flecs::ecs_block_allocator_t) -> *unit;
+    public extern fun flecs_balloc_w_dbg_info(allocator: *flecs::ecs_block_allocator_t, type_name: *uint8) -> *unit;
+    public extern fun flecs_bcalloc(allocator: *flecs::ecs_block_allocator_t) -> *unit;
+    public extern fun flecs_bcalloc_w_dbg_info(allocator: *flecs::ecs_block_allocator_t, type_name: *uint8) -> *unit;
+    public extern fun flecs_bfree(allocator: *flecs::ecs_block_allocator_t, memory: *unit);
+    public extern fun flecs_bfree_w_dbg_info(allocator: *flecs::ecs_block_allocator_t, memory: *unit, type_name: *uint8);
+    public extern fun flecs_brealloc(dst: *flecs::ecs_block_allocator_t, src: *flecs::ecs_block_allocator_t, memory: *unit) -> *unit;
+    public extern fun flecs_brealloc_w_dbg_info(dst: *flecs::ecs_block_allocator_t, src: *flecs::ecs_block_allocator_t, memory: *unit, type_name: *uint8) -> *unit;
+    public extern fun flecs_bdup(ba: *flecs::ecs_block_allocator_t, memory: *unit) -> *unit;
+    public extern fun flecs_stack_init(stack: *flecs::ecs_stack_t);
+    public extern fun flecs_stack_fini(stack: *flecs::ecs_stack_t);
+    public extern fun flecs_stack_alloc(stack: *flecs::ecs_stack_t, size: int32, align: int32) -> *unit;
+    public extern fun flecs_stack_calloc(stack: *flecs::ecs_stack_t, size: int32, align: int32) -> *unit;
+    public extern fun flecs_stack_free(ptr: *unit, size: int32);
+    public extern fun flecs_stack_reset(stack: *flecs::ecs_stack_t);
+    public extern fun flecs_stack_get_cursor(stack: *flecs::ecs_stack_t) -> *flecs::ecs_stack_cursor_t;
+    public extern fun flecs_stack_restore_cursor(stack: *flecs::ecs_stack_t, cursor: *flecs::ecs_stack_cursor_t);
+    public extern fun ecs_map_init(map: *flecs::ecs_map_t, allocator: *flecs::ecs_allocator_t);
+    public extern fun ecs_map_init_if(map: *flecs::ecs_map_t, allocator: *flecs::ecs_allocator_t);
+    public extern fun ecs_map_reclaim(map: *flecs::ecs_map_t);
+    public extern fun ecs_map_fini(map: *flecs::ecs_map_t);
+    public extern fun ecs_map_get(map: *flecs::ecs_map_t, key: flecs::ecs_map_key_t) -> *flecs::ecs_map_val_t;
+    public extern fun ecs_map_get_deref_(map: *flecs::ecs_map_t, key: flecs::ecs_map_key_t) -> *unit;
+    public extern fun ecs_map_ensure(map: *flecs::ecs_map_t, key: flecs::ecs_map_key_t) -> *flecs::ecs_map_val_t;
+    public extern fun ecs_map_ensure_alloc(map: *flecs::ecs_map_t, elem_size: int32, key: flecs::ecs_map_key_t) -> *unit;
+    public extern fun ecs_map_insert(map: *flecs::ecs_map_t, key: flecs::ecs_map_key_t, value: flecs::ecs_map_val_t);
+    public extern fun ecs_map_insert_alloc(map: *flecs::ecs_map_t, elem_size: int32, key: flecs::ecs_map_key_t) -> *unit;
+    public extern fun ecs_map_remove(map: *flecs::ecs_map_t, key: flecs::ecs_map_key_t) -> flecs::ecs_map_val_t;
+    public extern fun ecs_map_remove_free(map: *flecs::ecs_map_t, key: flecs::ecs_map_key_t);
+    public extern fun ecs_map_clear(map: *flecs::ecs_map_t);
+    public extern fun ecs_map_iter(map: *flecs::ecs_map_t) -> flecs::ecs_map_iter_t;
+    public extern fun ecs_map_iter_valid(iter: *flecs::ecs_map_iter_t) -> bool;
+    public extern fun ecs_map_next(iter: *flecs::ecs_map_iter_t) -> bool;
+    public extern fun ecs_map_copy(dst: *flecs::ecs_map_t, src: *flecs::ecs_map_t);
+    public extern fun flecs_allocator_init(a: *flecs::ecs_allocator_t);
+    public extern fun flecs_allocator_fini(a: *flecs::ecs_allocator_t);
+    public extern fun flecs_allocator_get(a: *flecs::ecs_allocator_t, size: int32) -> *flecs::ecs_block_allocator_t;
+    public extern fun flecs_strdup(a: *flecs::ecs_allocator_t, str_: *uint8) -> *uint8;
+    public extern fun flecs_strfree(a: *flecs::ecs_allocator_t, str_: *uint8);
+    public extern fun flecs_dup(a: *flecs::ecs_allocator_t, size: int32, src: *unit) -> *unit;
+    public extern fun ecs_strbuf_vappend(buffer: *flecs::ecs_strbuf_t, fmt: *uint8, args: flecs::va_list);
+    public extern fun ecs_strbuf_appendstr(buffer: *flecs::ecs_strbuf_t, str_: *uint8);
+    public extern fun ecs_strbuf_appendch(buffer: *flecs::ecs_strbuf_t, ch: uint8);
+    public extern fun ecs_strbuf_appendint(buffer: *flecs::ecs_strbuf_t, v: int64);
+    public extern fun ecs_strbuf_appendflt(buffer: *flecs::ecs_strbuf_t, v: float64, nan_delim: uint8);
+    public extern fun ecs_strbuf_appendbool(buffer: *flecs::ecs_strbuf_t, v: bool);
+    public extern fun ecs_strbuf_mergebuff(dst_buffer: *flecs::ecs_strbuf_t, src_buffer: *flecs::ecs_strbuf_t);
+    public extern fun ecs_strbuf_appendstrn(buffer: *flecs::ecs_strbuf_t, str_: *uint8, n: int32);
+    public extern fun ecs_strbuf_get(buffer: *flecs::ecs_strbuf_t) -> *uint8;
+    public extern fun ecs_strbuf_get_small(buffer: *flecs::ecs_strbuf_t) -> *uint8;
+    public extern fun ecs_strbuf_reset(buffer: *flecs::ecs_strbuf_t);
+    public extern fun ecs_strbuf_list_push(buffer: *flecs::ecs_strbuf_t, list_open: *uint8, separator: *uint8);
+    public extern fun ecs_strbuf_list_pop(buffer: *flecs::ecs_strbuf_t, list_close: *uint8);
+    public extern fun ecs_strbuf_list_next(buffer: *flecs::ecs_strbuf_t);
+    public extern fun ecs_strbuf_list_appendch(buffer: *flecs::ecs_strbuf_t, ch: uint8);
+    public extern fun ecs_strbuf_list_appendstr(buffer: *flecs::ecs_strbuf_t, str_: *uint8);
+    public extern fun ecs_strbuf_list_appendstrn(buffer: *flecs::ecs_strbuf_t, str_: *uint8, n: int32);
+    public extern fun ecs_strbuf_written(buffer: *flecs::ecs_strbuf_t) -> int32;
+    public extern fun ecs_os_init();
+    public extern fun ecs_os_fini();
+    public extern fun ecs_os_set_api(os_api: *flecs::ecs_os_api_t);
+    public extern fun ecs_os_get_api() -> flecs::ecs_os_api_t;
+    public extern fun ecs_os_set_api_defaults();
+    public extern fun ecs_os_dbg(file: *uint8, line: int32, msg: *uint8);
+    public extern fun ecs_os_trace(file: *uint8, line: int32, msg: *uint8);
+    public extern fun ecs_os_warn(file: *uint8, line: int32, msg: *uint8);
+    public extern fun ecs_os_err(file: *uint8, line: int32, msg: *uint8);
+    public extern fun ecs_os_fatal(file: *uint8, line: int32, msg: *uint8);
+    public extern fun ecs_os_strerror(err: int32) -> *uint8;
+    public extern fun ecs_os_strset(str_: **uint8, value: *uint8);
+    public extern fun ecs_os_perf_trace_push_(file: *uint8, line: flecs::size_t, name: *uint8);
+    public extern fun ecs_os_perf_trace_pop_(file: *uint8, line: flecs::size_t, name: *uint8);
+    public extern fun ecs_sleepf(t: float64);
+    public extern fun ecs_time_measure(start: *flecs::ecs_time_t) -> float64;
+    public extern fun ecs_time_sub(t1: flecs::ecs_time_t, t2: flecs::ecs_time_t) -> flecs::ecs_time_t;
+    public extern fun ecs_time_to_double(t: flecs::ecs_time_t) -> float64;
+    public extern fun ecs_os_memdup(src: *unit, size: int32) -> *unit;
+    public extern fun ecs_os_has_heap() -> bool;
+    public extern fun ecs_os_has_threading() -> bool;
+    public extern fun ecs_os_has_task_support() -> bool;
+    public extern fun ecs_os_has_time() -> bool;
+    public extern fun ecs_os_has_logging() -> bool;
+    public extern fun ecs_os_has_dl() -> bool;
+    public extern fun ecs_os_has_modules() -> bool;
+    public extern fun flecs_module_path_from_c(c_name: *uint8) -> *uint8;
+    public extern fun flecs_default_ctor(ptr: *unit, count: int32, type_info: *flecs::ecs_type_info_t);
+    public extern fun flecs_type_info_ctor(ptr: *unit, count: int32, type_info: *flecs::ecs_type_info_t) -> bool;
+    public extern fun flecs_type_info_dtor(ptr: *unit, count: int32, type_info: *flecs::ecs_type_info_t) -> bool;
+    public extern fun flecs_type_info_copy(dst: *unit, src: *unit, count: int32, type_info: *flecs::ecs_type_info_t);
+    public extern fun flecs_type_info_move(dst: *unit, src: *unit, count: int32, type_info: *flecs::ecs_type_info_t);
+    public extern fun flecs_type_info_copy_ctor(dst: *unit, src: *unit, count: int32, type_info: *flecs::ecs_type_info_t);
+    public extern fun flecs_type_info_move_ctor(dst: *unit, src: *unit, count: int32, type_info: *flecs::ecs_type_info_t);
+    public extern fun flecs_type_info_ctor_move_dtor(dst: *unit, src: *unit, count: int32, type_info: *flecs::ecs_type_info_t);
+    public extern fun flecs_type_info_move_dtor(dst: *unit, src: *unit, count: int32, type_info: *flecs::ecs_type_info_t);
+    public extern fun flecs_type_info_cmp(a: *unit, b: *unit, type_info: *flecs::ecs_type_info_t) -> int32;
+    public extern fun flecs_type_info_equals(a: *unit, b: *unit, type_info: *flecs::ecs_type_info_t) -> bool;
+    public extern fun flecs_vasprintf(fmt: *uint8, args: flecs::va_list) -> *uint8;
+    public extern fun flecs_chresc(out: *uint8, in: uint8, delimiter: uint8) -> *uint8;
+    public extern fun flecs_chrparse(in: *uint8, out: *uint8) -> *uint8;
+    public extern fun flecs_stresc(out: *uint8, size: int32, delimiter: uint8, in: *uint8) -> int32;
+    public extern fun flecs_astresc(delimiter: uint8, in: *uint8) -> *uint8;
+    public extern fun flecs_parse_ws_eol(ptr: *uint8) -> *uint8;
+    public extern fun flecs_parse_digit(ptr: *uint8, token: *uint8) -> *uint8;
+    public extern fun flecs_to_snake_case(str_: *uint8) -> *uint8;
+    public extern fun flecs_suspend_readonly(world: *flecs::ecs_world_t, state: *flecs::ecs_suspend_readonly_state_t) -> *flecs::ecs_world_t;
+    public extern fun flecs_resume_readonly(world: *flecs::ecs_world_t, state: *flecs::ecs_suspend_readonly_state_t);
+    public extern fun flecs_table_observed_count(table: *flecs::ecs_table_t) -> int32;
+    public extern fun flecs_dump_backtrace(stream: *unit);
+    public extern fun flecs_poly_claim_(poly: *flecs::ecs_poly_t) -> int32;
+    public extern fun flecs_poly_release_(poly: *flecs::ecs_poly_t) -> int32;
+    public extern fun flecs_poly_refcount(poly: *flecs::ecs_poly_t) -> int32;
+    public extern fun flecs_component_ids_index_get() -> int32;
+    public extern fun flecs_component_ids_get(world: *flecs::ecs_world_t, index: int32) -> uint64;
+    public extern fun flecs_component_ids_get_alive(world: *flecs::ecs_world_t, index: int32) -> uint64;
+    public extern fun flecs_component_ids_set(world: *flecs::ecs_world_t, index: int32, id: uint64);
+    public extern fun flecs_query_trivial_cached_next(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun flecs_check_exclusive_world_access_write(world: *flecs::ecs_world_t);
+    public extern fun flecs_check_exclusive_world_access_read(world: *flecs::ecs_world_t);
+    public extern fun flecs_defer_end(world: *flecs::ecs_world_t, stage: *flecs::ecs_stage_t) -> bool;
+    public extern fun flecs_hashmap_init_(hm: *flecs::ecs_hashmap_t, key_size: int32, value_size: int32, hash: flecs::ecs_hash_value_action_t, compare: flecs::ecs_compare_action_t, allocator: *flecs::ecs_allocator_t);
+    public extern fun flecs_hashmap_fini(map: *flecs::ecs_hashmap_t);
+    public extern fun flecs_hashmap_get_(map: *flecs::ecs_hashmap_t, key_size: int32, key: *unit, value_size: int32) -> *unit;
+    public extern fun flecs_hashmap_ensure_(map: *flecs::ecs_hashmap_t, key_size: int32, key: *unit, value_size: int32) -> flecs::flecs_hashmap_result_t;
+    public extern fun flecs_hashmap_set_(map: *flecs::ecs_hashmap_t, key_size: int32, key: *unit, value_size: int32, value: *unit);
+    public extern fun flecs_hashmap_remove_(map: *flecs::ecs_hashmap_t, key_size: int32, key: *unit, value_size: int32);
+    public extern fun flecs_hashmap_remove_w_hash_(map: *flecs::ecs_hashmap_t, key_size: int32, key: *unit, value_size: int32, hash: flecs::uint64_t);
+    public extern fun flecs_hashmap_get_bucket(map: *flecs::ecs_hashmap_t, hash: flecs::uint64_t) -> *flecs::ecs_hm_bucket_t;
+    public extern fun flecs_hm_bucket_remove(map: *flecs::ecs_hashmap_t, bucket: *flecs::ecs_hm_bucket_t, hash: flecs::uint64_t, index: int32);
+    public extern fun flecs_hashmap_copy(dst: *flecs::ecs_hashmap_t, src: *flecs::ecs_hashmap_t);
+    public extern fun flecs_hashmap_iter(map: *flecs::ecs_hashmap_t) -> flecs::flecs_hashmap_iter_t;
+    public extern fun flecs_hashmap_next_(it: *flecs::flecs_hashmap_iter_t, key_size: int32, key_out: *unit, value_size: int32) -> *unit;
+    public extern fun ecs_record_find(world: *flecs::ecs_world_t, entity: uint64) -> *flecs::ecs_record_t;
+    public extern fun ecs_record_get_entity(record: *flecs::ecs_record_t) -> uint64;
+    public extern fun ecs_write_begin(world: *flecs::ecs_world_t, entity: uint64) -> *flecs::ecs_record_t;
+    public extern fun ecs_write_end(record: *flecs::ecs_record_t);
+    public extern fun ecs_read_begin(world: *flecs::ecs_world_t, entity: uint64) -> *flecs::ecs_record_t;
+    public extern fun ecs_read_end(record: *flecs::ecs_record_t);
+    public extern fun ecs_record_get_id(world: *flecs::ecs_world_t, record: *flecs::ecs_record_t, id: flecs::ecs_id_t) -> *unit;
+    public extern fun ecs_record_ensure_id(world: *flecs::ecs_world_t, record: *flecs::ecs_record_t, id: flecs::ecs_id_t) -> *unit;
+    public extern fun ecs_record_has_id(world: *flecs::ecs_world_t, record: *flecs::ecs_record_t, id: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_record_get_by_column(record: *flecs::ecs_record_t, column: int32, size: flecs::size_t) -> *unit;
+    public extern fun flecs_components_get(world: *flecs::ecs_world_t, id: flecs::ecs_id_t) -> *flecs::ecs_component_record_t;
+    public extern fun flecs_components_ensure(world: *flecs::ecs_world_t, id: flecs::ecs_id_t) -> *flecs::ecs_component_record_t;
+    public extern fun flecs_component_get_id(cr: *flecs::ecs_component_record_t) -> flecs::ecs_id_t;
+    public extern fun flecs_component_get_flags(world: *flecs::ecs_world_t, id: flecs::ecs_id_t) -> flecs::ecs_flags32_t;
+    public extern fun flecs_component_get_type_info(cr: *flecs::ecs_component_record_t) -> *flecs::ecs_type_info_t;
+    public extern fun flecs_component_get_table(cr: *flecs::ecs_component_record_t, table: *flecs::ecs_table_t) -> *flecs::ecs_table_record_t;
+    public extern fun flecs_component_get_parent_record(cr: *flecs::ecs_component_record_t, table: *flecs::ecs_table_t) -> *flecs::ecs_parent_record_t;
+    public extern fun flecs_component_get_childof_depth(cr: *flecs::ecs_component_record_t) -> int32;
+    public extern fun flecs_component_iter(cr: *flecs::ecs_component_record_t, iter_out: *flecs::ecs_table_cache_iter_t) -> bool;
+    public extern fun flecs_component_next(iter: *flecs::ecs_table_cache_iter_t) -> *flecs::ecs_table_record_t;
+    public extern fun flecs_table_records(table: *flecs::ecs_table_t) -> flecs::ecs_table_records_t;
+    public extern fun flecs_table_record_get_component(tr: *flecs::ecs_table_record_t) -> *flecs::ecs_component_record_t;
+    public extern fun flecs_table_id(table: *flecs::ecs_table_t) -> flecs::uint64_t;
+    public extern fun flecs_table_traverse_add(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, id_ptr: *flecs::ecs_id_t, diff: *flecs::ecs_table_diff_t) -> *flecs::ecs_table_t;
+    public extern fun ecs_init() -> *flecs::ecs_world_t;
+    public extern fun ecs_mini() -> *flecs::ecs_world_t;
+    public extern fun ecs_init_w_args(argc: int32, argv: *uint8) -> *flecs::ecs_world_t;
+    public extern fun ecs_fini(world: *flecs::ecs_world_t) -> int32;
+    public extern fun ecs_is_fini(world: *flecs::ecs_world_t) -> bool;
+    public extern fun ecs_atfini(world: *flecs::ecs_world_t, action: flecs::ecs_fini_action_t, ctx: *unit);
+    public extern fun ecs_get_entities(world: *flecs::ecs_world_t) -> flecs::ecs_entities_t;
+    public extern fun ecs_world_get_flags(world: *flecs::ecs_world_t) -> flecs::ecs_flags32_t;
+    public extern fun ecs_frame_begin(world: *flecs::ecs_world_t, delta_time: float32) -> float32;
+    public extern fun ecs_frame_end(world: *flecs::ecs_world_t);
+    public extern fun ecs_run_post_frame(world: *flecs::ecs_world_t, action: flecs::ecs_fini_action_t, ctx: *unit);
+    public extern fun ecs_quit(world: *flecs::ecs_world_t);
+    public extern fun ecs_should_quit(world: *flecs::ecs_world_t) -> bool;
+    public extern fun ecs_measure_frame_time(world: *flecs::ecs_world_t, enable: bool);
+    public extern fun ecs_measure_system_time(world: *flecs::ecs_world_t, enable: bool);
+    public extern fun ecs_set_target_fps(world: *flecs::ecs_world_t, fps: float32);
+    public extern fun ecs_set_default_query_flags(world: *flecs::ecs_world_t, flags: flecs::ecs_flags32_t);
+    public extern fun ecs_readonly_begin(world: *flecs::ecs_world_t, multi_threaded: bool) -> bool;
+    public extern fun ecs_readonly_end(world: *flecs::ecs_world_t);
+    public extern fun ecs_merge(stage: *flecs::ecs_world_t);
+    public extern fun ecs_defer_begin(world: *flecs::ecs_world_t) -> bool;
+    public extern fun ecs_defer_end(world: *flecs::ecs_world_t) -> bool;
+    public extern fun ecs_defer_suspend(world: *flecs::ecs_world_t);
+    public extern fun ecs_defer_resume(world: *flecs::ecs_world_t);
+    public extern fun ecs_is_deferred(world: *flecs::ecs_world_t) -> bool;
+    public extern fun ecs_is_defer_suspended(world: *flecs::ecs_world_t) -> bool;
+    public extern fun ecs_set_stage_count(world: *flecs::ecs_world_t, stages: int32);
+    public extern fun ecs_get_stage_count(world: *flecs::ecs_world_t) -> int32;
+    public extern fun ecs_get_stage(world: *flecs::ecs_world_t, stage_id: int32) -> *flecs::ecs_world_t;
+    public extern fun ecs_stage_is_readonly(world: *flecs::ecs_world_t) -> bool;
+    public extern fun ecs_stage_new(world: *flecs::ecs_world_t) -> *flecs::ecs_world_t;
+    public extern fun ecs_stage_free(stage: *flecs::ecs_world_t);
+    public extern fun ecs_stage_get_id(world: *flecs::ecs_world_t) -> int32;
+    public extern fun ecs_set_ctx(world: *flecs::ecs_world_t, ctx: *unit, ctx_free: flecs::ecs_ctx_free_t);
+    public extern fun ecs_set_binding_ctx(world: *flecs::ecs_world_t, ctx: *unit, ctx_free: flecs::ecs_ctx_free_t);
+    public extern fun ecs_get_ctx(world: *flecs::ecs_world_t) -> *unit;
+    public extern fun ecs_get_binding_ctx(world: *flecs::ecs_world_t) -> *unit;
+    public extern fun ecs_get_build_info() -> *flecs::ecs_build_info_t;
+    public extern fun ecs_get_world_info(world: *flecs::ecs_world_t) -> *flecs::ecs_world_info_t;
+    public extern fun ecs_dim(world: *flecs::ecs_world_t, entity_count: int32);
+    public extern fun ecs_shrink(world: *flecs::ecs_world_t);
+    public extern fun ecs_entity_range_new(world: *flecs::ecs_world_t, min: uint32, max: uint32) -> *flecs::ecs_entity_range_t;
+    public extern fun ecs_entity_range_set(world: *flecs::ecs_world_t, range: *flecs::ecs_entity_range_t);
+    public extern fun ecs_entity_range_get(world: *flecs::ecs_world_t) -> *flecs::ecs_entity_range_t;
+    public extern fun ecs_get_max_id(world: *flecs::ecs_world_t) -> uint64;
+    public extern fun ecs_run_aperiodic(world: *flecs::ecs_world_t, flags: flecs::ecs_flags32_t);
+    public extern fun ecs_delete_empty_tables(world: *flecs::ecs_world_t, desc: *flecs::ecs_delete_empty_tables_desc_t) -> int32;
+    public extern fun ecs_get_world(poly: *flecs::ecs_poly_t) -> *flecs::ecs_world_t;
+    public extern fun ecs_get_entity(poly: *flecs::ecs_poly_t) -> uint64;
+    public extern fun flecs_poly_is_(object: *flecs::ecs_poly_t, type: int32) -> bool;
+    public extern fun ecs_make_pair(first: uint64, second: uint64) -> flecs::ecs_id_t;
+    public extern fun ecs_exclusive_access_begin(world: *flecs::ecs_world_t, thread_name: *uint8);
+    public extern fun ecs_exclusive_access_end(world: *flecs::ecs_world_t, lock_world: bool);
+    public extern fun ecs_new(world: *flecs::ecs_world_t) -> uint64;
+    public extern fun ecs_new_low_id(world: *flecs::ecs_world_t) -> uint64;
+    public extern fun ecs_new_w_id(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> uint64;
+    public extern fun ecs_new_w_table(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t) -> uint64;
+    public extern fun ecs_entity_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_entity_desc_t) -> uint64;
+    public extern fun ecs_bulk_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_bulk_desc_t) -> *uint64;
+    public extern fun ecs_bulk_new_w_id(world: *flecs::ecs_world_t, component: flecs::ecs_id_t, count: int32) -> *uint64;
+    public extern fun ecs_clone(world: *flecs::ecs_world_t, dst: uint64, src: uint64, copy_value: bool) -> uint64;
+    public extern fun ecs_delete(world: *flecs::ecs_world_t, entity: uint64);
+    public extern fun ecs_delete_with(world: *flecs::ecs_world_t, component: flecs::ecs_id_t);
+    public extern fun ecs_set_child_order(world: *flecs::ecs_world_t, parent: uint64, children: *uint64, child_count: int32);
+    public extern fun ecs_get_ordered_children(world: *flecs::ecs_world_t, parent: uint64) -> flecs::ecs_entities_t;
+    public extern fun ecs_add_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t);
+    public extern fun ecs_remove_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t);
+    public extern fun ecs_auto_override_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t);
+    public extern fun ecs_clear(world: *flecs::ecs_world_t, entity: uint64);
+    public extern fun ecs_remove_all(world: *flecs::ecs_world_t, component: flecs::ecs_id_t);
+    public extern fun ecs_set_with(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> uint64;
+    public extern fun ecs_get_with(world: *flecs::ecs_world_t) -> flecs::ecs_id_t;
+    public extern fun ecs_enable(world: *flecs::ecs_world_t, entity: uint64, enabled: bool);
+    public extern fun ecs_enable_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t, enable: bool);
+    public extern fun ecs_is_enabled_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_get_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t) -> *unit;
+    public extern fun ecs_get_mut_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t) -> *unit;
+    public extern fun ecs_ensure_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t, size: flecs::size_t) -> *unit;
+    public extern fun ecs_ref_init_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t) -> flecs::ecs_ref_t;
+    public extern fun ecs_ref_get_id(world: *flecs::ecs_world_t, ref: *flecs::ecs_ref_t, component: flecs::ecs_id_t) -> *unit;
+    public extern fun ecs_ref_update(world: *flecs::ecs_world_t, ref: *flecs::ecs_ref_t);
+    public extern fun ecs_emplace_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t, size: flecs::size_t, is_new: *bool) -> *unit;
+    public extern fun ecs_modified_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t);
+    public extern fun ecs_set_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t, size: flecs::size_t, ptr: *unit);
+    public extern fun ecs_is_valid(world: *flecs::ecs_world_t, e: uint64) -> bool;
+    public extern fun ecs_is_alive(world: *flecs::ecs_world_t, e: uint64) -> bool;
+    public extern fun ecs_strip_generation(e: uint64) -> flecs::ecs_id_t;
+    public extern fun ecs_get_alive(world: *flecs::ecs_world_t, e: uint64) -> uint64;
+    public extern fun ecs_make_alive(world: *flecs::ecs_world_t, entity: uint64);
+    public extern fun ecs_make_alive_id(world: *flecs::ecs_world_t, component: flecs::ecs_id_t);
+    public extern fun ecs_exists(world: *flecs::ecs_world_t, entity: uint64) -> bool;
+    public extern fun ecs_set_version(world: *flecs::ecs_world_t, entity: uint64);
+    public extern fun ecs_get_version(entity: uint64) -> uint32;
+    public extern fun ecs_get_type(world: *flecs::ecs_world_t, entity: uint64) -> *flecs::ecs_type_t;
+    public extern fun ecs_get_table(world: *flecs::ecs_world_t, entity: uint64) -> *flecs::ecs_table_t;
+    public extern fun ecs_type_str(world: *flecs::ecs_world_t, type: *flecs::ecs_type_t) -> *uint8;
+    public extern fun ecs_table_str(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t) -> *uint8;
+    public extern fun ecs_entity_str(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_has_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_owns_id(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_get_target(world: *flecs::ecs_world_t, entity: uint64, rel: uint64, index: int32) -> uint64;
+    public extern fun ecs_get_parent(world: *flecs::ecs_world_t, entity: uint64) -> uint64;
+    public extern fun ecs_new_w_parent(world: *flecs::ecs_world_t, parent: uint64, name: *uint8) -> uint64;
+    public extern fun ecs_get_target_for_id(world: *flecs::ecs_world_t, entity: uint64, rel: uint64, component: flecs::ecs_id_t) -> uint64;
+    public extern fun ecs_get_depth(world: *flecs::ecs_world_t, entity: uint64, rel: uint64) -> int32;
+    public extern fun ecs_count_id(world: *flecs::ecs_world_t, entity: flecs::ecs_id_t) -> int32;
+    public extern fun ecs_get_name(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_get_symbol(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_set_name(world: *flecs::ecs_world_t, entity: uint64, name: *uint8) -> uint64;
+    public extern fun ecs_set_symbol(world: *flecs::ecs_world_t, entity: uint64, symbol: *uint8) -> uint64;
+    public extern fun ecs_set_alias(world: *flecs::ecs_world_t, entity: uint64, alias: *uint8);
+    public extern fun ecs_lookup(world: *flecs::ecs_world_t, path: *uint8) -> uint64;
+    public extern fun ecs_lookup_child(world: *flecs::ecs_world_t, parent: uint64, name: *uint8) -> uint64;
+    public extern fun ecs_lookup_path_w_sep(world: *flecs::ecs_world_t, parent: uint64, path: *uint8, sep: *uint8, prefix: *uint8, recursive: bool) -> uint64;
+    public extern fun ecs_lookup_symbol(world: *flecs::ecs_world_t, symbol: *uint8, lookup_as_path: bool, recursive: bool) -> uint64;
+    public extern fun ecs_get_path_w_sep(world: *flecs::ecs_world_t, parent: uint64, child: uint64, sep: *uint8, prefix: *uint8) -> *uint8;
+    public extern fun ecs_get_path_w_sep_buf(world: *flecs::ecs_world_t, parent: uint64, child: uint64, sep: *uint8, prefix: *uint8, buf: *flecs::ecs_strbuf_t, escape: bool);
+    public extern fun ecs_new_from_path_w_sep(world: *flecs::ecs_world_t, parent: uint64, path: *uint8, sep: *uint8, prefix: *uint8) -> uint64;
+    public extern fun ecs_add_path_w_sep(world: *flecs::ecs_world_t, entity: uint64, parent: uint64, path: *uint8, sep: *uint8, prefix: *uint8) -> uint64;
+    public extern fun ecs_set_scope(world: *flecs::ecs_world_t, scope: uint64) -> uint64;
+    public extern fun ecs_get_scope(world: *flecs::ecs_world_t) -> uint64;
+    public extern fun ecs_set_name_prefix(world: *flecs::ecs_world_t, prefix: *uint8) -> *uint8;
+    public extern fun ecs_set_lookup_path(world: *flecs::ecs_world_t, lookup_path: *uint64) -> *uint64;
+    public extern fun ecs_get_lookup_path(world: *flecs::ecs_world_t) -> *uint64;
+    public extern fun ecs_component_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_component_desc_t) -> uint64;
+    public extern fun ecs_get_type_info(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> *flecs::ecs_type_info_t;
+    public extern fun ecs_set_hooks_id(world: *flecs::ecs_world_t, component: uint64, hooks: *flecs::ecs_type_hooks_t);
+    public extern fun ecs_get_hooks_id(world: *flecs::ecs_world_t, component: uint64) -> *flecs::ecs_type_hooks_t;
+    public extern fun ecs_id_is_tag(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_id_in_use(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_get_typeid(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> uint64;
+    public extern fun ecs_id_match(component: flecs::ecs_id_t, pattern: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_id_is_pair(component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_id_is_wildcard(component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_id_is_any(component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_id_is_valid(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_id_get_flags(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> flecs::ecs_flags32_t;
+    public extern fun ecs_id_flag_str(component_flags: flecs::uint64_t) -> *uint8;
+    public extern fun ecs_id_str(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> *uint8;
+    public extern fun ecs_id_str_buf(world: *flecs::ecs_world_t, component: flecs::ecs_id_t, buf: *flecs::ecs_strbuf_t);
+    public extern fun ecs_id_from_str(world: *flecs::ecs_world_t, expr: *uint8) -> flecs::ecs_id_t;
+    public extern fun ecs_term_ref_is_set(ref: *flecs::ecs_term_ref_t) -> bool;
+    public extern fun ecs_term_is_initialized(term: *flecs::ecs_term_t) -> bool;
+    public extern fun ecs_term_match_this(term: *flecs::ecs_term_t) -> bool;
+    public extern fun ecs_term_match_0(term: *flecs::ecs_term_t) -> bool;
+    public extern fun ecs_term_str(world: *flecs::ecs_world_t, term: *flecs::ecs_term_t) -> *uint8;
+    public extern fun ecs_query_str(query: *flecs::ecs_query_t) -> *uint8;
+    public extern fun ecs_each_id(world: *flecs::ecs_world_t, component: flecs::ecs_id_t) -> flecs::ecs_iter_t;
+    public extern fun ecs_each_next(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_children(world: *flecs::ecs_world_t, parent: uint64) -> flecs::ecs_iter_t;
+    public extern fun ecs_children_w_rel(world: *flecs::ecs_world_t, relationship: uint64, parent: uint64) -> flecs::ecs_iter_t;
+    public extern fun ecs_children_next(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_query_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_query_desc_t) -> *flecs::ecs_query_t;
+    public extern fun ecs_query_fini(query: *flecs::ecs_query_t);
+    public extern fun ecs_query_find_var(query: *flecs::ecs_query_t, name: *uint8) -> int32;
+    public extern fun ecs_query_var_name(query: *flecs::ecs_query_t, var_id: int32) -> *uint8;
+    public extern fun ecs_query_var_is_entity(query: *flecs::ecs_query_t, var_id: int32) -> bool;
+    public extern fun ecs_query_iter(world: *flecs::ecs_world_t, query: *flecs::ecs_query_t) -> flecs::ecs_iter_t;
+    public extern fun ecs_query_next(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_query_has(query: *flecs::ecs_query_t, entity: uint64, it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_query_has_table(query: *flecs::ecs_query_t, table: *flecs::ecs_table_t, it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_query_has_range(query: *flecs::ecs_query_t, range: *flecs::ecs_table_range_t, it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_query_match_count(query: *flecs::ecs_query_t) -> int32;
+    public extern fun ecs_query_plan(query: *flecs::ecs_query_t) -> *uint8;
+    public extern fun ecs_query_plan_w_profile(query: *flecs::ecs_query_t, it: *flecs::ecs_iter_t) -> *uint8;
+    public extern fun ecs_query_plans(query: *flecs::ecs_query_t) -> *uint8;
+    public extern fun ecs_query_args_parse(query: *flecs::ecs_query_t, it: *flecs::ecs_iter_t, expr: *uint8) -> *uint8;
+    public extern fun ecs_query_changed(query: *flecs::ecs_query_t) -> bool;
+    public extern fun ecs_query_get(world: *flecs::ecs_world_t, query: uint64) -> *flecs::ecs_query_t;
+    public extern fun ecs_iter_skip(it: *flecs::ecs_iter_t);
+    public extern fun ecs_iter_set_group(it: *flecs::ecs_iter_t, group_id: flecs::uint64_t);
+    public extern fun ecs_query_get_groups(query: *flecs::ecs_query_t) -> *flecs::ecs_map_t;
+    public extern fun ecs_query_get_group_ctx(query: *flecs::ecs_query_t, group_id: flecs::uint64_t) -> *unit;
+    public extern fun ecs_query_get_group_info(query: *flecs::ecs_query_t, group_id: flecs::uint64_t) -> *flecs::ecs_query_group_info_t;
+    public extern fun ecs_query_count(query: *flecs::ecs_query_t) -> flecs::ecs_query_count_t;
+    public extern fun ecs_query_is_true(query: *flecs::ecs_query_t) -> bool;
+    public extern fun ecs_query_get_cache_query(query: *flecs::ecs_query_t) -> *flecs::ecs_query_t;
+    public extern fun ecs_emit(world: *flecs::ecs_world_t, desc: *flecs::ecs_event_desc_t);
+    public extern fun ecs_enqueue(world: *flecs::ecs_world_t, desc: *flecs::ecs_event_desc_t);
+    public extern fun ecs_observer_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_observer_desc_t) -> uint64;
+    public extern fun ecs_observer_get(world: *flecs::ecs_world_t, observer: uint64) -> *flecs::ecs_observer_t;
+    public extern fun ecs_iter_next(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_iter_fini(it: *flecs::ecs_iter_t);
+    public extern fun ecs_iter_count(it: *flecs::ecs_iter_t) -> int32;
+    public extern fun ecs_iter_is_true(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_iter_first(it: *flecs::ecs_iter_t) -> uint64;
+    public extern fun ecs_iter_set_var(it: *flecs::ecs_iter_t, var_id: int32, entity: uint64);
+    public extern fun ecs_iter_set_var_as_table(it: *flecs::ecs_iter_t, var_id: int32, table: *flecs::ecs_table_t);
+    public extern fun ecs_iter_set_var_as_range(it: *flecs::ecs_iter_t, var_id: int32, range: *flecs::ecs_table_range_t);
+    public extern fun ecs_iter_get_var(it: *flecs::ecs_iter_t, var_id: int32) -> uint64;
+    public extern fun ecs_iter_get_var_name(it: *flecs::ecs_iter_t, var_id: int32) -> *uint8;
+    public extern fun ecs_iter_get_var_count(it: *flecs::ecs_iter_t) -> int32;
+    public extern fun ecs_iter_get_vars(it: *flecs::ecs_iter_t) -> *flecs::ecs_var_t;
+    public extern fun ecs_iter_get_var_as_table(it: *flecs::ecs_iter_t, var_id: int32) -> *flecs::ecs_table_t;
+    public extern fun ecs_iter_get_var_as_range(it: *flecs::ecs_iter_t, var_id: int32) -> flecs::ecs_table_range_t;
+    public extern fun ecs_iter_var_is_constrained(it: *flecs::ecs_iter_t, var_id: int32) -> bool;
+    public extern fun ecs_iter_get_group(it: *flecs::ecs_iter_t) -> flecs::uint64_t;
+    public extern fun ecs_iter_changed(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_iter_str(it: *flecs::ecs_iter_t) -> *uint8;
+    public extern fun ecs_page_iter(it: *flecs::ecs_iter_t, offset: int32, limit: int32) -> flecs::ecs_iter_t;
+    public extern fun ecs_page_next(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_worker_iter(it: *flecs::ecs_iter_t, index: int32, count: int32) -> flecs::ecs_iter_t;
+    public extern fun ecs_worker_next(it: *flecs::ecs_iter_t) -> bool;
+    public extern fun ecs_field_w_size(it: *flecs::ecs_iter_t, size: flecs::size_t, index: flecs::int8_t) -> *unit;
+    public extern fun ecs_field_at_w_size(it: *flecs::ecs_iter_t, size: flecs::size_t, index: flecs::int8_t, row: int32) -> *unit;
+    public extern fun ecs_field_is_readonly(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> bool;
+    public extern fun ecs_field_is_writeonly(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> bool;
+    public extern fun ecs_field_is_set(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> bool;
+    public extern fun ecs_field_id(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> flecs::ecs_id_t;
+    public extern fun ecs_field_column(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> int32;
+    public extern fun ecs_field_src(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> uint64;
+    public extern fun ecs_field_size(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> flecs::size_t;
+    public extern fun ecs_field_is_self(it: *flecs::ecs_iter_t, index: flecs::int8_t) -> bool;
+    public extern fun ecs_table_get_type(table: *flecs::ecs_table_t) -> *flecs::ecs_type_t;
+    public extern fun ecs_table_get_type_index(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, component: flecs::ecs_id_t) -> int32;
+    public extern fun ecs_table_get_column_index(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, component: flecs::ecs_id_t) -> int32;
+    public extern fun ecs_table_column_count(table: *flecs::ecs_table_t) -> int32;
+    public extern fun ecs_table_type_to_column_index(table: *flecs::ecs_table_t, index: int32) -> int32;
+    public extern fun ecs_table_column_to_type_index(table: *flecs::ecs_table_t, index: int32) -> int32;
+    public extern fun ecs_table_get_column(table: *flecs::ecs_table_t, index: int32, offset: int32) -> *unit;
+    public extern fun ecs_table_get_id(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, component: flecs::ecs_id_t, offset: int32) -> *unit;
+    public extern fun ecs_table_get_column_size(table: *flecs::ecs_table_t, index: int32) -> flecs::size_t;
+    public extern fun ecs_table_count(table: *flecs::ecs_table_t) -> int32;
+    public extern fun ecs_table_size(table: *flecs::ecs_table_t) -> int32;
+    public extern fun ecs_table_entities(table: *flecs::ecs_table_t) -> *uint64;
+    public extern fun ecs_table_has_id(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, component: flecs::ecs_id_t) -> bool;
+    public extern fun ecs_table_get_target(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, relationship: uint64, index: int32) -> uint64;
+    public extern fun ecs_table_get_depth(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, rel: uint64) -> int32;
+    public extern fun ecs_table_add_id(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, component: flecs::ecs_id_t) -> *flecs::ecs_table_t;
+    public extern fun ecs_table_find(world: *flecs::ecs_world_t, ids: *flecs::ecs_id_t, id_count: int32) -> *flecs::ecs_table_t;
+    public extern fun ecs_table_remove_id(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, component: flecs::ecs_id_t) -> *flecs::ecs_table_t;
+    public extern fun ecs_table_lock(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t);
+    public extern fun ecs_table_unlock(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t);
+    public extern fun ecs_table_has_flags(table: *flecs::ecs_table_t, flags: flecs::ecs_flags32_t) -> bool;
+    public extern fun ecs_table_has_traversable(table: *flecs::ecs_table_t) -> bool;
+    public extern fun ecs_table_swap_rows(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, row_1: int32, row_2: int32);
+    public extern fun ecs_commit(world: *flecs::ecs_world_t, entity: uint64, record: *flecs::ecs_record_t, table: *flecs::ecs_table_t, added: *flecs::ecs_type_t, removed: *flecs::ecs_type_t) -> bool;
+    public extern fun ecs_search(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, component: flecs::ecs_id_t, component_out: *flecs::ecs_id_t) -> int32;
+    public extern fun ecs_search_offset(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, offset: int32, component: flecs::ecs_id_t, component_out: *flecs::ecs_id_t) -> int32;
+    public extern fun ecs_search_relation(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t, offset: int32, component: flecs::ecs_id_t, rel: uint64, flags: flecs::ecs_flags64_t, tgt_out: *uint64, component_out: *flecs::ecs_id_t, tr_out: **flecs::ecs_table_record_t) -> int32;
+    public extern fun ecs_search_relation_for_entity(world: *flecs::ecs_world_t, entity: uint64, id: flecs::ecs_id_t, rel: uint64, self: bool, cr: *flecs::ecs_component_record_t, tgt_out: *uint64, id_out: *flecs::ecs_id_t, tr_out: **flecs::ecs_table_record_t) -> int32;
+    public extern fun ecs_table_clear_entities(world: *flecs::ecs_world_t, table: *flecs::ecs_table_t);
+    public extern fun ecs_value_init(world: *flecs::ecs_world_t, type: uint64, ptr: *unit) -> int32;
+    public extern fun ecs_value_init_w_type_info(world: *flecs::ecs_world_t, ti: *flecs::ecs_type_info_t, ptr: *unit) -> int32;
+    public extern fun ecs_value_new(world: *flecs::ecs_world_t, type: uint64) -> *unit;
+    public extern fun ecs_value_new_w_type_info(world: *flecs::ecs_world_t, ti: *flecs::ecs_type_info_t) -> *unit;
+    public extern fun ecs_value_fini_w_type_info(world: *flecs::ecs_world_t, ti: *flecs::ecs_type_info_t, ptr: *unit) -> int32;
+    public extern fun ecs_value_fini(world: *flecs::ecs_world_t, type: uint64, ptr: *unit) -> int32;
+    public extern fun ecs_value_free(world: *flecs::ecs_world_t, type: uint64, ptr: *unit) -> int32;
+    public extern fun ecs_value_copy_w_type_info(world: *flecs::ecs_world_t, ti: *flecs::ecs_type_info_t, dst: *unit, src: *unit) -> int32;
+    public extern fun ecs_value_copy(world: *flecs::ecs_world_t, type: uint64, dst: *unit, src: *unit) -> int32;
+    public extern fun ecs_value_move_w_type_info(world: *flecs::ecs_world_t, ti: *flecs::ecs_type_info_t, dst: *unit, src: *unit) -> int32;
+    public extern fun ecs_value_move(world: *flecs::ecs_world_t, type: uint64, dst: *unit, src: *unit) -> int32;
+    public extern fun ecs_value_move_ctor_w_type_info(world: *flecs::ecs_world_t, ti: *flecs::ecs_type_info_t, dst: *unit, src: *unit) -> int32;
+    public extern fun ecs_value_move_ctor(world: *flecs::ecs_world_t, type: uint64, dst: *unit, src: *unit) -> int32;
+    public extern fun ecs_deprecated_(file: *uint8, line: int32, msg: *uint8);
+    public extern fun ecs_log_push_(level: int32);
+    public extern fun ecs_log_pop_(level: int32);
+    public extern fun ecs_should_log(level: int32) -> bool;
+    public extern fun ecs_strerror(error_code: int32) -> *uint8;
+    public extern fun ecs_printv_(level: int32, file: *uint8, line: int32, fmt: *uint8, args: flecs::va_list);
+    public extern fun ecs_logv_(level: int32, file: *uint8, line: int32, fmt: *uint8, args: flecs::va_list);
+    public extern fun ecs_parser_errorv_(name: *uint8, expr: *uint8, column: int64, fmt: *uint8, args: flecs::va_list);
+    public extern fun ecs_parser_warningv_(name: *uint8, expr: *uint8, column: int64, fmt: *uint8, args: flecs::va_list);
+    public extern fun ecs_log_set_level(level: int32) -> int32;
+    public extern fun ecs_log_get_level() -> int32;
+    public extern fun ecs_log_enable_colors(enabled: bool) -> bool;
+    public extern fun ecs_log_enable_timestamp(enabled: bool) -> bool;
+    public extern fun ecs_log_enable_timedelta(enabled: bool) -> bool;
+    public extern fun ecs_log_last_error() -> int32;
+    public extern fun ecs_log_start_capture(capture_try: bool);
+    public extern fun ecs_log_stop_capture() -> *uint8;
+    public extern fun ecs_app_run(world: *flecs::ecs_world_t, desc: *flecs::ecs_app_desc_t) -> int32;
+    public extern fun ecs_app_run_frame(world: *flecs::ecs_world_t, desc: *flecs::ecs_app_desc_t) -> int32;
+    public extern fun ecs_app_set_run_action(callback: flecs::ecs_app_run_action_t) -> int32;
+    public extern fun ecs_app_set_frame_action(callback: flecs::ecs_app_frame_action_t) -> int32;
+    public extern fun ecs_http_server_init(desc: *flecs::ecs_http_server_desc_t) -> *flecs::ecs_http_server_t;
+    public extern fun ecs_http_server_fini(server: *flecs::ecs_http_server_t);
+    public extern fun ecs_http_server_start(server: *flecs::ecs_http_server_t) -> int32;
+    public extern fun ecs_http_server_dequeue(server: *flecs::ecs_http_server_t, delta_time: float32);
+    public extern fun ecs_http_server_stop(server: *flecs::ecs_http_server_t);
+    public extern fun ecs_http_server_http_request(srv: *flecs::ecs_http_server_t, req: *uint8, len: int32, reply_out: *flecs::ecs_http_reply_t) -> int32;
+    public extern fun ecs_http_server_request(srv: *flecs::ecs_http_server_t, method: *uint8, req: *uint8, body: *uint8, reply_out: *flecs::ecs_http_reply_t) -> int32;
+    public extern fun ecs_http_server_ctx(srv: *flecs::ecs_http_server_t) -> *unit;
+    public extern fun ecs_http_get_header(req: *flecs::ecs_http_request_t, name: *uint8) -> *uint8;
+    public extern fun ecs_http_get_param(req: *flecs::ecs_http_request_t, name: *uint8) -> *uint8;
+    public extern fun ecs_rest_server_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_http_server_desc_t) -> *flecs::ecs_http_server_t;
+    public extern fun ecs_rest_server_fini(srv: *flecs::ecs_http_server_t);
+    public extern fun FlecsRestImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_set_timeout(world: *flecs::ecs_world_t, tick_source: uint64, timeout: float32) -> uint64;
+    public extern fun ecs_get_timeout(world: *flecs::ecs_world_t, tick_source: uint64) -> float32;
+    public extern fun ecs_set_interval(world: *flecs::ecs_world_t, tick_source: uint64, interval: float32) -> uint64;
+    public extern fun ecs_get_interval(world: *flecs::ecs_world_t, tick_source: uint64) -> float32;
+    public extern fun ecs_start_timer(world: *flecs::ecs_world_t, tick_source: uint64);
+    public extern fun ecs_stop_timer(world: *flecs::ecs_world_t, tick_source: uint64);
+    public extern fun ecs_reset_timer(world: *flecs::ecs_world_t, tick_source: uint64);
+    public extern fun ecs_randomize_timers(world: *flecs::ecs_world_t);
+    public extern fun ecs_set_rate(world: *flecs::ecs_world_t, tick_source: uint64, rate: int32, source: uint64) -> uint64;
+    public extern fun ecs_set_tick_source(world: *flecs::ecs_world_t, system: uint64, tick_source: uint64);
+    public extern fun FlecsTimerImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_pipeline_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_pipeline_desc_t) -> uint64;
+    public extern fun ecs_set_pipeline(world: *flecs::ecs_world_t, pipeline: uint64);
+    public extern fun ecs_get_pipeline(world: *flecs::ecs_world_t) -> uint64;
+    public extern fun ecs_progress(world: *flecs::ecs_world_t, delta_time: float32) -> bool;
+    public extern fun ecs_set_time_scale(world: *flecs::ecs_world_t, scale: float32);
+    public extern fun ecs_reset_clock(world: *flecs::ecs_world_t);
+    public extern fun ecs_run_pipeline(world: *flecs::ecs_world_t, pipeline: uint64, delta_time: float32);
+    public extern fun ecs_set_threads(world: *flecs::ecs_world_t, threads: int32);
+    public extern fun ecs_set_task_threads(world: *flecs::ecs_world_t, task_threads: int32);
+    public extern fun ecs_using_task_threads(world: *flecs::ecs_world_t) -> bool;
+    public extern fun FlecsPipelineImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_system_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_system_desc_t) -> uint64;
+    public extern fun ecs_system_get(world: *flecs::ecs_world_t, system: uint64) -> *flecs::ecs_system_t;
+    public extern fun ecs_system_set_group(world: *flecs::ecs_world_t, system: uint64, group_id: flecs::uint64_t);
+    public extern fun ecs_run(world: *flecs::ecs_world_t, system: uint64, delta_time: float32, param: *unit) -> uint64;
+    public extern fun ecs_run_worker(world: *flecs::ecs_world_t, system: uint64, stage_current: int32, stage_count: int32, delta_time: float32, param: *unit) -> uint64;
+    public extern fun FlecsSystemImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_world_stats_get(world: *flecs::ecs_world_t, stats: *flecs::ecs_world_stats_t);
+    public extern fun ecs_world_stats_reduce(dst: *flecs::ecs_world_stats_t, src: *flecs::ecs_world_stats_t);
+    public extern fun ecs_world_stats_reduce_last(stats: *flecs::ecs_world_stats_t, old: *flecs::ecs_world_stats_t, count: int32);
+    public extern fun ecs_world_stats_repeat_last(stats: *flecs::ecs_world_stats_t);
+    public extern fun ecs_world_stats_copy_last(dst: *flecs::ecs_world_stats_t, src: *flecs::ecs_world_stats_t);
+    public extern fun ecs_world_stats_log(world: *flecs::ecs_world_t, stats: *flecs::ecs_world_stats_t);
+    public extern fun ecs_query_stats_get(world: *flecs::ecs_world_t, query: *flecs::ecs_query_t, stats: *flecs::ecs_query_stats_t);
+    public extern fun ecs_query_cache_stats_reduce(dst: *flecs::ecs_query_stats_t, src: *flecs::ecs_query_stats_t);
+    public extern fun ecs_query_cache_stats_reduce_last(stats: *flecs::ecs_query_stats_t, old: *flecs::ecs_query_stats_t, count: int32);
+    public extern fun ecs_query_cache_stats_repeat_last(stats: *flecs::ecs_query_stats_t);
+    public extern fun ecs_query_cache_stats_copy_last(dst: *flecs::ecs_query_stats_t, src: *flecs::ecs_query_stats_t);
+    public extern fun ecs_system_stats_get(world: *flecs::ecs_world_t, system: uint64, stats: *flecs::ecs_system_stats_t) -> bool;
+    public extern fun ecs_system_stats_reduce(dst: *flecs::ecs_system_stats_t, src: *flecs::ecs_system_stats_t);
+    public extern fun ecs_system_stats_reduce_last(stats: *flecs::ecs_system_stats_t, old: *flecs::ecs_system_stats_t, count: int32);
+    public extern fun ecs_system_stats_repeat_last(stats: *flecs::ecs_system_stats_t);
+    public extern fun ecs_system_stats_copy_last(dst: *flecs::ecs_system_stats_t, src: *flecs::ecs_system_stats_t);
+    public extern fun ecs_pipeline_stats_get(world: *flecs::ecs_world_t, pipeline: uint64, stats: *flecs::ecs_pipeline_stats_t) -> bool;
+    public extern fun ecs_pipeline_stats_fini(stats: *flecs::ecs_pipeline_stats_t);
+    public extern fun ecs_pipeline_stats_reduce(dst: *flecs::ecs_pipeline_stats_t, src: *flecs::ecs_pipeline_stats_t);
+    public extern fun ecs_pipeline_stats_reduce_last(stats: *flecs::ecs_pipeline_stats_t, old: *flecs::ecs_pipeline_stats_t, count: int32);
+    public extern fun ecs_pipeline_stats_repeat_last(stats: *flecs::ecs_pipeline_stats_t);
+    public extern fun ecs_pipeline_stats_copy_last(dst: *flecs::ecs_pipeline_stats_t, src: *flecs::ecs_pipeline_stats_t);
+    public extern fun ecs_metric_reduce(dst: *flecs::ecs_metric_t, src: *flecs::ecs_metric_t, t_dst: int32, t_src: int32);
+    public extern fun ecs_metric_reduce_last(m: *flecs::ecs_metric_t, t: int32, count: int32);
+    public extern fun ecs_metric_copy(m: *flecs::ecs_metric_t, dst: int32, src: int32);
+    public extern fun ecs_entity_memory_get(world: *flecs::ecs_world_t) -> flecs::ecs_entities_memory_t;
+    public extern fun ecs_component_record_memory_get(cr: *flecs::ecs_component_record_t, result: *flecs::ecs_component_index_memory_t);
+    public extern fun ecs_component_index_memory_get(world: *flecs::ecs_world_t) -> flecs::ecs_component_index_memory_t;
+    public extern fun ecs_query_memory_get(query: *flecs::ecs_query_t, result: *flecs::ecs_query_memory_t);
+    public extern fun ecs_queries_memory_get(world: *flecs::ecs_world_t) -> flecs::ecs_query_memory_t;
+    public extern fun ecs_table_component_memory_get(table: *flecs::ecs_table_t, result: *flecs::ecs_component_memory_t);
+    public extern fun ecs_component_memory_get(world: *flecs::ecs_world_t) -> flecs::ecs_component_memory_t;
+    public extern fun ecs_table_memory_get(table: *flecs::ecs_table_t, result: *flecs::ecs_table_memory_t);
+    public extern fun ecs_tables_memory_get(world: *flecs::ecs_world_t) -> flecs::ecs_table_memory_t;
+    public extern fun ecs_table_histogram_get(world: *flecs::ecs_world_t) -> flecs::ecs_table_histogram_t;
+    public extern fun ecs_misc_memory_get(world: *flecs::ecs_world_t) -> flecs::ecs_misc_memory_t;
+    public extern fun ecs_allocator_memory_get(world: *flecs::ecs_world_t) -> flecs::ecs_allocator_memory_t;
+    public extern fun ecs_memory_get(world: *flecs::ecs_world_t) -> int32;
+    public extern fun FlecsStatsImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_metric_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_metric_desc_t) -> uint64;
+    public extern fun FlecsMetricsImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_alert_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_alert_desc_t) -> uint64;
+    public extern fun ecs_get_alert_count(world: *flecs::ecs_world_t, entity: uint64, alert: uint64) -> int32;
+    public extern fun ecs_get_alert(world: *flecs::ecs_world_t, entity: uint64, alert: uint64) -> uint64;
+    public extern fun FlecsAlertsImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_ptr_from_json(world: *flecs::ecs_world_t, type: uint64, ptr: *unit, json: *uint8, desc: *flecs::ecs_from_json_desc_t) -> *uint8;
+    public extern fun ecs_entity_from_json(world: *flecs::ecs_world_t, entity: uint64, json: *uint8, desc: *flecs::ecs_from_json_desc_t) -> *uint8;
+    public extern fun ecs_world_from_json(world: *flecs::ecs_world_t, json: *uint8, desc: *flecs::ecs_from_json_desc_t) -> *uint8;
+    public extern fun ecs_world_from_json_file(world: *flecs::ecs_world_t, filename: *uint8, desc: *flecs::ecs_from_json_desc_t) -> *uint8;
+    public extern fun ecs_array_to_json(world: *flecs::ecs_world_t, type: uint64, data: *unit, count: int32) -> *uint8;
+    public extern fun ecs_array_to_json_buf(world: *flecs::ecs_world_t, type: uint64, data: *unit, count: int32, buf_out: *flecs::ecs_strbuf_t) -> int32;
+    public extern fun ecs_ptr_to_json(world: *flecs::ecs_world_t, type: uint64, data: *unit) -> *uint8;
+    public extern fun ecs_ptr_to_json_buf(world: *flecs::ecs_world_t, type: uint64, data: *unit, buf_out: *flecs::ecs_strbuf_t) -> int32;
+    public extern fun ecs_type_info_to_json(world: *flecs::ecs_world_t, type: uint64) -> *uint8;
+    public extern fun ecs_type_info_to_json_buf(world: *flecs::ecs_world_t, type: uint64, buf_out: *flecs::ecs_strbuf_t) -> int32;
+    public extern fun ecs_entity_to_json(world: *flecs::ecs_world_t, entity: uint64, desc: *uint64o_json_desc_t) -> *uint8;
+    public extern fun ecs_entity_to_json_buf(world: *flecs::ecs_world_t, entity: uint64, buf_out: *flecs::ecs_strbuf_t, desc: *uint64o_json_desc_t) -> int32;
+    public extern fun ecs_iter_to_json(iter: *flecs::ecs_iter_t, desc: *flecs::ecs_iter_to_json_desc_t) -> *uint8;
+    public extern fun ecs_iter_to_json_buf(iter: *flecs::ecs_iter_t, buf_out: *flecs::ecs_strbuf_t, desc: *flecs::ecs_iter_to_json_desc_t) -> int32;
+    public extern fun ecs_world_to_json(world: *flecs::ecs_world_t, desc: *flecs::ecs_world_to_json_desc_t) -> *uint8;
+    public extern fun ecs_world_to_json_buf(world: *flecs::ecs_world_t, buf_out: *flecs::ecs_strbuf_t, desc: *flecs::ecs_world_to_json_desc_t) -> int32;
+    public extern fun FlecsUnitsImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_script_parse(world: *flecs::ecs_world_t, name: *uint8, code: *uint8, desc: *flecs::ecs_script_eval_desc_t, result: *flecs::ecs_script_eval_result_t) -> *flecs::ecs_script_t;
+    public extern fun ecs_script_eval(script: *flecs::ecs_script_t, desc: *flecs::ecs_script_eval_desc_t, result: *flecs::ecs_script_eval_result_t) -> int32;
+    public extern fun ecs_script_free(script: *flecs::ecs_script_t);
+    public extern fun ecs_script_run(world: *flecs::ecs_world_t, name: *uint8, code: *uint8, result: *flecs::ecs_script_eval_result_t) -> int32;
+    public extern fun ecs_script_run_file(world: *flecs::ecs_world_t, filename: *uint8) -> int32;
+    public extern fun ecs_script_runtime_new() -> *flecs::ecs_script_runtime_t;
+    public extern fun ecs_script_runtime_free(runtime: *flecs::ecs_script_runtime_t);
+    public extern fun ecs_script_ast_to_buf(script: *flecs::ecs_script_t, buf: *flecs::ecs_strbuf_t, colors: bool) -> int32;
+    public extern fun ecs_script_ast_to_str(script: *flecs::ecs_script_t, colors: bool) -> *uint8;
+    public extern fun ecs_script_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_script_desc_t) -> uint64;
+    public extern fun ecs_script_update(world: *flecs::ecs_world_t, script: uint64, instance: uint64, code: *uint8) -> int32;
+    public extern fun ecs_script_clear(world: *flecs::ecs_world_t, script: uint64, instance: uint64);
+    public extern fun ecs_script_vars_init(world: *flecs::ecs_world_t) -> *flecs::ecs_script_vars_t;
+    public extern fun ecs_script_vars_fini(vars: *flecs::ecs_script_vars_t);
+    public extern fun ecs_script_vars_push(parent: *flecs::ecs_script_vars_t) -> *flecs::ecs_script_vars_t;
+    public extern fun ecs_script_vars_pop(vars: *flecs::ecs_script_vars_t) -> *flecs::ecs_script_vars_t;
+    public extern fun ecs_script_vars_declare(vars: *flecs::ecs_script_vars_t, name: *uint8) -> *flecs::ecs_script_var_t;
+    public extern fun ecs_script_vars_define_id(vars: *flecs::ecs_script_vars_t, name: *uint8, type: uint64) -> *flecs::ecs_script_var_t;
+    public extern fun ecs_script_vars_lookup(vars: *flecs::ecs_script_vars_t, name: *uint8) -> *flecs::ecs_script_var_t;
+    public extern fun ecs_script_vars_from_sp(vars: *flecs::ecs_script_vars_t, sp: int32) -> *flecs::ecs_script_var_t;
+    public extern fun ecs_script_vars_print(vars: *flecs::ecs_script_vars_t);
+    public extern fun ecs_script_vars_set_size(vars: *flecs::ecs_script_vars_t, count: int32);
+    public extern fun ecs_script_vars_from_iter(it: *flecs::ecs_iter_t, vars: *flecs::ecs_script_vars_t, offset: int32);
+    public extern fun ecs_expr_run(world: *flecs::ecs_world_t, ptr: *uint8, value: *flecs::ecs_value_t, desc: *flecs::ecs_expr_eval_desc_t) -> *uint8;
+    public extern fun ecs_expr_parse(world: *flecs::ecs_world_t, expr: *uint8, desc: *flecs::ecs_expr_eval_desc_t) -> *flecs::ecs_script_t;
+    public extern fun ecs_expr_eval(script: *flecs::ecs_script_t, value: *flecs::ecs_value_t, desc: *flecs::ecs_expr_eval_desc_t) -> int32;
+    public extern fun ecs_script_string_interpolate(world: *flecs::ecs_world_t, str_: *uint8, vars: *flecs::ecs_script_vars_t) -> *uint8;
+    public extern fun ecs_const_var_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_const_var_desc_t) -> uint64;
+    public extern fun ecs_const_var_get(world: *flecs::ecs_world_t, var: uint64) -> flecs::ecs_value_t;
+    public extern fun ecs_function_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_function_desc_t) -> uint64;
+    public extern fun ecs_method_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_function_desc_t) -> uint64;
+    public extern fun ecs_ptr_to_expr(world: *flecs::ecs_world_t, type: uint64, data: *unit) -> *uint8;
+    public extern fun ecs_ptr_to_expr_buf(world: *flecs::ecs_world_t, type: uint64, data: *unit, buf: *flecs::ecs_strbuf_t) -> int32;
+    public extern fun ecs_ptr_to_str(world: *flecs::ecs_world_t, type: uint64, data: *unit) -> *uint8;
+    public extern fun ecs_ptr_to_str_buf(world: *flecs::ecs_world_t, type: uint64, data: *unit, buf: *flecs::ecs_strbuf_t) -> int32;
+    public extern fun FlecsScriptImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_doc_set_uuid(world: *flecs::ecs_world_t, entity: uint64, uuid: *uint8);
+    public extern fun ecs_doc_set_name(world: *flecs::ecs_world_t, entity: uint64, name: *uint8);
+    public extern fun ecs_doc_set_brief(world: *flecs::ecs_world_t, entity: uint64, description: *uint8);
+    public extern fun ecs_doc_set_detail(world: *flecs::ecs_world_t, entity: uint64, description: *uint8);
+    public extern fun ecs_doc_set_link(world: *flecs::ecs_world_t, entity: uint64, link: *uint8);
+    public extern fun ecs_doc_set_color(world: *flecs::ecs_world_t, entity: uint64, color: *uint8);
+    public extern fun ecs_doc_get_uuid(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_doc_get_name(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_doc_get_brief(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_doc_get_detail(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_doc_get_link(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun ecs_doc_get_color(world: *flecs::ecs_world_t, entity: uint64) -> *uint8;
+    public extern fun FlecsDocImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_meta_serializer_to_str(world: *flecs::ecs_world_t, type: uint64) -> *uint8;
+    public extern fun ecs_meta_cursor(world: *flecs::ecs_world_t, type: uint64, ptr: *unit) -> flecs::ecs_meta_cursor_t;
+    public extern fun ecs_meta_get_ptr(cursor: *flecs::ecs_meta_cursor_t) -> *unit;
+    public extern fun ecs_meta_next(cursor: *flecs::ecs_meta_cursor_t) -> int32;
+    public extern fun ecs_meta_elem(cursor: *flecs::ecs_meta_cursor_t, elem: int32) -> int32;
+    public extern fun ecs_meta_member(cursor: *flecs::ecs_meta_cursor_t, name: *uint8) -> int32;
+    public extern fun ecs_meta_try_member(cursor: *flecs::ecs_meta_cursor_t, name: *uint8) -> int32;
+    public extern fun ecs_meta_dotmember(cursor: *flecs::ecs_meta_cursor_t, name: *uint8) -> int32;
+    public extern fun ecs_meta_try_dotmember(cursor: *flecs::ecs_meta_cursor_t, name: *uint8) -> int32;
+    public extern fun ecs_meta_push(cursor: *flecs::ecs_meta_cursor_t) -> int32;
+    public extern fun ecs_meta_pop(cursor: *flecs::ecs_meta_cursor_t) -> int32;
+    public extern fun ecs_meta_is_collection(cursor: *flecs::ecs_meta_cursor_t) -> bool;
+    public extern fun ecs_meta_get_type(cursor: *flecs::ecs_meta_cursor_t) -> uint64;
+    public extern fun ecs_meta_get_unit(cursor: *flecs::ecs_meta_cursor_t) -> uint64;
+    public extern fun ecs_meta_get_member(cursor: *flecs::ecs_meta_cursor_t) -> *uint8;
+    public extern fun ecs_meta_get_member_id(cursor: *flecs::ecs_meta_cursor_t) -> uint64;
+    public extern fun ecs_meta_set_bool(cursor: *flecs::ecs_meta_cursor_t, value: bool) -> int32;
+    public extern fun ecs_meta_set_char(cursor: *flecs::ecs_meta_cursor_t, value: uint8) -> int32;
+    public extern fun ecs_meta_set_int(cursor: *flecs::ecs_meta_cursor_t, value: int64) -> int32;
+    public extern fun ecs_meta_set_uint(cursor: *flecs::ecs_meta_cursor_t, value: flecs::uint64_t) -> int32;
+    public extern fun ecs_meta_set_float(cursor: *flecs::ecs_meta_cursor_t, value: float64) -> int32;
+    public extern fun ecs_meta_set_string(cursor: *flecs::ecs_meta_cursor_t, value: *uint8) -> int32;
+    public extern fun ecs_meta_set_string_literal(cursor: *flecs::ecs_meta_cursor_t, value: *uint8) -> int32;
+    public extern fun ecs_meta_set_entity(cursor: *flecs::ecs_meta_cursor_t, value: uint64) -> int32;
+    public extern fun ecs_meta_set_id(cursor: *flecs::ecs_meta_cursor_t, value: flecs::ecs_id_t) -> int32;
+    public extern fun ecs_meta_set_null(cursor: *flecs::ecs_meta_cursor_t) -> int32;
+    public extern fun ecs_meta_set_value(cursor: *flecs::ecs_meta_cursor_t, value: *flecs::ecs_value_t) -> int32;
+    public extern fun ecs_meta_get_bool(cursor: *flecs::ecs_meta_cursor_t) -> bool;
+    public extern fun ecs_meta_get_char(cursor: *flecs::ecs_meta_cursor_t) -> uint8;
+    public extern fun ecs_meta_get_int(cursor: *flecs::ecs_meta_cursor_t) -> int64;
+    public extern fun ecs_meta_get_uint(cursor: *flecs::ecs_meta_cursor_t) -> flecs::uint64_t;
+    public extern fun ecs_meta_get_float(cursor: *flecs::ecs_meta_cursor_t) -> float64;
+    public extern fun ecs_meta_get_string(cursor: *flecs::ecs_meta_cursor_t) -> *uint8;
+    public extern fun ecs_meta_get_entity(cursor: *flecs::ecs_meta_cursor_t) -> uint64;
+    public extern fun ecs_meta_get_id(cursor: *flecs::ecs_meta_cursor_t) -> flecs::ecs_id_t;
+    public extern fun ecs_meta_ptr_to_float(type_kind: flecs::ecs_primitive_kind_t, ptr: *unit) -> float64;
+    public extern fun ecs_meta_op_get_elem_count(op: *flecs::ecs_meta_op_t, ptr: *unit) -> int32;
+    public extern fun ecs_primitive_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_primitive_desc_t) -> uint64;
+    public extern fun ecs_enum_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_enum_desc_t) -> uint64;
+    public extern fun ecs_bitmask_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_bitmask_desc_t) -> uint64;
+    public extern fun ecs_array_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_array_desc_t) -> uint64;
+    public extern fun ecs_vector_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_vector_desc_t) -> uint64;
+    public extern fun ecs_struct_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_struct_desc_t) -> uint64;
+    public extern fun ecs_struct_add_member(world: *flecs::ecs_world_t, type: uint64, member: *flecs::ecs_member_t) -> int32;
+    public extern fun ecs_struct_get_member(world: *flecs::ecs_world_t, type: uint64, name: *uint8) -> *flecs::ecs_member_t;
+    public extern fun ecs_struct_get_nth_member(world: *flecs::ecs_world_t, type: uint64, i: int32) -> *flecs::ecs_member_t;
+    public extern fun ecs_opaque_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_opaque_desc_t) -> uint64;
+    public extern fun ecs_unit_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_unit_desc_t) -> uint64;
+    public extern fun ecs_unit_prefix_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_unit_prefix_desc_t) -> uint64;
+    public extern fun ecs_quantity_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_entity_desc_t) -> uint64;
+    public extern fun FlecsMetaImport(world: *flecs::ecs_world_t);
+    public extern fun ecs_meta_from_desc(world: *flecs::ecs_world_t, component: uint64, kind: flecs::ecs_type_kind_t, desc: *uint8) -> int32;
+    public extern fun ecs_set_os_api_impl();
+    public extern fun ecs_import(world: *flecs::ecs_world_t, module: flecs::ecs_module_action_t, module_name: *uint8) -> uint64;
+    public extern fun ecs_import_c(world: *flecs::ecs_world_t, module: flecs::ecs_module_action_t, module_name_c: *uint8) -> uint64;
+    public extern fun ecs_import_from_library(world: *flecs::ecs_world_t, library_name: *uint8, module_name: *uint8) -> uint64;
+    public extern fun ecs_module_init(world: *flecs::ecs_world_t, c_name: *uint8, desc: *flecs::ecs_component_desc_t) -> uint64;
+    public extern fun ecs_cpp_get_type_name(type_name: *uint8, func_name: *uint8, len: flecs::size_t, front_len: flecs::size_t) -> *uint8;
+    public extern fun ecs_cpp_get_symbol_name(symbol_name: *uint8, type_name: *uint8, len: flecs::size_t) -> *uint8;
+    public extern fun ecs_cpp_get_constant_name(constant_name: *uint8, func_name: *uint8, len: flecs::size_t, back_len: flecs::size_t) -> *uint8;
+    public extern fun ecs_cpp_trim_module(world: *flecs::ecs_world_t, type_name: *uint8) -> *uint8;
+    public extern fun ecs_cpp_component_register(world: *flecs::ecs_world_t, desc: *flecs::ecs_cpp_component_desc_t) -> uint64;
+    public extern fun ecs_cpp_enum_init(world: *flecs::ecs_world_t, id: uint64, underlying_type: uint64);
+    public extern fun ecs_cpp_enum_constant_register(world: *flecs::ecs_world_t, parent: uint64, id: uint64, name: *uint8, value: *unit, value_type: uint64, value_size: flecs::size_t) -> uint64;
+    public extern fun ecs_cpp_set(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t, new_ptr: *unit, size: flecs::size_t) -> flecs::ecs_cpp_get_mut_t;
+    public extern fun ecs_cpp_assign(world: *flecs::ecs_world_t, entity: uint64, component: flecs::ecs_id_t, new_ptr: *unit, size: flecs::size_t) -> flecs::ecs_cpp_get_mut_t;
+    public extern fun ecs_cpp_new(world: *flecs::ecs_world_t, parent: uint64, name: *uint8, sep: *uint8, root_sep: *uint8) -> uint64;
+    public extern fun ecs_cpp_last_member(world: *flecs::ecs_world_t, type: uint64) -> *flecs::ecs_member_t;
+
+    // Skipped by package command:
+    // - ecs_vec_reset: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_vec_append: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_vec_grow: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_vec_get: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_vec_first: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_vec_last: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_sparse_add: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_sparse_get_dense: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_sparse_get: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_sparse_insert: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_sparse_ensure: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_sparse_ensure_fast: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_sparse_ids: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_sparse_add: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_sparse_get_dense: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_sparse_get: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_ballocator_new: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_balloc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_balloc_w_dbg_info: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_bcalloc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_bcalloc_w_dbg_info: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_brealloc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_brealloc_w_dbg_info: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_bdup: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_stack_alloc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_stack_calloc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_stack_get_cursor: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_map_get: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_map_get_deref_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_map_ensure: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_map_ensure_alloc: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_map_insert_alloc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_allocator_get: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_strdup: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_dup: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_strbuf_append: variadic function (unsafe forwarding)
+    // - ecs_strbuf_get: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_strbuf_get_small: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_strbuf_list_append: variadic function (unsafe forwarding)
+    // - ecs_os_api_malloc_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_api_realloc_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_api_calloc_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_api_strdup_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_thread_callback_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_api_thread_join_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_api_task_join_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_api_module_to_path_t: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_strerror: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_os_memdup: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_group_create_action_t: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_module_path_from_c: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_vasprintf: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_asprintf: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_asprintf: variadic function (unsafe forwarding)
+    // - flecs_chresc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_chrparse: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_astresc: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_parse_ws_eol: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_parse_digit: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_to_snake_case: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_suspend_readonly: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_hashmap_get_: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_hashmap_get_bucket: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_hashmap_next_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_record_find: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_write_begin: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_read_begin: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_record_get_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_record_ensure_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_record_get_by_column: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_components_get: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_components_ensure: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_component_get_type_info: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_component_get_table: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_component_get_parent_record: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_component_next: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_table_record_get_component: function-pointer declaration emits as *uint8 in .atlas
+    // - flecs_table_traverse_add: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_init: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_mini: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_init_w_args: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_stage: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_stage_new: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_ctx: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_binding_ctx: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_build_info: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_world_info: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_entity_range_new: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_entity_range_get: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_world: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_bulk_init: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_bulk_new_w_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_mut_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_ensure_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_ref_get_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_emplace_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_type: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_table: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_type_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_entity_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_name: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_symbol: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_path_w_sep: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_set_name_prefix: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_set_lookup_path: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_lookup_path: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_type_info: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_get_hooks_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_id_flag_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_id_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_term_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_init: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_var_name: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_plan: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_plan_w_profile: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_plans: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_args_parse: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_get: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_get_groups: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_get_group_ctx: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_get_group_info: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_query_get_cache_query: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_observer_get: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_iter_get_var_name: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_iter_get_vars: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_iter_get_var_as_table: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_iter_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_field_w_size: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_field_at_w_size: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_get_type: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_get_column: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_get_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_entities: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_add_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_find: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_table_remove_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_value_new: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_value_new_w_type_info: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_strerror: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_print_: variadic function (unsafe forwarding)
+    // - ecs_log_: variadic function (unsafe forwarding)
+    // - ecs_abort_: variadic function (unsafe forwarding)
+    // - ecs_assert_log_: variadic function (unsafe forwarding)
+    // - ecs_parser_error_: variadic function (unsafe forwarding)
+    // - ecs_parser_warning_: variadic function (unsafe forwarding)
+    // - ecs_log_stop_capture: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_http_server_init: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_http_server_ctx: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_http_get_header: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_http_get_param: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_rest_server_init: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_system_get: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_ptr_from_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_entity_from_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_world_from_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_world_from_json_file: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_array_to_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_ptr_to_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_type_info_to_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_entity_to_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_iter_to_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_world_to_json: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_parse: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_runtime_new: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_ast_to_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_vars_init: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_vars_push: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_vars_pop: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_vars_declare: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_vars_define_id: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_vars_lookup: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_vars_from_sp: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_expr_run: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_expr_parse: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_script_string_interpolate: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_ptr_to_expr: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_ptr_to_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_doc_get_uuid: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_doc_get_name: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_doc_get_brief: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_doc_get_detail: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_doc_get_link: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_doc_get_color: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_meta_serializer_to_str_: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_meta_get_ptr: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_meta_get_member: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_meta_get_string: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_struct_get_member: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_struct_get_nth_member: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_cpp_get_type_name: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_cpp_get_symbol_name: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_cpp_get_constant_name: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_cpp_trim_module: function-pointer declaration emits as *uint8 in .atlas
+    // - ecs_cpp_last_member: function-pointer declaration emits as *uint8 in .atlas
+}

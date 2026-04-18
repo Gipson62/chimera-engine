@@ -8,7 +8,7 @@ compiler = "tinycc"
 args = []
 
 [dependencies]
-headers = ["math.h", "atlas77-glfw3.h", "glad/glad.h"]
+headers = ["math.h", "atlas77-flecs.h"]
 
 [link]
 # The libraries to link against.
@@ -16,25 +16,23 @@ shared = []
 
 [link.windows]
 # The libraries to link against on Windows specifically.
-libs = ["glfw3"]
+libs = ["dbghelp", "ws2_32", "flecs"] # We still havent done object files for linux just yet
 
 [link.linux]
 # The libraries to link against on Linux specifically.
-libs = ["glfw"]
+libs = ["rt", "pthread", "m"]
 
 # NB: There will be a "c.windows" and "c.linux" section in the future.
 [c]
 # The directories to search for header files.
 include_dirs = [
     "include/",
-    "include/glad/",
-    "include/KHR",
-    "C:/msys64/mingw64/include/",
+    #"C:/msys64/mingw64/include/",
 ]
 # The directories to search for libraries.
 # TODO: We soon need a way to have separate windows & Linux lib_dirs. e.g. in this case,
 # we need an empty one for Linux, but have `lib/` for Windows
-lib_dirs = []
+lib_dirs = ["lib/"]
 # Directories recursively scanned for extra .c source files compiled and linked
 # alongside generated output.
 source_dirs = ["include/", "include/glad/"]
