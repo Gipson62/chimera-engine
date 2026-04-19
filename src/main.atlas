@@ -1,3 +1,5 @@
 import "src/ecs/ecs.atlas";
 
-fun main() -> int32 {}
+fun main() -> int32 {
+	return run_particle_simulation_demo();
+}

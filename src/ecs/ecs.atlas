@@ -1,54 +1,180 @@
 import "src/ecs/flecs.atlas";
 import "std/optional";
+import "std/io";
 
+fun ECS_MAX_SYSTEMS_1() -> uint32 {
+    return 32;
+}
+
+fun ECS_MAX_SYSTEMS_2() -> uint32 {
+    return 32;
+}
+
+public struct System1 {
+  public:
+    query: *flecs::ecs_query_t;
+    component_size: uint64;
+    update: fun(uint64, *unit, float32) -> unit;
+
+    fun noop(entity_id: uint64, component: *unit, dt: float32) -> unit {
+        return;
+    }
+
+    ~System1() {
+    }
+}
+
+public struct System2 {
+  public:
+    query: *flecs::ecs_query_t;
+    component_a_size: uint64;
+    component_b_size: uint64;
+    update: fun(uint64, *unit, *unit, float32) -> unit;
+
+    fun noop(entity_id: uint64, component_a: *unit, component_b: *unit, dt: float32) -> unit {
+        return;
+    }
+
+    ~System2() {
+    }
+}
+
+//! Main ECS world wrapper.
+//!
+//! Owns the Flecs world pointer and all registered query-driven systems.
+//! Most user-facing ECS operations are exposed as methods on this type.
 public struct World
 {
   private:
     world: *flecs::ecs_world_t;
+    system1_count: uint32;
+    system2_count: uint32;
+    systems1: [System1; 32];
+    systems2: [System2; 32];
   public:
+    //! Create a new world instance.
+    //!
+    //! The returned value owns the runtime world and must outlive any
+    //! `EntityView` created from it.
     fun new() -> World {
         return World {
             .world = flecs::ecs_init(),
+            .system1_count = 0,
+            .system2_count = 0,
+            .systems1 = [System1 {
+                .query = null,
+                .component_size = 0,
+                .update = System1::noop,
+            }; 32],
+            .systems2 = [System2 {
+                .query = null,
+                .component_a_size = 0,
+                .component_b_size = 0,
+                .update = System2::noop,
+            }; 32],
         };
     }
+    //! Destroy the world and free all registered queries.
     ~World() {
+        let s1: uint32 = 0;
+        while (s1 < this->system1_count) {
+            if (this->systems1[s1].query != null) {
+                flecs::ecs_query_free(this->systems1[s1].query);
+                this->systems1[s1].query = null;
+            }
+            s1 = s1 + 1;
+        }
+
+        let s2: uint32 = 0;
+        while (s2 < this->system2_count) {
+            if (this->systems2[s2].query != null) {
+                flecs::ecs_query_free(this->systems2[s2].query);
+                this->systems2[s2].query = null;
+            }
+            s2 = s2 + 1;
+        }
+
         flecs::ecs_fini(this->world);
     }
-    // Only use when the bindings are unsufficient.
+
+    //! Get the raw Flecs world pointer.
+    //!
+    //! This is an escape hatch for APIs that are not exposed yet.
+    //! Prefer higher-level methods when possible.
     fun get_raw_ptr(*this) -> *flecs::ecs_world_t {
         return this->world;
     }
+
+    //! Run one simulation step for all registered systems.
+    //!
+    //! `dt` is the delta time passed to each system callback.
+    fun progress(*this, dt: float32) {
+        let s1: uint32 = 0;
+        while (s1 < this->system1_count) {
+            let system = this->systems1[s1];
+            flecs::ecs_query_each_1(
+                this->world,
+                system.query,
+                system.component_size,
+                system.update,
+                dt
+            );
+            s1 = s1 + 1;
+        }
+
+        let s2: uint32 = 0;
+        while (s2 < this->system2_count) {
+            let system = this->systems2[s2];
+            flecs::ecs_query_each_2(
+                this->world,
+                system.query,
+                system.component_a_size,
+                system.component_b_size,
+                system.update,
+                dt
+            );
+            s2 = s2 + 1;
+        }
+    }
+
+    //! Create a new unnamed entity.
     fun entity(*this) -> EntityView {
         return EntityView {
             .id = Entity { 
-                .id = flecs::ecs_entity_init(
-                    this->world, 
-                    &flecs::ecs_entity_desc_t::default()
-                ),
+                .id = flecs::ecs_entity_new(this->world),
             },
             .world = this,
         };
     }
+    //! Create a new named entity.
+    //!
+    //! Names can later be resolved with `lookup`.
     fun entity_named(*this, name: str) -> EntityView {
         return EntityView {
             .id = Entity { 
-                .id = flecs::ecs_entity_init(
-                    this->world, 
-                    &flecs::ecs_entity_desc_t::with_name(name)
-                ),
+                .id = flecs::ecs_entity_new_named(this->world, name),
             },
             .world = this,
         };
     }
+    //! Delete an entity from the world.
     fun delete_entity(*this, entity: Entity) {
         flecs::ecs_delete(this->world, entity.id);
     }
+
+    //! Check whether an entity is alive.
     fun is_entity_alive(*const this, entity: Entity) -> bool {
         return flecs::ecs_is_alive(this->world, entity.id);
     }
+
+    //! Check whether an entity identifier is valid in this world.
     fun is_entity_valid(*const this, entity: Entity) -> bool {
         return flecs::ecs_is_valid(this->world, entity.id);
     }
+
+    //! Find an entity by name.
+    //!
+    //! Returns an empty optional when no entity matches.
     fun lookup(*const this, name: str) -> std::optional<Entity> {
         let id = flecs::ecs_lookup(this->world, name);
         if (id == 0) {
@@ -58,65 +184,340 @@ public struct World
             .id = id,
         });
     }
+    //! Register a component type.
+    //!
+    //! The returned handle stores the runtime component id needed for
+    //! add/set/get operations.
     fun register_component<T>(*this, name: str) -> ComponentHandle<T> {
-        let entity_desc = flecs::ecs_entity_desc_t::with_name(name);
-        let entity = flecs::ecs_entity_init(this->world, entity_desc);
-
-        let desc = flecs::ecs_component_desc_t::default();
-        desc.entity = entity;
-        desc.size = size_of<T>();
-        desc.alignment = align_of<T>();
-
-        let id = flecs::ecs_component_init(this->world, desc);
+        let component_id = flecs::ecs_component_register(
+            this->world,
+            name,
+            size_of<T>() as int32,
+            align_of<T>() as int32
+        );
         return ComponentHandle<T> {
-            .id = id,
+            .id = component_id,
         };
+    }
+
+    //! Register a system that reads/writes one component type.
+    //!
+    //! The callback receives:
+    //! - entity id
+    //! - mutable pointer to the matched component row
+    //! - delta time
+    //!
+    //! Returns `false` when system capacity is exhausted or query creation fails.
+    fun register_system1<T>(
+        *this,
+        component: ComponentHandle<T>,
+        update: fun(uint64, *T, float32) -> unit
+    ) -> bool {
+        if (this->system1_count >= ECS_MAX_SYSTEMS_1()) {
+            return false;
+        }
+
+        let query = flecs::ecs_query_new_1(this->world, component.id);
+        if (query == null) {
+            return false;
+        }
+
+        let index = this->system1_count;
+        this->systems1[index] = System1 {
+            .query = query,
+            .component_size = size_of<T>(),
+            .update = update as fun(uint64, *unit, float32) -> unit,
+        };
+        this->system1_count = index + 1;
+
+        return true;
+    }
+
+    //! Register a system that reads/writes two component types.
+    //!
+    //! The callback receives:
+    //! - entity id
+    //! - mutable pointer to component A
+    //! - mutable pointer to component B
+    //! - delta time
+    //!
+    //! Returns `false` when system capacity is exhausted or query creation fails.
+    fun register_system2<A, B>(
+        *this,
+        component_a: ComponentHandle<A>,
+        component_b: ComponentHandle<B>,
+        update: fun(uint64, *A, *B, float32) -> unit
+    ) -> bool {
+        if (this->system2_count >= ECS_MAX_SYSTEMS_2()) {
+            return false;
+        }
+
+        let query = flecs::ecs_query_new_2(this->world, component_a.id, component_b.id);
+        if (query == null) {
+            return false;
+        }
+
+        let index = this->system2_count;
+        this->systems2[index] = System2 {
+            .query = query,
+            .component_a_size = size_of<A>(),
+            .component_b_size = size_of<B>(),
+            .update = update as fun(uint64, *unit, *unit, float32) -> unit,
+        };
+        this->system2_count = index + 1;
+
+        return true;
+    }
+
+    //! Attach a component id to an entity.
+    fun add_component<T>(*this, entity: Entity, component: ComponentHandle<T>) {
+        flecs::ecs_add_id(this->world, entity.id, component.id);
+    }
+
+    //! Remove a component id from an entity.
+    fun remove_component<T>(*this, entity: Entity, component: ComponentHandle<T>) {
+        flecs::ecs_remove_id(this->world, entity.id, component.id);
+    }
+
+    //! Check whether an entity currently has a component.
+    fun has_component<T>(*const this, entity: Entity, component: ComponentHandle<T>) -> bool {
+        return flecs::ecs_has_id(this->world, entity.id, component.id);
+    }
+
+    //! Set component data for an entity.
+    //!
+    //! The component must already be attached to the entity.
+    fun set_component<T>(*this, entity: Entity, component: ComponentHandle<T>, value: T) {
+        flecs::ecs_set_id(
+            this->world,
+            entity.id,
+            component.id,
+            size_of<T>(),
+            &value as *const unit
+        );
+    }
+
+    //! Get an immutable component pointer.
+    //!
+    //! Returns `null` when the component is missing.
+    fun get_component<T>(*const this, entity: Entity, component: ComponentHandle<T>) -> *const T {
+        return flecs::ecs_get_id(this->world, entity.id, component.id) as *const T;
+    }
+
+    //! Get a mutable component pointer.
+    //!
+    //! Returns `null` when the component is missing.
+    fun get_component_mut<T>(*this, entity: Entity, component: ComponentHandle<T>) -> *T {
+        return flecs::ecs_get_mut_id(this->world, entity.id, component.id) as *T;
+    }
+
+    //! Mark a component as modified after mutating through a raw pointer.
+    fun mark_component_modified<T>(*this, entity: Entity, component: ComponentHandle<T>) {
+        flecs::ecs_modified_id(this->world, entity.id, component.id);
     }
 }
 
+//! Lightweight entity identifier.
 public struct Entity 
 {
   public:
+    //! Runtime id used by Flecs.
     id: uint64;
+
+    //! Create a view object bound to a world.
     fun get_view(*const this, world: *World) -> EntityView {
         return EntityView {
-            .id = this,
+            .id = *this,
             .world = world,
         };
     }
 }
 
+//! Convenience handle that pairs an `Entity` id with its owning world.
+//!
+//! This type exposes ergonomic entity operations without requiring the caller
+//! to pass a `World` pointer each time.
+#[std::trivially_copyable]
 public struct EntityView
 {
   public:
+    //! The underlying entity id.
     id: Entity;
+
+    //! Owning world pointer.
     world: *World;
+
+    //! Delete this entity from its world.
     fun drop(*this) {
         flecs::ecs_delete(this->world->get_raw_ptr(), this->id.id);
     }
+
+    //! Check whether this entity is alive.
     fun is_alive(*const this) -> bool {
         return this->world->is_entity_alive(this->id);
     }
+
+    //! Check whether this entity id is valid.
     fun is_valid(*const this) -> bool {
         return this->world->is_entity_valid(this->id);
     }
+
+    //! Get the optional debug name for this entity.
     fun get_name(*this) -> *const uint8 {
         return flecs::ecs_get_name(this->world->get_raw_ptr(), this->id.id);
     }
-    fun add_component<T>(*this, component: ComponentHandle<T>) {
-        flecs::ecs_add_id(this->world->get_raw_ptr(), this->id.id, component.id);
-    }
 }
 
+//! Typed component registration handle.
+//!
+//! Keeps the runtime component id associated with a compile-time type `T`.
 public struct ComponentHandle<T>
 {
   public:
+    //! Runtime component id (`ecs_id_t`).
     id: uint64;
 }
 
-fun main() -> int32 {
+public struct Position2D {
+    public:
+    x: float32;
+    y: float32;
+}
+
+public struct Velocity2D {
+    public:
+    x: float32;
+    y: float32;
+}
+
+fun gravity_system(entity_id: uint64, velocity: *Velocity2D, dt: float32) {
+    if (velocity == null) {
+        return;
+    }
+
+    velocity->y = velocity->y - (9.81 * dt);
+}
+
+fun integrate_system(entity_id: uint64, position: *Position2D, velocity: *Velocity2D, dt: float32) {
+    if (position == null || velocity == null) {
+        return;
+    }
+
+    position->x = position->x + velocity->x * dt;
+    position->y = position->y + velocity->y * dt;
+}
+
+public fun run_particle_simulation_demo() -> int32 {
     let world = World::new();
-    let entity = world.entity_named("MyEntity");
-    std::printf("Entity name: %s\n", entity.get_name());
+
+    let position_component = world.register_component<Position2D>("Position2D");
+    let velocity_component = world.register_component<Velocity2D>("Velocity2D");
+
+    let particle_a = world.entity_named("particle_A");
+    let particle_b = world.entity_named("particle_B");
+    let particle_c = world.entity_named("particle_C");
+
+    world.add_component<Position2D>(particle_a.id, position_component);
+    world.add_component<Velocity2D>(particle_a.id, velocity_component);
+    world.set_component<Position2D>(particle_a.id, position_component, Position2D { .x = 0.0, .y = 6.0 });
+    world.set_component<Velocity2D>(particle_a.id, velocity_component, Velocity2D { .x = 1.0, .y = 0.0 });
+
+    world.add_component<Position2D>(particle_b.id, position_component);
+    world.add_component<Velocity2D>(particle_b.id, velocity_component);
+    world.set_component<Position2D>(particle_b.id, position_component, Position2D { .x = -2.0, .y = 3.0 });
+    world.set_component<Velocity2D>(particle_b.id, velocity_component, Velocity2D { .x = 2.0, .y = 1.5 });
+
+    world.add_component<Position2D>(particle_c.id, position_component);
+    world.add_component<Velocity2D>(particle_c.id, velocity_component);
+    world.set_component<Position2D>(particle_c.id, position_component, Position2D { .x = 3.0, .y = 8.0 });
+    world.set_component<Velocity2D>(particle_c.id, velocity_component, Velocity2D { .x = -1.0, .y = -0.5 });
+
+    if (world.register_system1<Velocity2D>(
+        velocity_component,
+        gravity_system
+    ) == false) {
+        std::printf("Failed to register gravity system\n", 0);
+        return 1;
+    }
+
+    if (world.register_system2<Position2D, Velocity2D>(
+        position_component,
+        velocity_component,
+        integrate_system
+    ) == false) {
+        std::printf("Failed to register integration system\n", 0);
+        return 1;
+    }
+
+    let tick: uint32 = 0;
+    while (tick < 6) {
+        std::printf("Tick %u\n", tick);
+
+        let a_pos = world.get_component<Position2D>(particle_a.id, position_component);
+        let a_vel = world.get_component<Velocity2D>(particle_a.id, velocity_component);
+        if (a_pos != null && a_vel != null) {
+            std::printf("  entity %llu\n", particle_a.id.id);
+            std::printf("    pos.x: %.2f\n", a_pos->x);
+            std::printf("    pos.y: %.2f\n", a_pos->y);
+            std::printf("    vel.x: %.2f\n", a_vel->x);
+            std::printf("    vel.y: %.2f\n", a_vel->y);
+        }
+
+        let b_pos = world.get_component<Position2D>(particle_b.id, position_component);
+        let b_vel = world.get_component<Velocity2D>(particle_b.id, velocity_component);
+        if (b_pos != null && b_vel != null) {
+            std::printf("  entity %llu\n", particle_b.id.id);
+            std::printf("    pos.x: %.2f\n", b_pos->x);
+            std::printf("    pos.y: %.2f\n", b_pos->y);
+            std::printf("    vel.x: %.2f\n", b_vel->x);
+            std::printf("    vel.y: %.2f\n", b_vel->y);
+        }
+
+        let c_pos = world.get_component<Position2D>(particle_c.id, position_component);
+        let c_vel = world.get_component<Velocity2D>(particle_c.id, velocity_component);
+        if (c_pos != null && c_vel != null) {
+            std::printf("  entity %llu\n", particle_c.id.id);
+            std::printf("    pos.x: %.2f\n", c_pos->x);
+            std::printf("    pos.y: %.2f\n", c_pos->y);
+            std::printf("    vel.x: %.2f\n", c_vel->x);
+            std::printf("    vel.y: %.2f\n", c_vel->y);
+        }
+
+        world.progress(0.1);
+        tick = tick + 1;
+    }
+
+    std::printf("Tick %u\n", tick);
+
+    let final_a_pos = world.get_component<Position2D>(particle_a.id, position_component);
+    let final_a_vel = world.get_component<Velocity2D>(particle_a.id, velocity_component);
+    if (final_a_pos != null && final_a_vel != null) {
+        std::printf("  entity %llu\n", particle_a.id.id);
+        std::printf("    pos.x: %.2f\n", final_a_pos->x);
+        std::printf("    pos.y: %.2f\n", final_a_pos->y);
+        std::printf("    vel.x: %.2f\n", final_a_vel->x);
+        std::printf("    vel.y: %.2f\n", final_a_vel->y);
+    }
+
+    let final_b_pos = world.get_component<Position2D>(particle_b.id, position_component);
+    let final_b_vel = world.get_component<Velocity2D>(particle_b.id, velocity_component);
+    if (final_b_pos != null && final_b_vel != null) {
+        std::printf("  entity %llu\n", particle_b.id.id);
+        std::printf("    pos.x: %.2f\n", final_b_pos->x);
+        std::printf("    pos.y: %.2f\n", final_b_pos->y);
+        std::printf("    vel.x: %.2f\n", final_b_vel->x);
+        std::printf("    vel.y: %.2f\n", final_b_vel->y);
+    }
+
+    let final_c_pos = world.get_component<Position2D>(particle_c.id, position_component);
+    let final_c_vel = world.get_component<Velocity2D>(particle_c.id, velocity_component);
+    if (final_c_pos != null && final_c_vel != null) {
+        std::printf("  entity %llu\n", particle_c.id.id);
+        std::printf("    pos.x: %.2f\n", final_c_pos->x);
+        std::printf("    pos.y: %.2f\n", final_c_pos->y);
+        std::printf("    vel.x: %.2f\n", final_c_vel->x);
+        std::printf("    vel.y: %.2f\n", final_c_vel->y);
+    }
+
     return 0;
 }

@@ -3,7 +3,7 @@ name = "my_awesome_project"
 version = "0.1.0"
 entry = "src/main.atlas"
 # The C compiler to use. Supported values: "gcc", "clang", "msvc", "intel", "tinycc". Default is "tinycc".
-compiler = "tinycc"
+compiler = "gcc"
 # Raw args passed to the C compiler. e.g.: -O2
 args = []
 
@@ -27,7 +27,7 @@ libs = ["rt", "pthread", "m"]
 # The directories to search for header files.
 include_dirs = [
     "include/",
-    #"C:/msys64/mingw64/include/",
+    "C:/msys64/mingw64/include/",
 ]
 # The directories to search for libraries.
 # TODO: We soon need a way to have separate windows & Linux lib_dirs. e.g. in this case,
