@@ -1,0 +1,108 @@
+import "src/raylib/raylib.atlas";
+
+
+// Unifying Vec3 struct, since both raylib and the future physics engine will likely use their own Vec3 types. This way we can convert between them easily and avoid confusion.
+public struct Vec3 {
+  public:
+    x: float32;
+    y: float32;
+    z: float32;
+
+    fun default() -> Vec3 {
+        return Vec3 { .x = 0.0, .y = 0.0, .z = 0.0 };
+    }
+    fun from_raylib_vec3(vec: raylib::Vector3) -> Vec3 {
+        return Vec3 { .x = vec.x, .y = vec.y, .z = vec.z };
+    }
+    fun to_raylib_vec3(*const this) -> raylib::Vector3 {
+        return raylib::Vector3 { .x = this->x, .y = this->y, .z = this->z };
+    }
+}
+
+public struct Vec2 {
+  public:
+    x: float32;
+    y: float32;
+
+    fun default() -> Vec2 {
+        return Vec2 { .x = 0.0, .y = 0.0 };
+    }
+    fun from_raylib_vec2(vec: raylib::Vector2) -> Vec2 {
+        return Vec2 { .x = vec.x, .y = vec.y };
+    }
+    fun to_raylib_vec2(*const this) -> raylib::Vector2 {
+        return raylib::Vector2 { .x = this->x, .y = this->y };
+    }
+}
+
+public struct Transform2D {
+  public:
+    position: Vec2;
+    // 
+    rotation_skew: Vec2;
+    scale: Vec2;
+
+    fun default() -> Transform2D {
+        return Transform2D {
+            position: Vec2::default(),
+            rotation_skew: Vec2::default(),
+            scale: Vec2 { .x = 1.0, .y = 1.0 }
+        };
+    }
+
+    fun from_raylib_vec2(position: raylib::Vector2, rotation: float32, scale: raylib::Vector2) -> Transform2D {
+        return Transform2D {
+            .position = Vec2::from_raylib_vec2(position),
+            .rotation = rotation,
+            .scale = Vec2::from_raylib_vec2(scale)
+        };
+    }
+
+    fun to_raylib_vec2(*const this) -> (raylib::Vector2, float32, raylib::Vector2) {
+        return (
+            raylib::Vector2 { .x = this->position.x, .y = this->position.y },
+            this->rotation,
+            raylib::Vector2 { .x = this->scale.x, .y = this->scale.y }
+        );
+    }
+}
+
+public struct Transform3D {
+  public: 
+    position: Vec3;
+    rotation: Vec3;
+    scale: Vec3;
+
+    fun default() -> Transform3D {
+        return Transform3D {
+            position: Vec3 { .x = 0.0, .y = 0.0, .z = 0.0 },
+            rotation: Vec3 { .x = 0.0, .y = 0.0, .z = 0.0 },
+            scale: Vec3 { .x = 1.0, .y = 1.0, .z = 1.0 }
+        };
+    }
+
+    fun from_raylib_vec3(position: raylib::Vector3, rotation: raylib::Vector3, scale: raylib::Vector3) -> Transform3D {
+        return Transform3D {
+            .position = Vec3::from_raylib_vec3(position),
+            .rotation = Vec3::from_raylib_vec3(rotation),
+            .scale = Vec3::from_raylib_vec3(scale)
+        };
+    }
+    fun to_raylib_vec3(*const this) -> [raylib::Vector3; 3] {
+        return [
+            raylib::Vector3 { .x = this->position.x, .y = this->position.y, .z = this->position.z },
+            raylib::Vector3 { .x = this->rotation.x, .y = this->rotation.y, .z = this->rotation.z },
+            raylib::Vector3 { .x = this->scale.x, .y = this->scale.y, .z = this->scale.z }
+        ];
+    }
+
+    fun get_position(*const this) -> Vec3 {
+        return this->position;
+    }
+    fun get_rotation(*const this) -> Vec3 {
+        return this->rotation;
+    }
+    fun get_scale(*const this) -> Vec3 {
+        return this->scale;
+    }
+}
