@@ -44,26 +44,18 @@ public struct Transform2D {
 
     fun default() -> Transform2D {
         return Transform2D {
-            position: Vec2::default(),
-            rotation_skew: Vec2::default(),
-            scale: Vec2 { .x = 1.0, .y = 1.0 }
+            .position = Vec2::default(),
+            .rotation_skew = Vec2::default(),
+            .scale = Vec2 { .x = 1.0, .y = 1.0 }
         };
     }
 
     fun from_raylib_vec2(position: raylib::Vector2, rotation: float32, scale: raylib::Vector2) -> Transform2D {
         return Transform2D {
             .position = Vec2::from_raylib_vec2(position),
-            .rotation = rotation,
+            .rotation_skew = Vec2::default(),
             .scale = Vec2::from_raylib_vec2(scale)
         };
-    }
-
-    fun to_raylib_vec2(*const this) -> (raylib::Vector2, float32, raylib::Vector2) {
-        return (
-            raylib::Vector2 { .x = this->position.x, .y = this->position.y },
-            this->rotation,
-            raylib::Vector2 { .x = this->scale.x, .y = this->scale.y }
-        );
     }
 }
 
@@ -75,9 +67,9 @@ public struct Transform3D {
 
     fun default() -> Transform3D {
         return Transform3D {
-            position: Vec3 { .x = 0.0, .y = 0.0, .z = 0.0 },
-            rotation: Vec3 { .x = 0.0, .y = 0.0, .z = 0.0 },
-            scale: Vec3 { .x = 1.0, .y = 1.0, .z = 1.0 }
+            .position = Vec3 { .x = 0.0, .y = 0.0, .z = 0.0 },
+            .rotation = Vec3 { .x = 0.0, .y = 0.0, .z = 0.0 },
+            .scale = Vec3 { .x = 1.0, .y = 1.0, .z = 1.0 }
         };
     }
 
@@ -87,13 +79,6 @@ public struct Transform3D {
             .rotation = Vec3::from_raylib_vec3(rotation),
             .scale = Vec3::from_raylib_vec3(scale)
         };
-    }
-    fun to_raylib_vec3(*const this) -> [raylib::Vector3; 3] {
-        return [
-            raylib::Vector3 { .x = this->position.x, .y = this->position.y, .z = this->position.z },
-            raylib::Vector3 { .x = this->rotation.x, .y = this->rotation.y, .z = this->rotation.z },
-            raylib::Vector3 { .x = this->scale.x, .y = this->scale.y, .z = this->scale.z }
-        ];
     }
 
     fun get_position(*const this) -> Vec3 {

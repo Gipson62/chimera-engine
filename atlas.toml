@@ -8,15 +8,18 @@ compiler = "gcc"
 args = []
 
 [dependencies]
-headers = ["math.h", "atlas77-flecs.h"]
+headers = ["math.h", "atlas77-flecs.h", "atlas77-raylib.h"]
 
 [link]
 # The libraries to link against.
-shared = []
+shared = ["m", "raylib"]
 
 [link.windows]
-# The libraries to link against on Windows specifically.
-libs = ["dbghelp", "ws2_32", "flecs"] # We still havent done object files for linux just yet
+libs = [
+    "dbghelp",
+    "ws2_32",
+    "flecs",
+] # We still havent done object files for linux just yet# The libraries to link against on Windows specifically.
 
 [link.linux]
 # The libraries to link against on Linux specifically.
@@ -25,10 +28,7 @@ libs = ["rt", "pthread", "m"]
 # NB: There will be a "c.windows" and "c.linux" section in the future.
 [c]
 # The directories to search for header files.
-include_dirs = [
-    "include/",
-    "C:/msys64/mingw64/include/",
-]
+include_dirs = ["include/", "C:/msys64/mingw64/include/"]
 # The directories to search for libraries.
 # TODO: We soon need a way to have separate windows & Linux lib_dirs. e.g. in this case,
 # we need an empty one for Linux, but have `lib/` for Windows

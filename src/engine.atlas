@@ -1,0 +1,50 @@
+public struct ChimeraEngine {
+  private:
+    window_config: WindowConfig;
+    timer: Timer;
+}
+
+// Everything done here is a wrapper around raylib.
+public struct WindowConfig {
+  private:
+    title: *uint8;
+    width: int32;
+    height: int32;
+    flags: uint32;
+    target_fps: int32;
+  public:
+    fun new(title: *uint8, width: int32, height: int32, flags: uint32, target_fps: int32) -> WindowConfig {
+        return WindowConfig {
+            .title = title,
+            .width = width,
+            .height = height,
+            .flags = flags,
+            .target_fps = target_fps,
+        };
+    }
+}
+
+public struct Timer {
+  private:
+    delta_time: float32;
+    fixed_dt: float32;
+    accumulator: float32;
+    frame_counter: uint64;
+    engine_time: float32;
+  public:
+    fun new(fixed_dt: float32) -> Timer {
+        return Timer {
+            .delta_time = 0.0,
+            .fixed_dt = fixed_dt,
+            .accumulator = 0.0,
+            .frame_counter = 0u,
+            .engine_time = 0.0,
+        };
+    }
+}
+
+// Contains all the assets of the game, such as textures, sounds, meshes, materials, shaders, ... 
+public struct AssetManager {
+  private:
+    // Multiple std::map<*uint8, *Asset>
+}

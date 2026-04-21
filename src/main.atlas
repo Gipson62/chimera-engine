@@ -1,5 +1,8 @@
 import "src/ecs/flecs.atlas";
+import "src/ecs/ecs.atlas";
 import "src/ecs/engine_component.atlas";
+import "std/io";
+import "core/reflection";
 
 public struct Position2D {
     public:
@@ -33,8 +36,8 @@ fun integrate_system(entity_id: uint64, position: *Position2D, velocity: *Veloci
 public fun run_particle_simulation_demo() -> int32 {
     let world = World::new();
 
-    let position_component = world.register_component<Position2D>("Position2D");
-    let velocity_component = world.register_component<Velocity2D>("Velocity2D");
+    let position_component = world.register_component<Position2D>(type_of<Position2D>().name);
+    let velocity_component = world.register_component<Velocity2D>(type_of<Velocity2D>().name);
 
     let particle_a = world.entity_named("particle_A");
     let particle_b = world.entity_named("particle_B");
@@ -143,4 +146,8 @@ public fun run_particle_simulation_demo() -> int32 {
     }
 
     return 0;
+}
+
+fun main() -> int32 {
+    return run_particle_simulation_demo();
 }
