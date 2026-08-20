@@ -15,18 +15,12 @@ headers = ["math.h", "atlas77-flecs.h", "atlas77-raylib.h"]
 shared = ["m", "raylib"]
 
 [link.windows]
-libs = [
-    "dbghelp",
-    "ws2_32",
-    "flecs",
-    "opengl32",
-    "gdi32",
-    "winmm",
-] # We still havent done object files for linux just yet# The libraries to link against on Windows specifically.
+# The libraries to link against on Windows specifically.
+libs = ["dbghelp", "ws2_32", "flecs", "opengl32", "gdi32", "winmm"]
 
 [link.linux]
 # The libraries to link against on Linux specifically.
-libs = ["rt", "pthread", "m"]
+libs = ["flecs", "GL", "X11", "pthread", "dl", "rt"]
 
 # NB: There will be a "c.windows" and "c.linux" section in the future.
 [c]
