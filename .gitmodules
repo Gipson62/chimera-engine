@@ -1,3 +1,7 @@
 [submodule "vendor/flecs"]
 	path = vendor/flecs
 	url = https://github.com/SanderMertens/flecs
+
+[submodule "vendor/raylib"]
+	path = vendor/raylib
+	url = https://github.com/raysan5/raylib

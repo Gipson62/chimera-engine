@@ -376,7 +376,7 @@ namespace raylib {
         events: *raylib::AutomationEvent;
     }
 
-    public enum ConfigFlags {
+    public extern enum ConfigFlags {
         FLAG_VSYNC_HINT = 0x00000040;
         FLAG_FULLSCREEN_MODE = 0x00000002;
         FLAG_WINDOW_RESIZABLE = 0x00000004;
@@ -395,7 +395,7 @@ namespace raylib {
         FLAG_INTERLACED_HINT = 0x00010000;
     }
 
-    public enum TraceLogLevel {
+    public extern enum TraceLogLevel {
         LOG_ALL = 0;
         LOG_TRACE;
         LOG_DEBUG;
@@ -406,7 +406,7 @@ namespace raylib {
         LOG_NONE;
     }
 
-    public enum KeyboardKey {
+    public extern enum KeyboardKey {
         KEY_NULL = 0;
         KEY_APOSTROPHE = 39;
         KEY_COMMA = 44;
@@ -519,7 +519,7 @@ namespace raylib {
         KEY_VOLUME_DOWN = 25;
     }
 
-    public enum MouseButton {
+    public extern enum MouseButton {
         MOUSE_BUTTON_LEFT = 0;
         MOUSE_BUTTON_RIGHT = 1;
         MOUSE_BUTTON_MIDDLE = 2;
@@ -529,7 +529,7 @@ namespace raylib {
         MOUSE_BUTTON_BACK = 6;
     }
 
-    public enum MouseCursor {
+    public extern enum MouseCursor {
         MOUSE_CURSOR_DEFAULT = 0;
         MOUSE_CURSOR_ARROW = 1;
         MOUSE_CURSOR_IBEAM = 2;
@@ -543,7 +543,7 @@ namespace raylib {
         MOUSE_CURSOR_NOT_ALLOWED = 10;
     }
 
-    public enum GamepadButton {
+    public extern enum GamepadButton {
         GAMEPAD_BUTTON_UNKNOWN = 0;
         GAMEPAD_BUTTON_LEFT_FACE_UP;
         GAMEPAD_BUTTON_LEFT_FACE_RIGHT;
@@ -564,7 +564,7 @@ namespace raylib {
         GAMEPAD_BUTTON_RIGHT_THUMB;
     }
 
-    public enum GamepadAxis {
+    public extern enum GamepadAxis {
         GAMEPAD_AXIS_LEFT_X = 0;
         GAMEPAD_AXIS_LEFT_Y = 1;
         GAMEPAD_AXIS_RIGHT_X = 2;
@@ -573,7 +573,7 @@ namespace raylib {
         GAMEPAD_AXIS_RIGHT_TRIGGER = 5;
     }
 
-    public enum MaterialMapIndex {
+    public extern enum MaterialMapIndex {
         MATERIAL_MAP_ALBEDO = 0;
         MATERIAL_MAP_METALNESS;
         MATERIAL_MAP_NORMAL;
@@ -587,7 +587,7 @@ namespace raylib {
         MATERIAL_MAP_BRDF;
     }
 
-    public enum ShaderLocationIndex {
+    public extern enum ShaderLocationIndex {
         SHADER_LOC_VERTEX_POSITION = 0;
         SHADER_LOC_VERTEX_TEXCOORD01;
         SHADER_LOC_VERTEX_TEXCOORD02;
@@ -619,7 +619,7 @@ namespace raylib {
         SHADER_LOC_BONE_MATRICES;
     }
 
-    public enum ShaderUniformDataType {
+    public extern enum ShaderUniformDataType {
         SHADER_UNIFORM_FLOAT = 0;
         SHADER_UNIFORM_VEC2;
         SHADER_UNIFORM_VEC3;
@@ -631,14 +631,14 @@ namespace raylib {
         SHADER_UNIFORM_SAMPLER2D;
     }
 
-    public enum ShaderAttributeDataType {
+    public extern enum ShaderAttributeDataType {
         SHADER_ATTRIB_FLOAT = 0;
         SHADER_ATTRIB_VEC2;
         SHADER_ATTRIB_VEC3;
         SHADER_ATTRIB_VEC4;
     }
 
-    public enum PixelFormat {
+    public extern enum PixelFormat {
         PIXELFORMAT_UNCOMPRESSED_GRAYSCALE = 1;
         PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA;
         PIXELFORMAT_UNCOMPRESSED_R5G6B5;
@@ -665,7 +665,7 @@ namespace raylib {
         PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA;
     }
 
-    public enum TextureFilter {
+    public extern enum TextureFilter {
         TEXTURE_FILTER_POINT = 0;
         TEXTURE_FILTER_BILINEAR;
         TEXTURE_FILTER_TRILINEAR;
@@ -674,14 +674,14 @@ namespace raylib {
         TEXTURE_FILTER_ANISOTROPIC_16X;
     }
 
-    public enum TextureWrap {
+    public extern enum TextureWrap {
         TEXTURE_WRAP_REPEAT = 0;
         TEXTURE_WRAP_CLAMP;
         TEXTURE_WRAP_MIRROR_REPEAT;
         TEXTURE_WRAP_MIRROR_CLAMP;
     }
 
-    public enum CubemapLayout {
+    public extern enum CubemapLayout {
         CUBEMAP_LAYOUT_AUTO_DETECT = 0;
         CUBEMAP_LAYOUT_LINE_VERTICAL;
         CUBEMAP_LAYOUT_LINE_HORIZONTAL;
@@ -689,13 +689,13 @@ namespace raylib {
         CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE;
     }
 
-    public enum FontType {
+    public extern enum FontType {
         FONT_DEFAULT = 0;
         FONT_BITMAP;
         FONT_SDF;
     }
 
-    public enum BlendMode {
+    public extern enum BlendMode {
         BLEND_ALPHA = 0;
         BLEND_ADDITIVE;
         BLEND_MULTIPLIED;
@@ -706,7 +706,7 @@ namespace raylib {
         BLEND_CUSTOM_SEPARATE;
     }
 
-    public enum Gesture {
+    public extern enum Gesture {
         GESTURE_NONE = 0;
         GESTURE_TAP = 1;
         GESTURE_DOUBLETAP = 2;
@@ -720,7 +720,7 @@ namespace raylib {
         GESTURE_PINCH_OUT = 512;
     }
 
-    public enum CameraMode {
+    public extern enum CameraMode {
         CAMERA_CUSTOM = 0;
         CAMERA_FREE;
         CAMERA_ORBITAL;
@@ -728,12 +728,12 @@ namespace raylib {
         CAMERA_THIRD_PERSON;
     }
 
-    public enum CameraProjection {
+    public extern enum CameraProjection {
         CAMERA_PERSPECTIVE = 0;
         CAMERA_ORTHOGRAPHIC;
     }
 
-    public enum NPatchLayout {
+    public extern enum NPatchLayout {
         NPATCH_NINE_PATCH = 0;
         NPATCH_THREE_PATCH_VERTICAL;
         NPATCH_THREE_PATCH_HORIZONTAL;

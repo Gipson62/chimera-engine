@@ -19,6 +19,9 @@ libs = [
     "dbghelp",
     "ws2_32",
     "flecs",
+    "opengl32",
+    "gdi32",
+    "winmm",
 ] # We still havent done object files for linux just yet# The libraries to link against on Windows specifically.
 
 [link.linux]
@@ -35,4 +38,4 @@ include_dirs = ["include/", "C:/msys64/mingw64/include/"]
 lib_dirs = ["lib/"]
 # Directories recursively scanned for extra .c source files compiled and linked
 # alongside generated output.
-source_dirs = ["include/", "include/glad/"]
+source_dirs = ["include/"]
