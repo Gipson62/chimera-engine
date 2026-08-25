@@ -8,11 +8,11 @@ compiler = "gcc"
 args = []
 
 [dependencies]
-headers = ["math.h", "atlas77-flecs.h", "atlas77-raylib.h"]
+headers = ["math.h", "atlas77-flecs.h"]
 
 [link]
 # The libraries to link against.
-shared = ["m", "raylib"]
+shared = ["m"]
 
 [link.windows]
 # The libraries to link against on Windows specifically.

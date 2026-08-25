@@ -58,22 +58,11 @@ public fun run_particle_simulation_demo() -> int32 {
     world.set_component<Position2D>(particle_c.id, position_component, Position2D { .x = 3.0, .y = 8.0 });
     world.set_component<Velocity2D>(particle_c.id, velocity_component, Velocity2D { .x = -1.0, .y = -0.5 });
 
-    if (world.register_system1<Velocity2D>(
-        velocity_component,
-        gravity_system
-    ) == false) {
-        std::printf("Failed to register gravity system\n", 0);
-        return 1;
-    }
+    world.register_system1<Velocity2D>("Gravity System", velocity_component, gravity_system);
 
-    if (world.register_system2<Position2D, Velocity2D>(
-        position_component,
-        velocity_component,
-        integrate_system
-    ) == false) {
-        std::printf("Failed to register integration system\n", 0);
-        return 1;
-    }
+    world.register_system2<Position2D, Velocity2D>(
+        "Integration System", position_component, 
+        velocity_component, integrate_system);
 
     let tick: uint32 = 0;
     while (tick < 6) {
