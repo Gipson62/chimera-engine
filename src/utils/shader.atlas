@@ -1,0 +1,85 @@
+import "std/file";
+
+import "src/glad.atlas";
+
+import "std/optional";
+
+enum ShaderKind {
+    FRAGMENT_SHADER = 0x8B30; // _GL_FRAGMENT_SHADER
+    VERTEX_SHADER = 0x8B31;   // _GL_VERTEX_SHADER
+}
+
+public  struct ShaderStage {
+  public:
+    //TODO: Potentially use std::expected<This, ShaderError>
+    // With ShaderError possibly being "File not found" or "Compilation Failed"
+    fun new(path: str, kind: ShaderKind) -> std::optional<This> {
+        let file = std::file::read_to_string(path);
+        if file.is_unexpected() {
+            return std::optional<This>::empty();
+        }
+
+        let shader_source: *const uint8 = file.expected_value().c_str();
+        let id = glCreateShader(kind);
+
+        glShaderSource(id, 1, &shader_source as const *const str, null);
+        glCompileShader(id);
+
+        let success: int32 = 1;
+        glGetShaderiv(id, _GL_COMPILE_STATUS(), &success);
+        if success == 0 {
+            let infoLog: [uint8; 256] = [0; 256];
+            glGetShaderInfoLog(id, 256, null, &infoLog[0]);
+            std::printf("SHADER COMPILATION ERROR: %s", infoLog);
+
+            glDeleteShader(id);
+            return std::optional<This>::empty();
+        }
+
+        return std::optional<This>::of(ShaderStage { .id = id });
+    }
+    ~ShaderStage() {
+        glDeleteShader(this->id);
+    }
+    fun get_id(*const this) -> uint32 {
+        return this->id;
+    }
+
+  private:
+    id: uint32;
+}
+
+public struct ShaderProgram {
+  public:
+    fun link(vertex: ShaderStage, fragment: ShaderStage) -> std::optional<This> {
+        let id = glCreateProgram();
+        glAttachShader(id, vertex.get_id());
+        glAttachShader(id, fragment.get_id());
+        glLinkProgram(id);
+
+        let success: int32 = 0;
+        glGetProgramiv(id, _GL_LINK_STATUS(), &success);
+        if success == 0 {
+            let infoLog: [uint8; 256] = [0; 256];
+            glGetProgramInfoLog(id, 256, null, &infoLog[0]);
+            std::printf("SHADER PROGRAM LINKING ERROR: %s", infoLog);
+
+            glDeleteProgram(id);
+            return std::optional<This>::empty();
+        }
+
+        return std::optional<This>::of(ShaderProgram { .id = id });
+    }
+
+    fun bind(*this) {
+        glUseProgram(this->id);
+    }
+
+    ~ShaderProgram() {
+        glDeleteProgram(this->id);
+    }
+
+  private:
+    id: uint32;
+    // You can add your own custom 'locs' dictionary/map here later!
+}

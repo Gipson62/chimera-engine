@@ -8,6 +8,18 @@ namespace flecs {
       public:
     }
 
+    public extern struct ecs_system_desc_t {
+      public:
+        name: str;
+        query: flecs::ecs_query_desc_t;
+        callback: fun(*flecs::ecs_iter_t) -> unit;
+    }
+
+    public extern struct ecs_query_desc_t {
+      public:
+
+    }
+
     //! Opaque Flecs query handle.
     public extern struct ecs_query_t
     {
@@ -48,6 +60,9 @@ namespace flecs {
         size: int32,
         alignment: int32
     ) -> uint64;
+
+
+    public extern fun ecs_system_init(world: *flecs::ecs_world_t, desc: *flecs::ecs_system_desc_t) -> uint64;
 
     //! Add a component id to an entity.
     public extern fun ecs_add_id(world: *flecs::ecs_world_t, entity: uint64, component: uint64);

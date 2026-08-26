@@ -1,142 +1,191 @@
-import "src/ecs/flecs.atlas";
-import "src/ecs/ecs.atlas";
-import "src/ecs/engine_component.atlas";
 import "std/io";
-import "core/reflection";
+import "std/memory";
+import "std/time";
+import "std/file";
 
-public struct Position2D {
-    public:
-    x: float32;
-    y: float32;
-}
+import "src/glfw3.atlas";
+import "src/glad.atlas";
+import "src/utils/shader.atlas";
 
-public struct Velocity2D {
-    public:
-    x: float32;
-    y: float32;
-}
+extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
-fun gravity_system(entity_id: uint64, velocity: *Velocity2D, dt: float32) {
-    if (velocity == null) {
-        return;
+fun main() -> int32 {
+    // Step 1: Initialize GLFW.
+    // GLFW handles window creation, OpenGL context creation, and input/events.
+    glfw::Init();
+
+    // Step 2: Tell GLFW which OpenGL context we want.
+    // This requests OpenGL 3.3 Core Profile, matching the LearnOpenGL basics.
+    glfw::WindowHint(glfw::CONTEXT_VERSION_MAJOR(), 3);
+    glfw::WindowHint(glfw::CONTEXT_VERSION_MINOR(), 3);
+    glfw::WindowHint(glfw::OPENGL_PROFILE(), glfw::OPENGL_CORE_PROFILE());
+
+    // Step 3: Create a window and its OpenGL context.
+    let window = glfw::CreateWindow(800, 600, "LearnOpenGL", null, null);
+    if (window == null)
+    {
+        std::println("Failed to create GLFW window");
+        glfw::Terminate();
+        return -1;
     }
 
-    velocity->y = velocity->y - (9.81 * dt);
-}
+    // Step 4: Make this context current on the calling thread.
+    // All OpenGL calls affect the currently bound context.
+    glfw::MakeContextCurrent(window);
 
-fun integrate_system(entity_id: uint64, position: *Position2D, velocity: *Velocity2D, dt: float32) {
-    if (position == null || velocity == null) {
-        return;
+    // Step 5: Register callback for resize events.
+    // OpenGL viewport must be updated when window size changes.
+    glfw::SetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    // Step 6: Load OpenGL function pointers with GLAD.
+    // On most platforms, OpenGL functions are resolved at runtime.
+    if (gladLoadGLLoader(glfw::GetProcAddress as fun(*const char) -> *unit) == 0)
+    {
+        std::panic("Failed to initialize GLAD");
     }
 
-    position->x = position->x + velocity->x * dt;
-    position->y = position->y + velocity->y * dt;
-}
+    // Step 7: Set initial viewport.
+    // NDC coordinates are mapped to this pixel rectangle.
+    // LearnOpenGL does this once at startup because callback may not fire yet.
+    glViewport(0, 0, 800, 600);
 
-public fun run_particle_simulation_demo() -> int32 {
-    let world = World::new();
+    // Shader compile/link diagnostics buffers.
+    let success: int32 = 0;
+    let infoLog: [uint8; 512] = [0; 512];
 
-    let position_component = world.register_component<Position2D>(type_of<Position2D>().name);
-    let velocity_component = world.register_component<Velocity2D>(type_of<Velocity2D>().name);
+    // Step 8: Vertex shader source.
+    // Takes vertex position input and outputs clip-space position.
+    let vertex_shader_opt = ShaderStage::new("src/vertex.vert", ShaderKind::VERTEX_SHADER);
+    if vertex_shader_opt.is_empty() {
+        std::panic("Something is wrong with the vertex shader boss");
+    }
 
-    let particle_a = world.entity_named("particle_A");
-    let particle_b = world.entity_named("particle_B");
-    let particle_c = world.entity_named("particle_C");
+    let fragment_shader_opt = ShaderStage::new("src/fragment.frag", ShaderKind::FRAGMENT_SHADER);
+    if fragment_shader_opt.is_empty() {
+        std::panic("Something is wrong with the fragment shader boss");
+    }
+    
+    let vertex_shader = vertex_shader_opt.value();
+    let fragment_shader = fragment_shader_opt.value();
 
-    world.add_component<Position2D>(particle_a.id, position_component);
-    world.add_component<Velocity2D>(particle_a.id, velocity_component);
-    world.set_component<Position2D>(particle_a.id, position_component, Position2D { .x = 0.0, .y = 6.0 });
-    world.set_component<Velocity2D>(particle_a.id, velocity_component, Velocity2D { .x = 1.0, .y = 0.0 });
+    let shader_program_opt = ShaderProgram::link(std::move(vertex_shader), std::move(fragment_shader));
+    if shader_program_opt.is_empty() {
+        std::panic("Something is wrong with the shader program boss");
+    }
 
-    world.add_component<Position2D>(particle_b.id, position_component);
-    world.add_component<Velocity2D>(particle_b.id, velocity_component);
-    world.set_component<Position2D>(particle_b.id, position_component, Position2D { .x = -2.0, .y = 3.0 });
-    world.set_component<Velocity2D>(particle_b.id, velocity_component, Velocity2D { .x = 2.0, .y = 1.5 });
+    let shader_program = shader_program_opt.value();
 
-    world.add_component<Position2D>(particle_c.id, position_component);
-    world.add_component<Velocity2D>(particle_c.id, velocity_component);
-    world.set_component<Position2D>(particle_c.id, position_component, Position2D { .x = 3.0, .y = 8.0 });
-    world.set_component<Velocity2D>(particle_c.id, velocity_component, Velocity2D { .x = -1.0, .y = -0.5 });
+    // Step 13: CPU-side geometry.
+    // 4 vertices define a quad, and the index buffer splits it into 2 triangles.
+    let vertices_arr: [float32; 12] = [
+         0.5,  0.5, 0.0, // top right
+         0.5, -0.5, 0.0, // bottom right
+        -0.5, -0.5, 0.0, // bottom left
+        -0.5,  0.5, 0.0  // top left
+    ];
+    let vertices: *float32 = &vertices_arr[0];
+    let indices_arr: [uint32; 6] = [
+        (0 as uint32), (1 as uint32), (3 as uint32),
+        (1 as uint32), (2 as uint32), (3 as uint32)
+    ];
+    let indices: *uint32 = &indices_arr[0];
 
-    world.register_system1<Velocity2D>("Gravity System", velocity_component, gravity_system);
+    // Step 14: Create OpenGL object handles.
+    // VAO stores vertex-input state, VBO stores vertex data, EBO stores indices.
+    let VBO: uint32 = 0;
+    let VAO: uint32 = 0;
+    let EBO: uint32 = 0;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
-    world.register_system2<Position2D, Velocity2D>(
-        "Integration System", position_component, 
-        velocity_component, integrate_system);
+    // Step 15: Bind VAO first so following vertex-input state is captured in it.
+    glBindVertexArray(VAO);
 
-    let tick: uint32 = 0;
-    while (tick < 6) {
-        std::printf("Tick %u\n", tick);
+    // Step 16: Upload vertex data to GPU buffer memory.
+    glBindBuffer(_GL_ARRAY_BUFFER(), VBO);
+    glBufferData(_GL_ARRAY_BUFFER(), sizeof<[float32; 12]>(), vertices as *unit, _GL_STATIC_DRAW());
 
-        let a_pos = world.get_component<Position2D>(particle_a.id, position_component);
-        let a_vel = world.get_component<Velocity2D>(particle_a.id, velocity_component);
-        if (a_pos != null && a_vel != null) {
-            std::printf("  entity %llu\n", particle_a.id.id);
-            std::printf("    pos.x: %.2f\n", a_pos->x);
-            std::printf("    pos.y: %.2f\n", a_pos->y);
-            std::printf("    vel.x: %.2f\n", a_vel->x);
-            std::printf("    vel.y: %.2f\n", a_vel->y);
+    // Step 17: Upload index data.
+    // EBO binding is VAO state; keep it associated with this VAO.
+    glBindBuffer(_GL_ELEMENT_ARRAY_BUFFER(), EBO);
+    glBufferData(_GL_ELEMENT_ARRAY_BUFFER(), sizeof<[uint32; 6]>(), indices as *unit, _GL_STATIC_DRAW());
+
+    // Step 18: Describe vertex attribute layout for location 0.
+    // Each vertex has 3 float components (x,y,z) tightly packed.
+    glVertexAttribPointer(0, 3, _GL_FLOAT(), _GL_FALSE(), sizeof<[float32; 3]>(), null);
+
+    // Step 19: Enable attribute location 0 for the active VAO.
+    glEnableVertexAttribArray(0);
+
+    // Optional cleanup: unbind VBO target.
+    // The attribute pointer already captured the VBO binding in VAO state.
+    glBindBuffer(_GL_ARRAY_BUFFER(), 0);
+
+    // Optional cleanup: unbind VAO to avoid accidental state edits.
+    glBindVertexArray(0);
+
+    let fps_timer = std::instant::now();
+    let frame_count: int64 = 0;
+    // Step 20: Render loop (runs once per frame).
+    while (glfw::WindowShouldClose(window) == 0)
+    {
+        // Handle per-frame input.
+        processInputs(window);
+
+        // Clear framebuffer with background color.
+        glClearColor(0.2, 0.3, 0.3, 1.0);
+        glClear(_GL_COLOR_BUFFER_BIT());
+
+        // Draw call sequence:
+        // 1) Use linked shader program
+        // 2) Bind VAO that contains vertex/index setup
+        // 3) Draw 6 indexed vertices => 2 triangles
+        shader_program.bind();
+        glBindVertexArray(VAO);
+        glDrawElements(_GL_TRIANGLES(), 6, _GL_UNSIGNED_INT(), null);
+        
+        frame_count = frame_count + 1;
+        let elapsed = fps_timer.elapsed();
+
+        if (elapsed.ns >= 1_000_000_000) {
+            let fps = frame_count as float64 / elapsed.seconds();
+
+            // Update window title here.
+            let title: [uint8; 64] = [0; 64];
+            sprintf(&title[0], "Atlas77 - FPS: %.1f", fps);
+
+            glfw::SetWindowTitle(window, &title[0]);
+
+            frame_count = 0;
+            fps_timer = std::instant::now();
         }
 
-        let b_pos = world.get_component<Position2D>(particle_b.id, position_component);
-        let b_vel = world.get_component<Velocity2D>(particle_b.id, velocity_component);
-        if (b_pos != null && b_vel != null) {
-            std::printf("  entity %llu\n", particle_b.id.id);
-            std::printf("    pos.x: %.2f\n", b_pos->x);
-            std::printf("    pos.y: %.2f\n", b_pos->y);
-            std::printf("    vel.x: %.2f\n", b_vel->x);
-            std::printf("    vel.y: %.2f\n", b_vel->y);
-        }
 
-        let c_pos = world.get_component<Position2D>(particle_c.id, position_component);
-        let c_vel = world.get_component<Velocity2D>(particle_c.id, velocity_component);
-        if (c_pos != null && c_vel != null) {
-            std::printf("  entity %llu\n", particle_c.id.id);
-            std::printf("    pos.x: %.2f\n", c_pos->x);
-            std::printf("    pos.y: %.2f\n", c_pos->y);
-            std::printf("    vel.x: %.2f\n", c_vel->x);
-            std::printf("    vel.y: %.2f\n", c_vel->y);
-        }
-
-        world.progress(0.1);
-        tick = tick + 1;
+        // Present frame and process OS events.
+        glfw::SwapBuffers(window);
+        glfw::PollEvents();
     }
 
-    std::printf("Tick %u\n", tick);
+    // Step 21: Explicit cleanup of GPU objects.
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 
-    let final_a_pos = world.get_component<Position2D>(particle_a.id, position_component);
-    let final_a_vel = world.get_component<Velocity2D>(particle_a.id, velocity_component);
-    if (final_a_pos != null && final_a_vel != null) {
-        std::printf("  entity %llu\n", particle_a.id.id);
-        std::printf("    pos.x: %.2f\n", final_a_pos->x);
-        std::printf("    pos.y: %.2f\n", final_a_pos->y);
-        std::printf("    vel.x: %.2f\n", final_a_vel->x);
-        std::printf("    vel.y: %.2f\n", final_a_vel->y);
-    }
-
-    let final_b_pos = world.get_component<Position2D>(particle_b.id, position_component);
-    let final_b_vel = world.get_component<Velocity2D>(particle_b.id, velocity_component);
-    if (final_b_pos != null && final_b_vel != null) {
-        std::printf("  entity %llu\n", particle_b.id.id);
-        std::printf("    pos.x: %.2f\n", final_b_pos->x);
-        std::printf("    pos.y: %.2f\n", final_b_pos->y);
-        std::printf("    vel.x: %.2f\n", final_b_vel->x);
-        std::printf("    vel.y: %.2f\n", final_b_vel->y);
-    }
-
-    let final_c_pos = world.get_component<Position2D>(particle_c.id, position_component);
-    let final_c_vel = world.get_component<Velocity2D>(particle_c.id, velocity_component);
-    if (final_c_pos != null && final_c_vel != null) {
-        std::printf("  entity %llu\n", particle_c.id.id);
-        std::printf("    pos.x: %.2f\n", final_c_pos->x);
-        std::printf("    pos.y: %.2f\n", final_c_pos->y);
-        std::printf("    vel.x: %.2f\n", final_c_vel->x);
-        std::printf("    vel.y: %.2f\n", final_c_vel->y);
-    }
-
+    // Step 22: Shutdown GLFW and release window/context resources.
+    glfw::Terminate();
     return 0;
 }
 
-fun main() -> int32 {
-    return run_particle_simulation_demo();
+fun framebuffer_size_callback(window: *glfw::window, width: int32, height: int32) -> unit {
+    // Keep viewport in sync with framebuffer size after resize.
+    glViewport(0, 0, width, height);
+}
+
+fun processInputs(window: *glfw::window) {
+    // Usual LearnOpenGL pattern:
+    if glfw::GetKey(window, glfw::KEY::ESCAPE) == glfw::KeyState::Press
+    {
+        glfw::SetWindowShouldClose(window, true);
+    }
 }

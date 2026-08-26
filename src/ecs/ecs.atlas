@@ -156,7 +156,7 @@ public struct World
         desc.query.terms[0].id = component.id;
         
         // Pass the generic trampoline to Flecs.
-        desc.callback = (run_system1<T>) as *unit;
+        desc.callback = run_system1<T>;
         
         // Pass the user-defined callback as type-erased context.
         desc.ctx = update as *unit;
@@ -181,7 +181,7 @@ public struct World
         desc.query.terms[0].id = component_a.id;
         desc.query.terms[1].id = component_b.id;
         
-        desc.callback = (run_system2<A, B>) as *unit;
+        desc.callback = run_system2<A, B>);
         desc.ctx = update as *unit;
 
         return Entity {
