@@ -99,8 +99,8 @@ fun main() -> int32 {
         Renderer::clear_color(0.2, 0.3, 0.3, 1.0);
         Renderer::clear();
 
-        texture.set_texture_unit(_GL_TEXTURE0());
-        texture2.set_texture_unit(_GL_TEXTURE1());
+        texture.set_texture_unit(GL::TEXTURE0);
+        texture2.set_texture_unit(GL::TEXTURE1);
 
         Renderer::draw(&va, &ib, &shader_program);
         

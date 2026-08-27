@@ -26,7 +26,7 @@ public  struct ShaderStage {
         glCompileShader(id);
 
         let success: int32 = 1;
-        glGetShaderiv(id, _GL_COMPILE_STATUS(), &success);
+        glGetShaderiv(id, GL::COMPILE_STATUS, &success);
         if success == 0 {
             let infoLog: [uint8; 256] = [0; 256];
             glGetShaderInfoLog(id, 256, null, &infoLog[0]);
@@ -58,7 +58,7 @@ public struct ShaderProgram {
         glLinkProgram(id);
 
         let success: int32 = 0;
-        glGetProgramiv(id, _GL_LINK_STATUS(), &success);
+        glGetProgramiv(id, GL::LINK_STATUS, &success);
         if success == 0 {
             let infoLog: [uint8; 256] = [0; 256];
             glGetProgramInfoLog(id, 256, null, &infoLog[0]);

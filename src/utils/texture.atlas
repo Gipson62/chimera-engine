@@ -16,12 +16,12 @@ public struct Texture2D {
             return std::optional<This>::empty();
         }
         
-        let internal_format: int32 = _GL_RGB() as int32;
-        let data_format: uint32 = _GL_RGB();
+        let internal_format: int32 = GL::RGB;
+        let data_format: uint32 = GL::RGB;
 
         if nr_channels == 4 {
-            internal_format = _GL_RGBA() as int32;
-            data_format = _GL_RGBA();
+            internal_format = GL::RGBA;
+            data_format = GL::RGBA;
         }
 
         let texture = Texture2D {
@@ -31,29 +31,29 @@ public struct Texture2D {
 
         texture.bind();
 
-        glTexParameteri(_GL_TEXTURE_2D(), _GL_TEXTURE_WRAP_S(), _GL_REPEAT());	
-        glTexParameteri(_GL_TEXTURE_2D(), _GL_TEXTURE_WRAP_T(), _GL_REPEAT());
-        glTexParameteri(_GL_TEXTURE_2D(), _GL_TEXTURE_MIN_FILTER(), _GL_LINEAR_MIPMAP_LINEAR());
-        glTexParameteri(_GL_TEXTURE_2D(), _GL_TEXTURE_MAG_FILTER(), _GL_LINEAR());
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);	
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
 
         glTexImage2D(
-            _GL_TEXTURE_2D(), 
+            GL::TEXTURE_2D, 
             0, 
             internal_format, 
             width, 
             height, 
             0, 
             data_format, 
-            _GL_UNSIGNED_BYTE(), 
+            GL::UNSIGNED_BYTE, 
             data as *unit
         );
-        glGenerateMipmap(_GL_TEXTURE_2D());
+        glGenerateMipmap(GL::TEXTURE_2D);
         stbi::image_free(data as *unit);
 
         return std::optional<This>::of(texture);
     }
     fun bind(*const this) {
-        glBindTexture(_GL_TEXTURE_2D(), this->id);
+        glBindTexture(GL::TEXTURE_2D, this->id);
     }
     // 
     fun set_texture_unit(*this, texture_unit: uint32) {

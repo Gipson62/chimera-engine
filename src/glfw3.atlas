@@ -1,23 +1,20 @@
 namespace glfw {
+    // We don't have global constant. 
+    // The language doesn't support them for now sadly.
     public fun CONTEXT_VERSION_MAJOR() -> int32 {
-        // 0x00022002
-        return 139266;
+        return 0x00022002;
     }
     public fun CONTEXT_VERSION_MINOR() -> int32 {
-        // 0x00022003
-        return 139267;
+        return 0x00022003;
     }
     public fun OPENGL_PROFILE() -> int32 {
-        // 0x00022008
-        return 139272;
+        return 0x00022008;
     }
     public fun OPENGL_CORE_PROFILE() -> int32 {
-        // 0x00032001
-        return 204801;
+        return 0x00032001;
     }
     public fun OPENGL_FORWARD_COMPAT() -> int32 {
-        // 0x00022006
-        return 139270;
+        return 0x00022006;
     }
 
     public extern struct monitor
