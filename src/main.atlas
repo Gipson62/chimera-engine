@@ -6,15 +6,17 @@ import "std/file";
 import "src/glfw3.atlas";
 import "src/glad.atlas";
 
-import "src/utils/shader.atlas";
 import "src/utils/buffer.atlas";
-import "src/utils/window.atlas";
+import "src/utils/texture.atlas";
+import "src/utils/shader.atlas";
 import "src/utils/renderer.atlas";
+import "src/utils/window.atlas";
 
 extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
 fun main() -> int32 {
     let window_res = Window::new(800, 600, "LearnOpenGL", Window::default_callback);
+    stbi::set_flip_vertically_on_load(true as int32);
     if window_res.is_unexpected() {
         std::printf("%s", window_res.unexpected_value().c_str());
         return -1;
@@ -44,29 +46,48 @@ fun main() -> int32 {
 
     let shader_program = shader_program_opt.value();
 
-    let vertices_arr: [float32; 12] = [
-         0.5,  0.5, 0.0, // top right
-         0.5, -0.5, 0.0, // bottom right
-        -0.5, -0.5, 0.0, // bottom left
-        -0.5,  0.5, 0.0  // top left
+    let vertices_arr: [float32; 32] = [
+        // positions          // colors           // texture coords
+         0.5,  0.5, 0.0,   1.0, 0.0, 0.0,   1.0, 1.0,   // top right
+         0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   1.0, 0.0,   // bottom right
+        -0.5, -0.5, 0.0,   0.0, 0.0, 1.0,   0.0, 0.0,   // bottom left
+        -0.5,  0.5, 0.0,   1.0, 1.0, 0.0,   0.0, 1.0    // top left
     ];
     let vertices: *float32 = &vertices_arr[0];
     let indices_arr: [uint32; 6] = [0, 1, 3, 1, 2, 3];
     let indices: *uint32 = &indices_arr[0];
 
-    let vb = VertexBuffer::new(vertices as *unit, sizeof<[float32; 12]>() as uint32);
+    let vb = VertexBuffer::new(vertices as *unit, size_of<[float32; 32]>() as uint32);
     
     let layout = VertexBufferLayout::default();
     layout.push<float32>(3);
+    layout.push<float32>(3);
+    layout.push<float32>(2);
 
     let va = VertexArray::new();
     va.add_buffer(&vb, &layout);
 
-    let ib = IndexBuffer::new(indices as *unit, sizeof<[uint32; 6]>() as uint32, 6);
+    let ib = IndexBuffer::new(indices as *unit, size_of<[uint32; 6]>() as uint32, 6);
 
     va.unbind();
     vb.unbind();
     ib.unbind();
+
+    let texture_opt = Texture2D::new("src/container.jpg");
+    if texture_opt.is_empty() {
+        std::panic("Something is wrong with the first texture2D boss");
+    }
+    let texture = texture_opt.value();
+
+    let texture2_opt = Texture2D::new("src/awesomeface.png");
+    if texture2_opt.is_empty() {
+        std::panic("Something is wrong with the second texture2D boss");
+    }
+    let texture2 = texture2_opt.value();
+
+    shader_program.bind();
+    shader_program.set_int("texture1", 0);
+    shader_program.set_int("texture2", 1);
 
     let fps_timer = std::instant::now();
     let frame_count: int64 = 0;
@@ -76,6 +97,9 @@ fun main() -> int32 {
 
         Renderer::clear_color(0.2, 0.3, 0.3, 1.0);
         Renderer::clear();
+
+        texture.set_texture_unit(_GL_TEXTURE0());
+        texture2.set_texture_unit(_GL_TEXTURE1());
 
         Renderer::draw(&va, &ib, &shader_program);
         

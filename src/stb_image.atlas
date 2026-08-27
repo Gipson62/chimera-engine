@@ -1,4 +1,5 @@
 namespace stbi {
+    #[c_name("stbi_stbi_io_callbacks")]
     public extern struct io_callbacks
     {
     public:
@@ -6,49 +7,91 @@ namespace stbi {
         skip: *unit;
         eof: *int32;
     }
-
+    #[c_name("stbi_stbi_load_from_memory")]
     public extern fun load_from_memory(buffer: *uint8, len: int32, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
+    #[c_name("stbi_stbi_load_from_callbacks")]
     public extern fun load_from_callbacks(clbk: *stbi::io_callbacks, user: *unit, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
+    #[c_name("stbi_stbi_load")]
     public extern fun load(filename: *uint8, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
+    #[c_name("stbi_stbi_load_from_file")]
     public extern fun load_from_file(f: *stbi::FILE, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
+    #[c_name("stbi_stbi_load_gif_from_memory")]
     public extern fun load_gif_from_memory(buffer: *uint8, len: int32, delays: **int32, x: *int32, y: *int32, z: *int32, comp: *int32, req_comp: int32) -> *uint8;
+    #[c_name("stbi_stbi_load_16_from_memory")]
     public extern fun load_16_from_memory(buffer: *uint8, len: int32, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint16;
+    #[c_name("stbi_stbi_load_16_from_callbacks")]
     public extern fun load_16_from_callbacks(clbk: *stbi::io_callbacks, user: *unit, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint16;
+    #[c_name("stbi_stbi_load_16")]
     public extern fun load_16(filename: *uint8, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint16;
+    #[c_name("stbi_stbi_load_from_file_16")]
     public extern fun load_from_file_16(f: *stbi::FILE, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint16;
+    #[c_name("stbi_stbi_loadf_from_memory")]
     public extern fun loadf_from_memory(buffer: *uint8, len: int32, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *float32;
+    #[c_name("stbi_stbi_loadf_from_callbacks")]
     public extern fun loadf_from_callbacks(clbk: *stbi::io_callbacks, user: *unit, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *float32;
+    #[c_name("stbi_stbi_loadf")]
     public extern fun loadf(filename: *uint8, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *float32;
+    #[c_name("stbi_stbi_loadf_from_file")]
     public extern fun loadf_from_file(f: *stbi::FILE, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *float32;
+    #[c_name("stbi_stbi_hdr_to_ldr_gamma")]
     public extern fun hdr_to_ldr_gamma(gamma: float32);
+    #[c_name("stbi_stbi_hdr_to_ldr_scale")]
     public extern fun hdr_to_ldr_scale(scale: float32);
+    #[c_name("stbi_stbi_ldr_to_hdr_gamma")]
     public extern fun ldr_to_hdr_gamma(gamma: float32);
+    #[c_name("stbi_stbi_ldr_to_hdr_scale")]
     public extern fun ldr_to_hdr_scale(scale: float32);
+    #[c_name("stbi_stbi_is_hdr_from_callbacks")]
     public extern fun is_hdr_from_callbacks(clbk: *stbi::io_callbacks, user: *unit) -> int32;
+    #[c_name("stbi_stbi_is_hdr_from_memory")]
     public extern fun is_hdr_from_memory(buffer: *uint8, len: int32) -> int32;
+    #[c_name("stbi_stbi_is_hdr")]
     public extern fun is_hdr(filename: *uint8) -> int32;
+    #[c_name("stbi_stbi_is_hdr_from_file")]
     public extern fun is_hdr_from_file(f: *stbi::FILE) -> int32;
+    #[c_name("stbi_stbi_failure_reason")]
     public extern fun failure_reason() -> *uint8;
+    #[c_name("stbi_stbi_image_free")]
     public extern fun image_free(retval_from_load: *unit);
+    #[c_name("stbi_stbi_info_from_memory")]
     public extern fun info_from_memory(buffer: *uint8, len: int32, x: *int32, y: *int32, comp: *int32) -> int32;
+    #[c_name("stbi_stbi_info_from_callbacks")]
     public extern fun info_from_callbacks(clbk: *stbi::io_callbacks, user: *unit, x: *int32, y: *int32, comp: *int32) -> int32;
+    #[c_name("stbi_stbi_is_16_bit_from_memory")]
     public extern fun is_16_bit_from_memory(buffer: *uint8, len: int32) -> int32;
+    #[c_name("stbi_stbi_is_16_bit_from_callbacks")]
     public extern fun is_16_bit_from_callbacks(clbk: *stbi::io_callbacks, user: *unit) -> int32;
+    #[c_name("stbi_stbi_info")]
     public extern fun info(filename: *uint8, x: *int32, y: *int32, comp: *int32) -> int32;
+    #[c_name("stbi_stbi_info_from_file")]
     public extern fun info_from_file(f: *stbi::FILE, x: *int32, y: *int32, comp: *int32) -> int32;
+    #[c_name("stbi_stbi_is_16_bit")]
     public extern fun is_16_bit(filename: *uint8) -> int32;
+    #[c_name("stbi_stbi_is_16_bit_from_file")]
     public extern fun is_16_bit_from_file(f: *stbi::FILE) -> int32;
+    #[c_name("stbi_stbi_set_unpremultiply_on_load")]
     public extern fun set_unpremultiply_on_load(flag_true_if_should_unpremultiply: int32);
+    #[c_name("stbi_stbi_convert_iphone_png_to_rgb")]
     public extern fun convert_iphone_png_to_rgb(flag_true_if_should_convert: int32);
+    #[c_name("stbi_stbi_set_flip_vertically_on_load")]
     public extern fun set_flip_vertically_on_load(flag_true_if_should_flip: int32);
+    #[c_name("stbi_stbi_set_unpremultiply_on_load_thread")]
     public extern fun set_unpremultiply_on_load_thread(flag_true_if_should_unpremultiply: int32);
+    #[c_name("stbi_stbi_convert_iphone_png_to_rgb_thread")]
     public extern fun convert_iphone_png_to_rgb_thread(flag_true_if_should_convert: int32);
+    #[c_name("stbi_stbi_set_flip_vertically_on_load_thread")]
     public extern fun set_flip_vertically_on_load_thread(flag_true_if_should_flip: int32);
+    #[c_name("stbi_stbi_zlib_decode_malloc_guesssize")]
     public extern fun zlib_decode_malloc_guesssize(buffer: *uint8, len: int32, initial_size: int32, outlen: *int32) -> *uint8;
+    #[c_name("stbi_stbi_zlib_decode_malloc_guesssize_headerflag")]
     public extern fun zlib_decode_malloc_guesssize_headerflag(buffer: *uint8, len: int32, initial_size: int32, outlen: *int32, parse_header: int32) -> *uint8;
+    #[c_name("stbi_stbi_zlib_decode_malloc")]
     public extern fun zlib_decode_malloc(buffer: *uint8, len: int32, outlen: *int32) -> *uint8;
+    #[c_name("stbi_stbi_zlib_decode_buffer")]
     public extern fun zlib_decode_buffer(obuffer: *uint8, olen: int32, ibuffer: *uint8, ilen: int32) -> int32;
+    #[c_name("stbi_stbi_zlib_decode_noheader_malloc")]
     public extern fun zlib_decode_noheader_malloc(buffer: *uint8, len: int32, outlen: *int32) -> *uint8;
+    #[c_name("stbi_stbi_zlib_decode_noheader_buffer")]
     public extern fun zlib_decode_noheader_buffer(obuffer: *uint8, olen: int32, ibuffer: *uint8, ilen: int32) -> int32;
 
     // Skipped by package command:

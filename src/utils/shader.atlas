@@ -70,7 +70,15 @@ public struct ShaderProgram {
 
         return std::optional<This>::of(ShaderProgram { .id = id });
     }
-
+    fun set_int(*const this, name: str, value: int32) {
+        glUniform1i(glGetUniformLocation(this->id, name), value);
+    }
+    fun set_bool(*const this, name: str, value: bool) {
+        glUniform1i(glGetUniformLocation(this->id, name), value as int32);
+    }
+    fun set_float(*const this, name: str, value: float32) {
+        glUniform1f(glGetUniformLocation(this->id, name), value);
+    }
     fun bind(*const this) {
         glUseProgram(this->id);
     }

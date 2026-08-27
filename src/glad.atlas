@@ -70,6 +70,61 @@ public fun _GL_TRIANGLES() -> uint32 {
 public fun _GL_ARRAY_BUFFER_BINDING() -> uint32 {
     return 0x8894;
 }
+public fun _GL_TEXTURE_2D() -> uint32 {
+    return 0x0DE1;
+}
+public fun _GL_RGB() -> uint32 {
+    return 0x1907;
+}
+public fun _GL_RGBA() -> uint32 {
+    return 0x1908;
+}
+public fun _GL_TEXTURE0() -> uint32 {
+    return 0x84C0;
+}
+public fun _GL_TEXTURE1() -> uint32 {
+    return 0x84C1;
+}
+public fun _GL_TEXTURE2() -> uint32 {
+    return 0x84C2;
+}
+public fun _GL_TEXTURE3() -> uint32 {
+    return 0x84C3;
+}
+public fun _GL_TEXTURE4() -> uint32 {
+    return 0x84C4;
+}
+public fun _GL_TEXTURE5() -> uint32 {
+    return 0x84C5;
+}
+public fun _GL_TEXTURE6() -> uint32 {
+    return 0x84C6;
+}
+public fun _GL_TEXTURE7() -> uint32 {
+    return 0x84C7;
+}
+
+public fun _GL_TEXTURE_WRAP_S() -> uint32 {
+    return 0x2802;
+}
+public fun _GL_TEXTURE_WRAP_T() -> uint32 {
+    return 0x2803;
+}
+public fun _GL_TEXTURE_MIN_FILTER() -> uint32 {
+    return 0x2801;
+}
+public fun _GL_TEXTURE_MAG_FILTER() -> uint32 {
+    return 0x2800;
+}
+public fun _GL_REPEAT() -> int32 {
+    return 0x2901;
+}
+public fun _GL_LINEAR_MIPMAP_LINEAR() -> int32 {
+    return 0x2702;
+}
+public fun _GL_LINEAR() -> int32 {
+    return 0x2601;
+}
 
 public extern fun glCullFace(mode: uint32);
 public extern fun glFrontFace(mode: uint32);
