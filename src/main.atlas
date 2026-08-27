@@ -5,6 +5,7 @@ import "std/file";
 
 import "src/glfw3.atlas";
 import "src/glad.atlas";
+import "src/cglm.atlas";
 
 import "src/utils/buffer.atlas";
 import "src/utils/texture.atlas";
