@@ -9,7 +9,7 @@ args = ["-std=c2y"]
 
 [dependencies]
 # Include minwindef.h before glad to fix APIENTRY windows shenanigans
-headers = ["minwindef.h", "math.h", "atlas77-glfw3.h", "glad/glad.h"]
+headers = ["minwindef.h", "math.h", "atlas77-glfw3.h", "glad/glad.h", "stb/stb_image.h"]
 
 [link]
 # The libraries to link against.
@@ -31,6 +31,7 @@ include_dirs = [
     "include/",
     "include/glad/",
     "include/KHR",
+    "include/stb",
 ]
 # The directories to search for libraries.
 # TODO: We soon need a way to have separate windows & Linux lib_dirs. e.g. in this case,
