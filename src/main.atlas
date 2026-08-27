@@ -8,50 +8,18 @@ import "src/glad.atlas";
 
 import "src/utils/shader.atlas";
 import "src/utils/buffer.atlas";
+import "src/utils/window.atlas";
 
 extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
 fun main() -> int32 {
-    // Step 1: Initialize GLFW.
-    // GLFW handles window creation, OpenGL context creation, and input/events.
-    glfw::Init();
-
-    // Step 2: Tell GLFW which OpenGL context we want.
-    // This requests OpenGL 3.3 Core Profile, matching the LearnOpenGL basics.
-    glfw::WindowHint(glfw::CONTEXT_VERSION_MAJOR(), 3);
-    glfw::WindowHint(glfw::CONTEXT_VERSION_MINOR(), 3);
-    glfw::WindowHint(glfw::OPENGL_PROFILE(), glfw::OPENGL_CORE_PROFILE());
-
-    // Step 3: Create a window and its OpenGL context.
-    let window = glfw::CreateWindow(800, 600, "LearnOpenGL", null, null);
-    if (window == null)
-    {
-        std::println("Failed to create GLFW window");
-        glfw::Terminate();
+    let window_res = Window::new(800, 600, "LearnOpenGL", Window::default_callback);
+    if window_res.is_unexpected() {
+        std::printf("%s", window_res.unexpected_value().c_str());
         return -1;
     }
+    let window = window_res.expected_value();
 
-    // Step 4: Make this context current on the calling thread.
-    // All OpenGL calls affect the currently bound context.
-    glfw::MakeContextCurrent(window);
-
-    // Step 5: Register callback for resize events.
-    // OpenGL viewport must be updated when window size changes.
-    glfw::SetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // Step 6: Load OpenGL function pointers with GLAD.
-    // On most platforms, OpenGL functions are resolved at runtime.
-    if (gladLoadGLLoader(glfw::GetProcAddress as fun(*const char) -> *unit) == 0)
-    {
-        std::panic("Failed to initialize GLAD");
-    }
-
-    // Step 7: Set initial viewport.
-    // NDC coordinates are mapped to this pixel rectangle.
-    // LearnOpenGL does this once at startup because callback may not fire yet.
-    glViewport(0, 0, 800, 600);
-
-    // Shader compile/link diagnostics buffers.
     let success: int32 = 0;
     let infoLog: [uint8; 512] = [0; 512];
 
@@ -101,11 +69,9 @@ fun main() -> int32 {
 
     let fps_timer = std::instant::now();
     let frame_count: int64 = 0;
-    // Step 20: Render loop (runs once per frame).
-    while (glfw::WindowShouldClose(window) == 0)
-    {
-        // Handle per-frame input.
-        processInputs(window);
+
+    while (window.should_close()) {
+        window.process_inputs();
 
         glClearColor(0.2, 0.3, 0.3, 1.0);
         glClear(_GL_COLOR_BUFFER_BIT());
@@ -120,41 +86,19 @@ fun main() -> int32 {
         if (elapsed.ns >= 1_000_000_000) {
             let fps = frame_count as float64 / elapsed.seconds();
 
-            // Update window title here.
             let title: [uint8; 64] = [0; 64];
             sprintf(&title[0], "Atlas77 - FPS: %.1f", fps);
 
-            glfw::SetWindowTitle(window, &title[0]);
+            window.set_window_title(&title[0]);
 
             frame_count = 0;
             fps_timer = std::instant::now();
         }
 
-
-        // Present frame and process OS events.
-        glfw::SwapBuffers(window);
+        window.swap_buffers();
         glfw::PollEvents();
     }
 
-    // Step 21: Explicit cleanup of GPU objects.
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-
-    // Step 22: Shutdown GLFW and release window/context resources.
     glfw::Terminate();
     return 0;
-}
-
-fun framebuffer_size_callback(window: *glfw::window, width: int32, height: int32) -> unit {
-    // Keep viewport in sync with framebuffer size after resize.
-    glViewport(0, 0, width, height);
-}
-
-fun processInputs(window: *glfw::window) {
-    // Usual LearnOpenGL pattern:
-    if glfw::GetKey(window, glfw::KEY::ESCAPE) == glfw::KeyState::Press
-    {
-        glfw::SetWindowShouldClose(window, true);
-    }
 }
