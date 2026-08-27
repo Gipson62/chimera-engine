@@ -1,0 +1,21 @@
+import "src/glad.atlas";
+import "src/utils/buffer.atlas";
+import "src/utils/shader.atlas";
+
+public struct Renderer {
+  public:
+    fun clear_color(r: float32, g: float32, b: float32, a: float32) {
+        glClearColor(r, g, b, a);
+    }
+
+    fun clear() {
+        glClear(_GL_COLOR_BUFFER_BIT());
+    }
+
+    fun draw(va: *const VertexArray, ib: *const IndexBuffer, shader: *const ShaderProgram) {
+        shader->bind();
+        va->bind();
+        ib->bind();
+        glDrawElements(_GL_TRIANGLES(), ib->get_count(), _GL_UNSIGNED_INT(), null);
+    }
+}

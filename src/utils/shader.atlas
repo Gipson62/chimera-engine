@@ -71,7 +71,7 @@ public struct ShaderProgram {
         return std::optional<This>::of(ShaderProgram { .id = id });
     }
 
-    fun bind(*this) {
+    fun bind(*const this) {
         glUseProgram(this->id);
     }
 

@@ -9,6 +9,7 @@ import "src/glad.atlas";
 import "src/utils/shader.atlas";
 import "src/utils/buffer.atlas";
 import "src/utils/window.atlas";
+import "src/utils/renderer.atlas";
 
 extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
@@ -73,12 +74,10 @@ fun main() -> int32 {
     while (window.should_close()) {
         window.process_inputs();
 
-        glClearColor(0.2, 0.3, 0.3, 1.0);
-        glClear(_GL_COLOR_BUFFER_BIT());
+        Renderer::clear_color(0.2, 0.3, 0.3, 1.0);
+        Renderer::clear();
 
-        shader_program.bind();
-        va.bind();
-        glDrawElements(_GL_TRIANGLES(), 6, _GL_UNSIGNED_INT(), null);
+        Renderer::draw(&va, &ib, &shader_program);
         
         frame_count = frame_count + 1;
         let elapsed = fps_timer.elapsed();
@@ -96,9 +95,8 @@ fun main() -> int32 {
         }
 
         window.swap_buffers();
-        glfw::PollEvents();
+        window.poll_events();
     }
 
-    glfw::Terminate();
     return 0;
 }

@@ -14,43 +14,34 @@ public extern fun gladLoadGLLoader(arg_0: fun(*const char) -> *unit) -> int32;
 // [!Note] For the love of God, I need global constants/variables,
 //  and possibilities of making them external
 public fun _GL_COLOR_BUFFER_BIT() -> uint32 {
-    // 0x00004000
-    return 16384;
+    return 0x00004000;
 }
 public fun _GL_ARRAY_BUFFER() -> uint32 {
-    // 0x8892
-    return 34962;
+    return 0x8892;
 }
 public fun _GL_ELEMENT_ARRAY_BUFFER() -> uint32 {
-    // 0x8893
-    return 34963;
+    return 0x8893;
 }
 public fun _GL_STATIC_DRAW() -> uint32 {
-    // 0x88E4
-    return 35044;
+    return 0x88E4;
 }
 public fun _GL_VERTEX_SHADER() -> uint32 {
-    // 0x8B31
-    return 35633;
+    return 0x8B31;
 }
 public fun _GL_COMPILE_STATUS() -> uint32 {
-    // 0x8B81
-    return 35713;
+    return 0x8B81;
 }
 public fun _GL_FRAGMENT_SHADER() -> uint32 {
-    // 0x8B30
-    return 35632;
+    return 0x8B30;
 }
 public fun _GL_LINK_STATUS() -> uint32 {
-    // 0x8B82
-    return 35714;
+    return 0x8B82;
 }
 public fun _GL_DOUBLE() -> uint32 {
     return 0x140A;
 }
 public fun _GL_FLOAT() -> uint32 {
-    // 0x1406
-    return 5126;
+    return 0x1406;
 }
 public fun _GL_INT() -> uint32 {
     return 0x1404;
@@ -62,8 +53,7 @@ public fun _GL_BYTE() -> uint32 {
     return 0x1400;
 }
 public fun _GL_UNSIGNED_INT() -> uint32 {
-    // 0x1405
-    return 5125;
+    return 0x1405;
 }
 public fun _GL_UNSIGNED_SHORT() -> uint32 {
     return 0x1403;
@@ -75,8 +65,7 @@ public fun _GL_FALSE() -> uint8 {
     return 0;
 }
 public fun _GL_TRIANGLES() -> uint32 {
-    // 0x0004
-    return 4;
+    return 0x0004;
 }
 public fun _GL_ARRAY_BUFFER_BINDING() -> uint32 {
     return 0x8894;

@@ -56,6 +56,9 @@ public struct Window {
     fun should_close(*const this) -> bool {
         return glfw::WindowShouldClose(this->handle) == 0;
     }
+    fun poll_events(*const this) {
+        glfw::PollEvents();
+    }
 
     ~Window() {
         glfw::Terminate();

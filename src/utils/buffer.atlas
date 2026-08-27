@@ -191,7 +191,7 @@ public struct VertexBuffer {
 
 public struct IndexBuffer {
   public:
-    fun new(data: *unit, size: uint32, count: uint32) -> This {
+    fun new(data: *unit, size: uint32, count: int32) -> This {
         let id: uint32 = 0;
         glGenBuffers(1, &id);
         let buffer = IndexBuffer { .id = id, .count = count };
@@ -209,7 +209,7 @@ public struct IndexBuffer {
         glBindBuffer(_GL_ELEMENT_ARRAY_BUFFER(), 0); 
     }
 
-    fun get_count(*const this) -> uint32 {
+    fun get_count(*const this) -> int32 {
         return this->count;
     }
 
@@ -219,5 +219,5 @@ public struct IndexBuffer {
 
   private:
     id: uint32;
-    count: uint32; // Kept so you know how many indices to pass to glDrawElements later
+    count: int32; // Kept so you know how many indices to pass to glDrawElements later
 }
