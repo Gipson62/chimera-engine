@@ -9,6 +9,8 @@ public:
 public extern fun gladLoadGL() -> int32;
 public extern fun gladLoadGLLoader(arg_0: fun(*const char) -> *unit) -> int32;
 
+// Tbf I could turn all that into an enum...
+
 // [!Note] For the love of God, I need global constants/variables,
 //  and possibilities of making them external
 public fun _GL_COLOR_BUFFER_BIT() -> uint32 {
@@ -43,20 +45,41 @@ public fun _GL_LINK_STATUS() -> uint32 {
     // 0x8B82
     return 35714;
 }
+public fun _GL_DOUBLE() -> uint32 {
+    return 0x140A;
+}
 public fun _GL_FLOAT() -> uint32 {
     // 0x1406
     return 5126;
 }
-public fun _GL_FALSE() -> uint8 {
-    return 0;
+public fun _GL_INT() -> uint32 {
+    return 0x1404;
+}
+public fun _GL_SHORT() -> uint32 {
+    return 0x1402;
+}
+public fun _GL_BYTE() -> uint32 {
+    return 0x1400;
 }
 public fun _GL_UNSIGNED_INT() -> uint32 {
     // 0x1405
     return 5125;
 }
+public fun _GL_UNSIGNED_SHORT() -> uint32 {
+    return 0x1403;
+}
+public fun _GL_UNSIGNED_BYTE() -> uint32 {
+    return 0x1401;
+}
+public fun _GL_FALSE() -> uint8 {
+    return 0;
+}
 public fun _GL_TRIANGLES() -> uint32 {
     // 0x0004
     return 4;
+}
+public fun _GL_ARRAY_BUFFER_BINDING() -> uint32 {
+    return 0x8894;
 }
 
 public extern fun glCullFace(mode: uint32);
@@ -253,7 +276,7 @@ public extern fun glVertexAttrib4sv(index: uint32, v: *int16);
 public extern fun glVertexAttrib4ubv(index: uint32, v: *uint8);
 public extern fun glVertexAttrib4uiv(index: uint32, v: *uint32);
 public extern fun glVertexAttrib4usv(index: uint32, v: *uint16);
-public extern fun glVertexAttribPointer(index: uint32, size: uint32, type: uint32, normalized: uint8, stride: uint64, pointer: *unit);
+public extern fun glVertexAttribPointer(index: uint32, size: uint32, type: uint32, normalized: uint8, stride: uint64, pointer: const *unit);
 public extern fun glUniformMatrix2x3fv(location: int32, count: int32, transpose: uint8, value: *float32);
 public extern fun glUniformMatrix3x2fv(location: int32, count: int32, transpose: uint8, value: *float32);
 public extern fun glUniformMatrix2x4fv(location: int32, count: int32, transpose: uint8, value: *float32);
