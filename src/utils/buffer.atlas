@@ -1,0 +1,223 @@
+import "std/vector";
+import "std/byte";
+import "core/reflection";
+
+import "src/glad.atlas";
+
+public struct VertexArray {
+  public:
+    fun new() -> This {
+        let id: uint32 = 0;
+        glGenVertexArrays(1, &id);
+        return VertexArray { .id = id };
+    }
+    fun bind(*const this) {
+        glBindVertexArray(this->id);
+    }
+    fun unbind(*const this) {
+        glBindVertexArray(0);
+    }
+    ~VertexArray() {
+        glDeleteVertexArrays(1, &this->id);
+    }
+    // Maybe we should require mutable pointers here for vb and layout
+    // Idk tbf...
+    fun add_buffer(*this, vb: *const VertexBuffer, layout: *const VertexBufferLayout) {
+        this->bind();
+        vb->bind();
+
+        let elements = layout->get_elements();
+        let i: uint64 = 0;
+        let offset: uint32 = 0;
+
+        while i < elements->len() {
+            let element = elements->get(i);
+
+            glEnableVertexAttribArray(i as uint32);
+
+            glVertexAttribPointer(
+                i as uint32,
+                element->count,
+                element->type,
+                element->normalized,
+                layout->get_stride(),
+                (offset as uint64) as *unit
+            );
+
+            offset = element->count * VertexBufferElement::get_size_of_type(element->type) + offset;
+            i = i + 1;
+        }
+    }
+    
+  private:
+    id: uint32;
+}
+
+
+public struct VertexBufferElement {
+  public:
+    type: uint32;
+    count: uint32;
+    normalized: uint8;
+
+    // In VertexBufferElement struct
+    fun get_size_of_type(type: uint32) -> uint32 {
+        if type == _GL_FLOAT()          { return 4; } 
+        if type == _GL_DOUBLE()         { return 8; }
+        if type == _GL_INT()            { return 4; } 
+        if type == _GL_UNSIGNED_INT()   { return 4; } 
+        if type == _GL_SHORT()          { return 2; } 
+        if type == _GL_UNSIGNED_SHORT() { return 2; } 
+        if type == _GL_BYTE()           { return 1; } 
+        if type == _GL_UNSIGNED_BYTE()  { return 1; } 
+        return 0;
+    }
+
+}
+
+public struct VertexBufferLayout {
+  public:
+    fun default() -> This {
+        return VertexBufferLayout {
+            .elements = std::vector<VertexBufferElement>::with_capacity(5),
+            .stride = 0,
+        };
+    }
+
+    fun push<T>(*this, count: uint32) {
+        if type_id<T>() == type_id<float32>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_FLOAT(), 
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else if type_id<T>() == type_id<float64>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_DOUBLE(), 
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else if type_id<T>() == type_id<int32>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_INT(), 
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else if type_id<T>() == type_id<uint32>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_UNSIGNED_INT(), 
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else if type_id<T>() == type_id<int16>() {
+            this->elements.push(VertexBufferElement { 
+                .type = _GL_SHORT(), 
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else if type_id<T>() == type_id<uint16>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_UNSIGNED_SHORT(), 
+                .count = count, 
+                .normalized = _GL_FALSE()
+            });
+        } else if type_id<T>() == type_id<int8>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_BYTE(),
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else if type_id<T>() == type_id<uint8>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_UNSIGNED_BYTE(), 
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else if type_id<T>() == type_id<std::byte>() {
+            this->elements.push(VertexBufferElement {
+                .type = _GL_UNSIGNED_BYTE(), 
+                .count = count, 
+                .normalized = _GL_FALSE() 
+            });
+        } else {
+            std::printf("Unsupported type %s\n", type_of<T>().name);
+            std::panic("List of supported type: float64, float32, int32, uint32, int16, uint16, int8, uint8, std::byte");
+        }
+
+        let last_type = this->elements.get(this->elements.len() - 1)->type;
+        this->stride = count * VertexBufferElement::get_size_of_type(last_type) + this->stride;
+    }
+
+
+    fun get_elements(*const this) -> *const std::vector<VertexBufferElement> {
+        return &this->elements;
+    }
+    fun get_stride(*const this) -> uint32 {
+        return this->stride;
+    }
+
+  private:
+    elements: std::vector<VertexBufferElement>;
+    stride: uint32;
+}
+
+public struct VertexBuffer {
+  public:
+    fun new(data: *unit, size: uint32) -> This {
+        let id: uint32 = 0;
+        glGenBuffers(1, &id);
+        let buffer = VertexBuffer { .id = id };
+        
+        buffer.bind();
+        glBufferData(_GL_ARRAY_BUFFER(), size, data, _GL_STATIC_DRAW());
+        return buffer;
+    }
+    // Not sure about having a const pointer here...
+    // To me it changes the state of the Buffer
+    // It's now bound...
+    fun bind(*const this) {
+        glBindBuffer(_GL_ARRAY_BUFFER(), this->id); 
+    }
+    fun unbind(*const this) {
+        glBindBuffer(_GL_ARRAY_BUFFER(), 0); 
+    }
+    ~VertexBuffer() {
+        glDeleteBuffers(1, &this->id);
+    }
+
+  private:
+    id: uint32;
+}
+
+public struct IndexBuffer {
+  public:
+    fun new(data: *unit, size: uint32, count: uint32) -> This {
+        let id: uint32 = 0;
+        glGenBuffers(1, &id);
+        let buffer = IndexBuffer { .id = id, .count = count };
+        
+        buffer.bind();
+        glBufferData(_GL_ELEMENT_ARRAY_BUFFER(), size, data, _GL_STATIC_DRAW());
+        return buffer;
+    }
+
+    fun bind(*const this) {
+        glBindBuffer(_GL_ELEMENT_ARRAY_BUFFER(), this->id); 
+    }
+
+    fun unbind(*const this) {
+        glBindBuffer(_GL_ELEMENT_ARRAY_BUFFER(), 0); 
+    }
+
+    fun get_count(*const this) -> uint32 {
+        return this->count;
+    }
+
+    ~IndexBuffer() {
+        glDeleteBuffers(1, &this->id);
+    }
+
+  private:
+    id: uint32;
+    count: uint32; // Kept so you know how many indices to pass to glDrawElements later
+}

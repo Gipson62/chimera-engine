@@ -5,7 +5,9 @@ import "std/file";
 
 import "src/glfw3.atlas";
 import "src/glad.atlas";
+
 import "src/utils/shader.atlas";
+import "src/utils/buffer.atlas";
 
 extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
@@ -53,8 +55,6 @@ fun main() -> int32 {
     let success: int32 = 0;
     let infoLog: [uint8; 512] = [0; 512];
 
-    // Step 8: Vertex shader source.
-    // Takes vertex position input and outputs clip-space position.
     let vertex_shader_opt = ShaderStage::new("src/vertex.vert", ShaderKind::VERTEX_SHADER);
     if vertex_shader_opt.is_empty() {
         std::panic("Something is wrong with the vertex shader boss");
@@ -75,8 +75,6 @@ fun main() -> int32 {
 
     let shader_program = shader_program_opt.value();
 
-    // Step 13: CPU-side geometry.
-    // 4 vertices define a quad, and the index buffer splits it into 2 triangles.
     let vertices_arr: [float32; 12] = [
          0.5,  0.5, 0.0, // top right
          0.5, -0.5, 0.0, // bottom right
@@ -84,46 +82,22 @@ fun main() -> int32 {
         -0.5,  0.5, 0.0  // top left
     ];
     let vertices: *float32 = &vertices_arr[0];
-    let indices_arr: [uint32; 6] = [
-        (0 as uint32), (1 as uint32), (3 as uint32),
-        (1 as uint32), (2 as uint32), (3 as uint32)
-    ];
+    let indices_arr: [uint32; 6] = [0, 1, 3, 1, 2, 3];
     let indices: *uint32 = &indices_arr[0];
 
-    // Step 14: Create OpenGL object handles.
-    // VAO stores vertex-input state, VBO stores vertex data, EBO stores indices.
-    let VBO: uint32 = 0;
-    let VAO: uint32 = 0;
-    let EBO: uint32 = 0;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    let vb = VertexBuffer::new(vertices as *unit, sizeof<[float32; 12]>() as uint32);
+    
+    let layout = VertexBufferLayout::default();
+    layout.push<float32>(3);
 
-    // Step 15: Bind VAO first so following vertex-input state is captured in it.
-    glBindVertexArray(VAO);
+    let va = VertexArray::new();
+    va.add_buffer(&vb, &layout);
 
-    // Step 16: Upload vertex data to GPU buffer memory.
-    glBindBuffer(_GL_ARRAY_BUFFER(), VBO);
-    glBufferData(_GL_ARRAY_BUFFER(), sizeof<[float32; 12]>(), vertices as *unit, _GL_STATIC_DRAW());
+    let ib = IndexBuffer::new(indices as *unit, sizeof<[uint32; 6]>() as uint32, 6);
 
-    // Step 17: Upload index data.
-    // EBO binding is VAO state; keep it associated with this VAO.
-    glBindBuffer(_GL_ELEMENT_ARRAY_BUFFER(), EBO);
-    glBufferData(_GL_ELEMENT_ARRAY_BUFFER(), sizeof<[uint32; 6]>(), indices as *unit, _GL_STATIC_DRAW());
-
-    // Step 18: Describe vertex attribute layout for location 0.
-    // Each vertex has 3 float components (x,y,z) tightly packed.
-    glVertexAttribPointer(0, 3, _GL_FLOAT(), _GL_FALSE(), sizeof<[float32; 3]>(), null);
-
-    // Step 19: Enable attribute location 0 for the active VAO.
-    glEnableVertexAttribArray(0);
-
-    // Optional cleanup: unbind VBO target.
-    // The attribute pointer already captured the VBO binding in VAO state.
-    glBindBuffer(_GL_ARRAY_BUFFER(), 0);
-
-    // Optional cleanup: unbind VAO to avoid accidental state edits.
-    glBindVertexArray(0);
+    va.unbind();
+    vb.unbind();
+    ib.unbind();
 
     let fps_timer = std::instant::now();
     let frame_count: int64 = 0;
@@ -133,16 +107,11 @@ fun main() -> int32 {
         // Handle per-frame input.
         processInputs(window);
 
-        // Clear framebuffer with background color.
         glClearColor(0.2, 0.3, 0.3, 1.0);
         glClear(_GL_COLOR_BUFFER_BIT());
 
-        // Draw call sequence:
-        // 1) Use linked shader program
-        // 2) Bind VAO that contains vertex/index setup
-        // 3) Draw 6 indexed vertices => 2 triangles
         shader_program.bind();
-        glBindVertexArray(VAO);
+        va.bind();
         glDrawElements(_GL_TRIANGLES(), 6, _GL_UNSIGNED_INT(), null);
         
         frame_count = frame_count + 1;
