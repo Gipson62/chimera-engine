@@ -1,0 +1,1658 @@
+import "std/io";
+
+import "std/math";
+
+namespace la {
+
+    public fun pi() -> float32 {
+        return 3.14159265358979323846;
+    }
+
+    public fun tau() -> float32 {
+        return 6.28318530717958647692;
+    }
+
+    public fun radians(degrees: float32) -> float32 {
+        return degrees * (la::pi() / 180.0);
+    }
+
+    public fun degrees(radians: float32) -> float32 {
+        return radians * (180.0 / la::pi());
+    }
+
+    public fun abs(x: float32) -> float32 {
+        return std::absf(x);
+    }
+
+    public fun min(a: float32, b: float32) -> float32 {
+        return std::minf(a, b);
+    }
+
+    public fun max(a: float32, b: float32) -> float32 {
+        return std::maxf(a, b);
+    }
+
+    public fun clamp(x: float32, low: float32, high: float32) -> float32 {
+        return la::max(low, la::min(x, high));
+    }
+
+    public fun sqrt(x: float32) -> float32 {
+        return std::sqrtf(x);
+    }
+
+    public fun sin(x: float32) -> float32 {
+        return std::sin(x);
+    }
+
+    public fun cos(x: float32) -> float32 {
+        return std::cos(x);
+    }
+
+    public fun tan(x: float32) -> float32 {
+        return std::tan(x);
+    }
+
+    public fun asin(x: float32) -> float32 {
+        return std::asin(x);
+    }
+
+    public fun acos(x: float32) -> float32 {
+        return std::acos(x);
+    }
+
+    public fun atan(x: float32) -> float32 {
+        return std::atan(x);
+    }
+
+    public fun atan2(y: float32, x: float32) -> float32 {
+        return std::atan2(y, x);
+    }
+
+    public fun floor(x: float32) -> float32 {
+        return std::floorf(x);
+    }
+
+    public fun ceil(x: float32) -> float32 {
+        return std::ceilf(x);
+    }
+
+    public fun trunc(x: float32) -> float32 {
+        return std::truncf(x);
+    }
+
+    public fun exp(x: float32) -> float32 {
+        return std::expf(x);
+    }
+
+    public fun log(x: float32) -> float32 {
+        return std::logf(x);
+    }
+
+    public fun pow(x: float32, y: float32) -> float32 {
+        return std::powf(x, y);
+    }
+
+    public fun fmod(x: float32, y: float32) -> float32 {
+        return std::modf(x, y);
+    }
+
+
+
+
+    // ============================== vec2 ===============================
+
+    public struct vec2 {
+        data: [float32; 2];
+    public:
+
+        fun new(x: float32, y: float32) -> This {
+            return la::vec2 { .data = [x, y] };
+        }
+
+        fun zero() -> This {
+            return la::vec2::new(0.0, 0.0);
+        }
+
+        fun one() -> This {
+            return la::vec2::new(1.0, 1.0);
+        }
+
+        fun splat(v: float32) -> This {
+            return la::vec2::new(v, v);
+        }
+
+        fun x(*const this) -> float32 { return this->data[0u]; }
+        fun y(*const this) -> float32 { return this->data[1u]; }
+
+        fun get(*const this, i: uint32) -> float32 {
+            if i < 2u {
+                return this->data[i];
+            }
+
+            std::panic("la::vec2::get: index out of bounds");
+            return 0.0;
+        }
+
+        fun set(*this, i: uint32, v: float32) {
+            if i < 2u {
+                this->data[i] = v;
+                return;
+            }
+
+            std::panic("la::vec2::set: index out of bounds");
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::vec2::new(
+                this->data[0u] + other->data[0u],
+                this->data[1u] + other->data[1u]
+            );
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::vec2::new(
+                this->data[0u] - other->data[0u],
+                this->data[1u] - other->data[1u]
+            );
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            return la::vec2::new(
+                this->data[0u] * other->data[0u],
+                this->data[1u] * other->data[1u]
+            );
+        }
+
+        operator div(*const this, other: *const This) -> This {
+            return la::vec2::new(
+                this->data[0u] / other->data[0u],
+                this->data[1u] / other->data[1u]
+            );
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u]);
+        }
+
+        fun scale(*const this, s: float32) -> This {
+            return la::vec2::new(
+                this->data[0u] * s,
+                this->data[1u] * s
+            );
+        }
+
+        operator neg(*const this) -> This {
+            return la::vec2::new(
+                -this->data[0u],
+                -this->data[1u]
+            );
+        }
+
+        fun dot(*const this, o: *const This) -> float32 {
+            return this->data[0u] * o->data[0u]
+                + this->data[1u] * o->data[1u];
+        }
+
+        fun length_squared(*const this) -> float32 {
+            return this->dot(this);
+        }
+
+        fun length(*const this) -> float32 {
+            return la::sqrt(this->length_squared());
+        }
+
+        fun normalized(*const this) -> This {
+            let l: float32 = this->length();
+
+            if l <= 0.0 {
+                return la::vec2::zero();
+            }
+
+            return this->scale(1.0 / l);
+        }
+
+        fun min(*const this, o: *const This) -> This {
+            return la::vec2::new(
+                la::min(this->data[0u], o->data[0u]),
+                la::min(this->data[1u], o->data[1u])
+            );
+        }
+
+        fun max(*const this, o: *const This) -> This {
+            return la::vec2::new(
+                la::max(this->data[0u], o->data[0u]),
+                la::max(this->data[1u], o->data[1u])
+            );
+        }
+
+        fun distance_squared(*const this, o: *const This) -> float32 {
+            return (this->sub(o)).length_squared();
+        }
+
+        fun distance(*const this, o: *const This) -> float32 {
+            return la::sqrt(this->distance_squared(o));
+        }
+
+        //! Linear interpolation between `this` and `o`.
+        //! `t = 0` returns `this`, `t = 1` returns `o`.
+        //! Values outside [0, 1] extrapolate.
+        fun lerp(*const this, o: *const This, t: float32) -> This {
+            let a: This = this->scale(1.0 - t);
+            let b: This = o->scale(t);
+            return a + b;
+        }
+
+        fun equals(*const this, o: *const This, epsilon: float32) -> bool {
+            return la::abs(this->data[0u] - o->data[0u]) <= epsilon
+                && la::abs(this->data[1u] - o->data[1u]) <= epsilon;
+        }
+
+        fun copy(*const this) -> This {
+            return la::vec2::new(this->data[0u], this->data[1u]);
+        }
+    }
+
+    // ============================== vec3 ===============================
+
+    public struct vec3 {
+        data: [float32; 3];
+    public:
+
+        fun new(x: float32, y: float32, z: float32) -> This {
+            return la::vec3 { .data = [x, y, z] };
+        }
+
+        fun zero() -> This {
+            return la::vec3::new(0.0, 0.0, 0.0);
+        }
+
+        fun one() -> This {
+            return la::vec3::new(1.0, 1.0, 1.0);
+        }
+
+        fun splat(v: float32) -> This {
+            return la::vec3::new(v, v, v);
+        }
+
+        fun right() -> This {
+            return la::vec3::new(1.0, 0.0, 0.0);
+        }
+
+        fun up() -> This {
+            return la::vec3::new(0.0, 1.0, 0.0);
+        }
+
+        fun forward() -> This {
+            return la::vec3::new(0.0, 0.0, -1.0);
+        }
+
+        fun x(*const this) -> float32 { return this->data[0u]; }
+        fun y(*const this) -> float32 { return this->data[1u]; }
+        fun z(*const this) -> float32 { return this->data[2u]; }
+
+        fun get(*const this, i: uint32) -> float32 {
+            if i < 3u {
+                return this->data[i];
+            }
+
+            std::panic("la::vec3::get: index out of bounds");
+            return 0.0;
+        }
+
+        fun set(*this, i: uint32, v: float32) {
+            if i < 3u {
+                this->data[i] = v;
+                return;
+            }
+
+            std::panic("la::vec3::set: index out of bounds");
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::vec3::new(
+                this->data[0u] + other->data[0u],
+                this->data[1u] + other->data[1u],
+                this->data[2u] + other->data[2u]
+            );
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::vec3::new(
+                this->data[0u] - other->data[0u],
+                this->data[1u] - other->data[1u],
+                this->data[2u] - other->data[2u]
+            );
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            return la::vec3::new(
+                this->data[0u] * other->data[0u],
+                this->data[1u] * other->data[1u],
+                this->data[2u] * other->data[2u]
+            );
+        }
+
+        operator div(*const this, other: *const This) -> This {
+            return la::vec3::new(
+                this->data[0u] / other->data[0u],
+                this->data[1u] / other->data[1u],
+                this->data[2u] / other->data[2u]
+            );
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u]
+                && this->data[2u] == other->data[2u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(*this == *other);
+        }
+
+        operator neg(*const this) -> This {
+            return la::vec3::new(
+                -this->data[0u],
+                -this->data[1u],
+                -this->data[2u]
+            );
+        }
+
+        fun scale(*const this, s: float32) -> This {
+            return la::vec3::new(
+                this->data[0u] * s,
+                this->data[1u] * s,
+                this->data[2u] * s
+            );
+        }
+
+        fun dot(*const this, o: *const This) -> float32 {
+            return this->data[0u] * o->data[0u]
+                + this->data[1u] * o->data[1u]
+                + this->data[2u] * o->data[2u];
+        }
+
+        fun cross(*const this, o: *const This) -> This {
+            return la::vec3::new(
+                this->data[1u] * o->data[2u] - this->data[2u] * o->data[1u],
+                this->data[2u] * o->data[0u] - this->data[0u] * o->data[2u],
+                this->data[0u] * o->data[1u] - this->data[1u] * o->data[0u]
+            );
+        }
+
+        fun length_squared(*const this) -> float32 {
+            return this->dot(this);
+        }
+
+        fun length(*const this) -> float32 {
+            return la::sqrt(this->length_squared());
+        }
+
+        fun normalized(*const this) -> This {
+            let l: float32 = this->length();
+
+            if l <= 0.0 {
+                return la::vec3::zero();
+            }
+
+            return this->scale(1.0 / l);
+        }
+
+        fun distance_squared(*const this, o: *const This) -> float32 {
+            return (this->sub(o)).length_squared();
+        }
+
+        fun distance(*const this, o: *const This) -> float32 {
+            return la::sqrt(this->distance_squared(o));
+        }
+
+        //! Linear interpolation between `this` and `o`.
+        //! `t = 0` returns `this`, `t = 1` returns `o`.
+        //! Values outside [0, 1] extrapolate.
+        fun lerp(*const this, o: *const This, t: float32) -> This {
+            let a: This = this->scale(1.0 - t);
+            let b: This = o->scale(t);
+            return a + b;
+        }
+
+        fun min(*const this, o: *const This) -> This {
+            return la::vec3::new(
+                la::min(this->data[0u], o->data[0u]),
+                la::min(this->data[1u], o->data[1u]),
+                la::min(this->data[2u], o->data[2u])
+            );
+        }
+
+        fun max(*const this, o: *const This) -> This {
+            return la::vec3::new(
+                la::max(this->data[0u], o->data[0u]),
+                la::max(this->data[1u], o->data[1u]),
+                la::max(this->data[2u], o->data[2u])
+            );
+        }
+
+        //! Reflects `this` around the normalized surface normal `n`.
+        fun reflect(*const this, n: *const This) -> This {
+            let d: float32 = 2.0 * this->dot(n);
+            return this->sub(&n->scale(d));
+        }
+
+        fun xy(*const this) -> la::vec2 {
+            return la::vec2::new(
+                this->data[0u],
+                this->data[1u]
+            );
+        }
+
+        fun from_la::vec2(xy: *const la::vec2, z: float32) -> This {
+            return la::vec3::new(
+                xy->x(),
+                xy->y(),
+                z
+            );
+        }
+
+        fun equals(*const this, o: *const This, epsilon: float32) -> bool {
+            return la::abs(this->data[0u] - o->data[0u]) <= epsilon
+                && la::abs(this->data[1u] - o->data[1u]) <= epsilon
+                && la::abs(this->data[2u] - o->data[2u]) <= epsilon;
+        }
+
+        fun copy(*const this) -> This {
+            return la::vec3::new(
+                this->data[0u],
+                this->data[1u],
+                this->data[2u]
+            );
+        }
+    }
+
+    // ============================== vec4 ===============================
+
+    public struct vec4 {
+        data: [float32; 4];
+      public:
+
+        fun new(x: float32, y: float32, z: float32, w: float32) -> This {
+            return la::vec4 { .data = [x, y, z, w] };
+        }
+
+        fun zero() -> This {
+            return la::vec4::new(0.0, 0.0, 0.0, 0.0);
+        }
+
+        fun one() -> This {
+            return la::vec4::new(1.0, 1.0, 1.0, 1.0);
+        }
+
+        fun splat(v: float32) -> This {
+            return la::vec4::new(v, v, v, v);
+        }
+
+
+        fun x(*const this) -> float32 { return this->data[0u]; }
+        fun y(*const this) -> float32 { return this->data[1u]; }
+        fun z(*const this) -> float32 { return this->data[2u]; }
+        fun w(*const this) -> float32 { return this->data[3u]; }
+
+        fun get(*const this, i: uint32) -> float32 {
+            if i < 4u {
+                return this->data[i];
+            }
+
+            std::panic("la::vec4::get: index out of bounds");
+            return 0.0;
+        }
+
+        fun set(*this, i: uint32, v: float32) {
+            if i < 4u {
+                this->data[i] = v;
+                return;
+            }
+
+            std::panic("la::vec4::set: index out of bounds");
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::vec4::new(
+                this->data[0u] + other->data[0u],
+                this->data[1u] + other->data[1u],
+                this->data[2u] + other->data[2u],
+                this->data[3u] + other->data[3u]
+            );
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::vec4::new(
+                this->data[0u] - other->data[0u],
+                this->data[1u] - other->data[1u],
+                this->data[2u] - other->data[2u],
+                this->data[3u] - other->data[3u]
+            );
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            return la::vec4::new(
+                this->data[0u] * other->data[0u],
+                this->data[1u] * other->data[1u],
+                this->data[2u] * other->data[2u],
+                this->data[3u] * other->data[3u]
+            );
+        }
+
+        operator div(*const this, other: *const This) -> This {
+            return la::vec4::new(
+                this->data[0u] / other->data[0u],
+                this->data[1u] / other->data[1u],
+                this->data[2u] / other->data[2u],
+                this->data[3u] / other->data[3u]
+            );
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u]
+                && this->data[2u] == other->data[2u]
+                && this->data[3u] == other->data[3u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(*this == *other);
+        }
+
+        operator neg(*const this) -> This {
+            return la::vec4::new(
+                -this->data[0u],
+                -this->data[1u],
+                -this->data[2u],
+                -this->data[3u],
+            );
+        }
+
+        fun scale(*const this, s: float32) -> This {
+            return la::vec4::new(
+                this->data[0u] * s,
+                this->data[1u] * s,
+                this->data[2u] * s,
+                this->data[3u] * s
+            );
+        }
+
+        fun dot(*const this, o: *const This) -> float32 {
+            return this->data[0u] * o->data[0u]
+                + this->data[1u] * o->data[1u]
+                + this->data[2u] * o->data[2u]
+                + this->data[3u] * o->data[3u];
+        }
+
+        fun length_squared(*const this) -> float32 {
+            return this->dot(this);
+        }
+
+        fun length(*const this) -> float32 {
+            return la::sqrt(this->length_squared());
+        }
+
+        fun normalized(*const this) -> This {
+            let l: float32 = this->length();
+
+            if l <= 0.0 {
+                return la::vec4::zero();
+            }
+
+            return this->scale(1.0 / l);
+        }
+
+        fun distance_squared(*const this, o: *const This) -> float32 {
+            return (this->sub(o)).length_squared();
+        }
+
+        fun distance(*const this, o: *const This) -> float32 {
+            return la::sqrt(this->distance_squared(o));
+        }
+
+        //! Linear interpolation between `this` and `o`.
+        //! `t = 0` returns `this`, `t = 1` returns `o`.
+        //! Values outside [0, 1] extrapolate.
+        fun lerp(*const this, o: *const This, t: float32) -> This {
+            let a: This = this->scale(1.0 - t);
+            let b: This = o->scale(t);
+            return a + b;
+        }
+
+        fun min(*const this, o: *const This) -> This {
+            return la::vec4::new(
+                la::min(this->data[0u], o->data[0u]),
+                la::min(this->data[1u], o->data[1u]),
+                la::min(this->data[2u], o->data[2u]),
+                la::min(this->data[3u], o->data[3u])
+            );
+        }
+
+        fun max(*const this, o: *const This) -> This {
+            return la::vec4::new(
+                la::max(this->data[0u], o->data[0u]),
+                la::max(this->data[1u], o->data[1u]),
+                la::max(this->data[2u], o->data[2u]),
+                la::max(this->data[3u], o->data[3u])
+            );
+        }
+
+        //! Reflects `this` around the normalized surface normal `n`.
+        fun reflect(*const this, n: *const This) -> This {
+            let d: float32 = 2.0 * this->dot(n);
+            return this->sub(&n->scale(d));
+        }
+
+        fun xy(*const this) -> la::vec2 {
+            return la::vec2::new(
+                this->data[0u],
+                this->data[1u]
+            );
+        }
+
+        fun from_vec2(xy: *const la::vec2, z: float32, w: float32) -> This {
+            return la::vec4::new(
+                xy->x(),
+                xy->y(),
+                z,
+                w
+            );
+        }
+        fun from_vec3(xyz: *const la::vec3, w: float32) -> This {
+            return la::vec4::new(
+                xyz->x(),
+                xyz->y(),
+                xyz->z(),
+                w
+            );
+        }
+
+        fun equals(*const this, o: *const This, epsilon: float32) -> bool {
+            return la::abs(this->data[0u] - o->data[0u]) <= epsilon
+                && la::abs(this->data[1u] - o->data[1u]) <= epsilon
+                && la::abs(this->data[2u] - o->data[2u]) <= epsilon
+                && la::abs(this->data[3u] - o->data[3u]) <= epsilon;
+        }
+
+        fun copy(*const this) -> This {
+            return la::vec4::new(
+                this->data[0u],
+                this->data[1u],
+                this->data[2u],
+                this->data[3u]
+            );
+        }
+    }
+
+
+    // ========================= la::vec2i / la::vec3i / la::vec4i ====================
+    // Integer vectors: sizes, texel coordinates, grid indices. Deliberately
+    // minimal — arithmetic and float conversion, nothing else.
+
+    public struct vec2i {
+        data: [int32; 2];
+      public:
+
+        fun new(x: int32, y: int32) -> This {
+            return la::vec2i { .data = [x, y] };
+        }
+        fun zero() -> This {
+            return la::vec2i::new(0, 0);
+        }
+        fun get(*const this, i: uint64) -> int32 {
+            if i < 2 {
+                return this->data[i];
+            }
+            std::panic("la::vec2i::get: index out of bounds");
+            return 0;
+        }
+        fun set(*this, i: uint64, val: int32) {
+            if i < 2 {
+                this->data[i] = val;
+                return;
+            }
+            std::panic("la::vec2i::set: index out of bounds");
+        }
+
+        fun x(*const this) -> int32 {
+            return this->data[0];
+        }
+        fun y(*const this) -> int32 {
+            return this->data[1];
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] + other->data[0u],
+                this->data[1u] + other->data[1u],
+            );
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] - other->data[0u],
+                this->data[1u] - other->data[1u],
+            );
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] * other->data[0u],
+                this->data[1u] * other->data[1u],
+            );
+        }
+
+        operator div(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] / other->data[0u],
+                this->data[1u] / other->data[1u],
+            );
+        }
+
+        operator mod(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] % other->data[0u],
+                this->data[1u] % other->data[1u],
+            );
+        }
+
+        operator bin_and(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] & other->data[0u],
+                this->data[1u] & other->data[1u],
+            );
+        }
+
+        operator bin_or(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] | other->data[0u],
+                this->data[1u] | other->data[1u],
+            );
+        }
+
+        operator bin_xor(*const this, other: *const This) -> This {
+            return la::vec2i::new(
+                this->data[0u] ^ other->data[0u],
+                this->data[1u] ^ other->data[1u],
+            );
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(*this == *other);
+        }
+    }
+
+    public struct vec3i {
+        data: [int32; 3];
+      public:
+
+        fun new(x: int32, y: int32, z: int32) -> This {
+            return la::vec3i { .data = [x, y, z] };
+        }
+
+        fun get(*const this, i: uint64) -> int32 {
+            if i < 3 {
+                return this->data[i];
+            }
+            std::panic("la::vec3i::get: index out of bounds");
+            return 0;
+        }
+        fun set(*this, i: uint64, val: int32) {
+            if i < 3 {
+                this->data[i] = val;
+                return;
+            }
+            std::panic("la::vec3i::set: index out of bounds");
+        }
+
+        fun x(*const this) -> int32 {
+            return this->data[0];
+        }
+        fun y(*const this) -> int32 {
+            return this->data[1];
+        }
+        fun z(*const this) -> int32 {
+            return this->data[2];
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] + other->data[0u],
+                this->data[1u] + other->data[1u],
+                this->data[2u] + other->data[2u]
+            );
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] - other->data[0u],
+                this->data[1u] - other->data[1u],
+                this->data[2u] - other->data[2u]
+            );
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] * other->data[0u],
+                this->data[1u] * other->data[1u],
+                this->data[2u] * other->data[2u]
+            );
+        }
+
+        operator div(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] / other->data[0u],
+                this->data[1u] / other->data[1u],
+                this->data[2u] / other->data[2u]
+            );
+        }
+
+        operator mod(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] % other->data[0u],
+                this->data[1u] % other->data[1u],
+                this->data[2u] % other->data[2u]
+            );
+        }
+
+        operator bin_and(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] & other->data[0u],
+                this->data[1u] & other->data[1u],
+                this->data[2u] & other->data[2u]
+            );
+        }
+
+        operator bin_or(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] | other->data[0u],
+                this->data[1u] | other->data[1u],
+                this->data[2u] | other->data[2u]
+            );
+        }
+
+        operator bin_xor(*const this, other: *const This) -> This {
+            return la::vec3i::new(
+                this->data[0u] ^ other->data[0u],
+                this->data[1u] ^ other->data[1u],
+                this->data[2u] ^ other->data[2u]
+            );
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u]
+                && this->data[2u] == other->data[2u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(*this == *other);
+        }
+    }
+
+    public struct vec4i {
+        data: [int32; 4];
+      public:
+
+        fun new(x: int32, y: int32, z: int32, w: int32) -> This {
+            return la::vec4i { .data = [x, y, z, w] };
+        }
+        fun zero() -> This {
+            return la::vec4i::new(0, 0, 0, 0);
+        }
+
+        fun get(*const this, i: uint64) -> int32 {
+            if i < 4 {
+                return this->data[i];
+            }
+            std::panic("la::vec4i::get: index out of bounds");
+            return 0;
+        }
+        fun set(*this, i: uint64, val: int32) {
+            if i < 4 {
+                this->data[i] = val;
+                return;
+            }
+            std::panic("la::vec4::set: index out of bounds");
+        }
+
+        fun x(*const this) -> int32 {
+            return this->data[0];
+        }
+        fun y(*const this) -> int32 {
+            return this->data[1];
+        }
+        fun z(*const this) -> int32 {
+            return this->data[2];
+        }
+        fun w(*const this) -> int32 {
+            return this->data[3];
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] + other->data[0u],
+                this->data[1u] + other->data[1u],
+                this->data[2u] + other->data[2u],
+                this->data[3u] + other->data[3u]
+            );
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] - other->data[0u],
+                this->data[1u] - other->data[1u],
+                this->data[2u] - other->data[2u],
+                this->data[3u] - other->data[3u]
+            );
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] * other->data[0u],
+                this->data[1u] * other->data[1u],
+                this->data[2u] * other->data[2u],
+                this->data[3u] * other->data[3u],
+            );
+        }
+
+        operator div(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] / other->data[0u],
+                this->data[1u] / other->data[1u],
+                this->data[2u] / other->data[2u],
+                this->data[3u] / other->data[3u]
+            );
+        }
+
+        operator mod(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] % other->data[0u],
+                this->data[1u] % other->data[1u],
+                this->data[2u] % other->data[2u],
+                this->data[3u] % other->data[3u],
+            );
+        }
+
+        operator bin_and(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] & other->data[0u],
+                this->data[1u] & other->data[1u],
+                this->data[2u] & other->data[2u],
+                this->data[3u] & other->data[3u]
+            );
+        }
+
+        operator bin_or(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] | other->data[0u],
+                this->data[1u] | other->data[1u],
+                this->data[2u] | other->data[2u],
+                this->data[3u] | other->data[3u]
+            );
+        }
+
+        operator bin_xor(*const this, other: *const This) -> This {
+            return la::vec4i::new(
+                this->data[0u] ^ other->data[0u],
+                this->data[1u] ^ other->data[1u],
+                this->data[2u] ^ other->data[2u],
+                this->data[3u] ^ other->data[3u]
+            );
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u]
+                && this->data[2u] == other->data[2u]
+                && this->data[3u] == other->data[3u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(*this == *other);
+        }
+    }
+
+
+    // ============================== quat ================================
+    //! Hamilton quaternion, layout (x, y, z, w) — w is the scalar part.
+
+    public struct quat {
+        data: [float32; 4];
+      public:
+
+        fun new(x: float32, y: float32, z: float32, w: float32) -> This {
+            return la::quat { .data = [x, y, z, w] };
+        }
+
+        fun x(*const this) -> float32 {
+            return this->data[0];
+        }
+        fun y(*const this) -> float32 {
+            return this->data[1];
+        }
+        fun z(*const this) -> float32 {
+            return this->data[2];
+        }
+        fun w(*const this) -> float32 {
+            return this->data[3];
+        }
+
+        fun identity() -> This {
+            return la::quat::new(0.0, 0.0, 0.0, 1.0);
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::quat::new(
+                this->data[0u] + other->data[0u],
+                this->data[1u] + other->data[1u],
+                this->data[2u] + other->data[2u],
+                this->data[3u] + other->data[3u]
+            );
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::quat::new(
+                this->data[0u] - other->data[0u],
+                this->data[1u] - other->data[1u],
+                this->data[2u] - other->data[2u],
+                this->data[3u] - other->data[3u]
+            );
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            let x1: float32 = this->data[0u];
+            let y1: float32 = this->data[1u];
+            let z1: float32 = this->data[2u];
+            let w1: float32 = this->data[3u];
+
+            let x2: float32 = other->data[0u];
+            let y2: float32 = other->data[1u];
+            let z2: float32 = other->data[2u];
+            let w2: float32 = other->data[3u];
+
+            return la::quat::new(
+                w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+                w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+                w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+                w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
+            );
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u] == other->data[0u]
+                && this->data[1u] == other->data[1u]
+                && this->data[2u] == other->data[2u]
+                && this->data[3u] == other->data[3u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(*this == *other);
+        }
+    }
+
+
+    // ============================== mat4 =================================
+    //! Column-major 4x4 matrix: `col0`, `col1`, `col2`, `col3` are the four
+    //! columns, exactly the layout `glUniformMatrix4fv` expects.
+
+    public struct mat4 {
+        data: [float32; 16];
+      public:
+
+        fun zero() -> This {
+            return la::mat4 { .data = [
+                0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0
+            ] };
+        }
+
+        fun identity() -> This {
+            return la::mat4 { .data = [
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0
+            ] };
+        }
+
+        fun get(*const this, col: uint32, row: uint32) -> float32 {
+            if col < 4u && row < 4u {
+                return this->data[col * 4u + row];
+            }
+
+            std::panic("la::mat4::get: index out of bounds");
+            return 0.0;
+        }
+
+        fun set(*this, col: uint32, row: uint32, value: float32) {
+            if col < 4u && row < 4u {
+                this->data[col * 4u + row] = value;
+                return;
+            }
+
+            std::panic("la::mat4::set: index out of bounds");
+        }
+
+        fun get_ptr(*const this) -> *const float32 {
+            return &this->data[0];
+        }
+
+        operator add(*const this, other: *const This) -> This {
+            return la::mat4 {
+                .data = [
+                    this->data[0u]  + other->data[0u],
+                    this->data[1u]  + other->data[1u],
+                    this->data[2u]  + other->data[2u],
+                    this->data[3u]  + other->data[3u],
+
+                    this->data[4u]  + other->data[4u],
+                    this->data[5u]  + other->data[5u],
+                    this->data[6u]  + other->data[6u],
+                    this->data[7u]  + other->data[7u],
+
+                    this->data[8u]  + other->data[8u],
+                    this->data[9u]  + other->data[9u],
+                    this->data[10u] + other->data[10u],
+                    this->data[11u] + other->data[11u],
+
+                    this->data[12u] + other->data[12u],
+                    this->data[13u] + other->data[13u],
+                    this->data[14u] + other->data[14u],
+                    this->data[15u] + other->data[15u]
+                ]
+            };
+        }
+
+        operator sub(*const this, other: *const This) -> This {
+            return la::mat4 {
+                .data = [
+                    this->data[0u]  - other->data[0u],
+                    this->data[1u]  - other->data[1u],
+                    this->data[2u]  - other->data[2u],
+                    this->data[3u]  - other->data[3u],
+
+                    this->data[4u]  - other->data[4u],
+                    this->data[5u]  - other->data[5u],
+                    this->data[6u]  - other->data[6u],
+                    this->data[7u]  - other->data[7u],
+
+                    this->data[8u]  - other->data[8u],
+                    this->data[9u]  - other->data[9u],
+                    this->data[10u] - other->data[10u],
+                    this->data[11u] - other->data[11u],
+
+                    this->data[12u] - other->data[12u],
+                    this->data[13u] - other->data[13u],
+                    this->data[14u] - other->data[14u],
+                    this->data[15u] - other->data[15u]
+                ]
+            };
+        }
+
+        operator mul(*const this, other: *const This) -> This {
+            let result: This = la::mat4::zero();
+
+            let i: uint32 = 0u;
+
+            while i < 4u {
+                let j: uint32 = 0u;
+
+                while j < 4u {
+                    let sum: float32 = 0.0;
+
+                    let k: uint32 = 0u;
+                    while k < 4u {
+                        sum = sum
+                            + this->data[k * 4u + j]
+                            * other->data[i * 4u + k];
+
+                        k = k + 1u;
+                    }
+
+                    result.data[i * 4u + j] = sum;
+
+                    j = j + 1u;
+                }
+
+                i = i + 1u;
+            }
+
+            return result;
+        }
+
+        operator equal(*const this, other: *const This) -> bool {
+            return this->data[0u]  == other->data[0u]
+                && this->data[1u]  == other->data[1u]
+                && this->data[2u]  == other->data[2u]
+                && this->data[3u]  == other->data[3u]
+                && this->data[4u]  == other->data[4u]
+                && this->data[5u]  == other->data[5u]
+                && this->data[6u]  == other->data[6u]
+                && this->data[7u]  == other->data[7u]
+                && this->data[8u]  == other->data[8u]
+                && this->data[9u]  == other->data[9u]
+                && this->data[10u] == other->data[10u]
+                && this->data[11u] == other->data[11u]
+                && this->data[12u] == other->data[12u]
+                && this->data[13u] == other->data[13u]
+                && this->data[14u] == other->data[14u]
+                && this->data[15u] == other->data[15u];
+        }
+
+        operator not_equal(*const this, other: *const This) -> bool {
+            return !(*this == *other);
+        }
+        fun mul_vec4(*const this, v: *const la::vec4) -> la::vec4 {
+            return la::vec4::new(
+                this->data[0u]  * v->x()
+                    + this->data[4u]  * v->y()
+                    + this->data[8u]  * v->z()
+                    + this->data[12u] * v->w(),
+
+                this->data[1u]  * v->x()
+                    + this->data[5u]  * v->y()
+                    + this->data[9u]  * v->z()
+                    + this->data[13u] * v->w(),
+
+                this->data[2u]  * v->x()
+                    + this->data[6u]  * v->y()
+                    + this->data[10u] * v->z()
+                    + this->data[14u] * v->w(),
+
+                this->data[3u]  * v->x()
+                    + this->data[7u]  * v->y()
+                    + this->data[11u] * v->z()
+                    + this->data[15u] * v->w()
+            );
+        }
+        fun transposed(*const this) -> This {
+            return la::mat4 {
+                .data = [
+                    this->data[0u],
+                    this->data[4u],
+                    this->data[8u],
+                    this->data[12u],
+
+                    this->data[1u],
+                    this->data[5u],
+                    this->data[9u],
+                    this->data[13u],
+
+                    this->data[2u],
+                    this->data[6u],
+                    this->data[10u],
+                    this->data[14u],
+
+                    this->data[3u],
+                    this->data[7u],
+                    this->data[11u],
+                    this->data[15u]
+                ]
+            };
+        }
+        fun inverted(*const this) -> This {
+            let a: [float32; 32] = [
+                this->data[0u],  this->data[4u],  this->data[8u],  this->data[12u],
+                1.0, 0.0, 0.0, 0.0,
+
+                this->data[1u],  this->data[5u],  this->data[9u],  this->data[13u],
+                0.0, 1.0, 0.0, 0.0,
+
+                this->data[2u],  this->data[6u],  this->data[10u], this->data[14u],
+                0.0, 0.0, 1.0, 0.0,
+
+                this->data[3u],  this->data[7u],  this->data[11u], this->data[15u],
+                0.0, 0.0, 0.0, 1.0
+            ];
+
+            let pivot_row: uint32 = 0u;
+
+            let column: uint32 = 0u;
+            while column < 4u {
+
+                pivot_row = column;
+
+                let r: uint32 = column + 1u;
+
+                while r < 4u {
+                    if la::abs(a[r * 8u + column]) > la::abs(a[pivot_row * 8u + column]) {
+                        pivot_row = r;
+                    }
+
+                    r = r + 1u;
+                }
+
+                if la::abs(a[pivot_row * 8u + column]) <= 0.000001 {
+                    std::panic("la::mat4::inverted: matrix is singular");
+                    return la::mat4::identity();
+                }
+
+                if pivot_row != column {
+                    let i: uint32 = 0u;
+
+                    while i < 8u {
+                        let tmp: float32 = a[column * 8u + i];
+                        a[column * 8u + i] = a[pivot_row * 8u + i];
+                        a[pivot_row * 8u + i] = tmp;
+
+                        i = i + 1u;
+                    }
+                }
+
+                let pivot: float32 = a[column * 8u + column];
+
+                let i: uint32 = 0u;
+                while i < 8u {
+                    a[column * 8u + i] =
+                        a[column * 8u + i] / pivot;
+
+                    i = i + 1u;
+                }
+
+                r = 0u;
+
+                while r < 4u {
+                    if r != column {
+                        let factor: float32 = a[r * 8u + column];
+
+                        i = 0u;
+
+                        while i < 8u {
+                            a[r * 8u + i] =
+                                a[r * 8u + i]
+                                - factor * a[column * 8u + i];
+
+                            i = i + 1u;
+                        }
+                    }
+
+                    r = r + 1u;
+                }
+
+                column = column + 1u;
+            }
+
+            // Convert the resulting row-major inverse back into
+            // the column-major representation used by la::mat4.
+            return la::mat4 {
+                .data = [
+                    a[4u],
+                    a[12u],
+                    a[20u],
+                    a[28u],
+
+                    a[5u],
+                    a[13u],
+                    a[21u],
+                    a[29u],
+
+                    a[6u],
+                    a[14u],
+                    a[22u],
+                    a[30u],
+
+                    a[7u],
+                    a[15u],
+                    a[23u],
+                    a[31u]
+                ]
+            };
+        }
+
+        fun translation(x: float32, y: float32, z: float32) -> This {
+            return la::mat4 {
+                .data = [
+                    1.0, 0.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0,
+                    x,   y,   z,   1.0
+                ]
+            };
+        }
+        fun scaling(x: float32, y: float32, z: float32) -> This {
+            return la::mat4 {
+                .data = [
+                    x,   0.0, 0.0, 0.0,
+                    0.0, y,   0.0, 0.0,
+                    0.0, 0.0, z,   0.0,
+                    0.0, 0.0, 0.0, 1.0
+                ]
+            };
+        }
+        fun rotation_x(angle: float32) -> This {
+            let s: float32 = la::sin(angle);
+            let c: float32 = la::cos(angle);
+
+            return la::mat4 {
+                .data = [
+                    1.0, 0.0, 0.0, 0.0,
+                    0.0, c,   s,   0.0,
+                    0.0, -s,  c,   0.0,
+                    0.0, 0.0, 0.0, 1.0
+                ]
+            };
+        }
+        fun rotation_y(angle: float32) -> This {
+            let s: float32 = la::sin(angle);
+            let c: float32 = la::cos(angle);
+
+            return la::mat4 {
+                .data = [
+                    c,   0.0, -s,  0.0,
+                    0.0, 1.0, 0.0, 0.0,
+                    s,   0.0, c,   0.0,
+                    0.0, 0.0, 0.0, 1.0
+                ]
+            };
+        }
+        fun rotation_z(angle: float32) -> This {
+            let s: float32 = la::sin(angle);
+            let c: float32 = la::cos(angle);
+
+            return la::mat4 {
+                .data = [
+                    c,   s,   0.0, 0.0,
+                    -s,  c,   0.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0,
+                    0.0, 0.0, 0.0, 1.0
+                ]
+            };
+        }
+        fun rotation(axis: *const la::vec3, angle: float32) -> This {
+            let a: la::vec3 = axis->normalized();
+
+            let s: float32 = la::sin(angle);
+            let c: float32 = la::cos(angle);
+            let t: float32 = 1.0 - c;
+
+            let x: float32 = a.x();
+            let y: float32 = a.y();
+            let z: float32 = a.z();
+
+            return la::mat4 {
+                .data = [
+                    t * x * x + c,
+                    t * x * y + s * z,
+                    t * x * z - s * y,
+                    0.0,
+
+                    t * x * y - s * z,
+                    t * y * y + c,
+                    t * y * z + s * x,
+                    0.0,
+
+                    t * x * z + s * y,
+                    t * y * z - s * x,
+                    t * z * z + c,
+                    0.0,
+
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            };
+        }
+        fun from_quat(q: *const la::quat) -> This {
+            let x: float32 = q->x();
+            let y: float32 = q->y();
+            let z: float32 = q->z();
+            let w: float32 = q->w();
+
+            let xx: float32 = x * x;
+            let yy: float32 = y * y;
+            let zz: float32 = z * z;
+
+            let xy: float32 = x * y;
+            let xz: float32 = x * z;
+            let yz: float32 = y * z;
+
+            let wx: float32 = w * x;
+            let wy: float32 = w * y;
+            let wz: float32 = w * z;
+
+            return la::mat4 {
+                .data = [
+                    1.0 - 2.0 * (yy + zz),
+                    2.0 * (xy + wz),
+                    2.0 * (xz - wy),
+                    0.0,
+
+                    2.0 * (xy - wz),
+                    1.0 - 2.0 * (xx + zz),
+                    2.0 * (yz + wx),
+                    0.0,
+
+                    2.0 * (xz + wy),
+                    2.0 * (yz - wx),
+                    1.0 - 2.0 * (xx + yy),
+                    0.0,
+
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            };
+        }
+
+        fun perspective(
+            fov_y: float32,
+            aspect: float32,
+            near: float32,
+            far: float32
+        ) -> This {
+            let f: float32 =
+                1.0 / la::tan(fov_y * 0.5);
+
+            return la::mat4 {
+                .data = [
+                    f / aspect,
+                    0.0,
+                    0.0,
+                    0.0,
+
+                    0.0,
+                    f,
+                    0.0,
+                    0.0,
+
+                    0.0,
+                    0.0,
+                    -(far + near) / (far - near),
+                    -1.0,
+
+                    0.0,
+                    0.0,
+                    -(2.0 * far * near) / (far - near),
+                    0.0
+                ]
+            };
+        }
+        fun orthographic(
+            left: float32,
+            right: float32,
+            bottom: float32,
+            top: float32,
+            near: float32,
+            far: float32
+        ) -> This {
+            return la::mat4 {
+                .data = [
+                    2.0 / (right - left),
+                    0.0,
+                    0.0,
+                    0.0,
+
+                    0.0,
+                    2.0 / (top - bottom),
+                    0.0,
+                    0.0,
+
+                    0.0,
+                    0.0,
+                    -2.0 / (far - near),
+                    0.0,
+
+                    -(right + left) / (right - left),
+                    -(top + bottom) / (top - bottom),
+                    -(far + near) / (far - near),
+                    1.0
+                ]
+            };
+        }
+        fun look_at(
+            eye: *const la::vec3,
+            target: *const la::vec3,
+            up: *const la::vec3
+        ) -> This {
+            let f: la::vec3 = (*target - *eye).normalized();
+
+            let s: la::vec3 =
+                f.cross(up).normalized();
+
+            let u: la::vec3 =
+                s.cross(&f);
+
+            return la::mat4 {
+                .data = [
+                    s.x(),  u.x(),  -f.x(), 0.0,
+                    s.y(),  u.y(),  -f.y(), 0.0,
+                    s.z(),  u.z(),  -f.z(), 0.0,
+
+                    -s.dot(eye),
+                    -u.dot(eye),
+                    f.dot(eye),
+                    1.0
+                ]
+            };
+        }
+        fun translated(*const this, x: float32, y: float32, z: float32) -> This {
+            return *this * la::mat4::translation(x, y, z);
+        }
+
+        fun scaled(*const this, x: float32, y: float32, z: float32) -> This {
+            return *this * la::mat4::scaling(x, y, z);
+        }
+
+        fun rotated(*const this, axis: *const la::vec3, angle: float32) -> This {
+            return *this * la::mat4::rotation(axis, angle);
+        }
+    }
+
+}
