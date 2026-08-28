@@ -11,8 +11,6 @@ headers = [
     "atlas77-glfw3.h",
     "glad/glad.h",
     "atlas77-stb_image.h",
-    "cglm.h",
-    "types-struct.h",
 ]
 
 [dependencies.windows]
@@ -29,7 +27,7 @@ libs = ["glfw3", "gdi32"]
 libs = ["glfw", "GL", "dl", "m"]
 
 [c]
-include_dirs = ["include/", "vendor/cglm/include/cglm/"]
+include_dirs = ["include/"]
 source_dirs = ["include/", "include/glad/"]
 lib_dirs = ["lib/"]
 
