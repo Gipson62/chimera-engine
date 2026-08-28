@@ -9,13 +9,13 @@ public struct Renderer {
     }
 
     fun clear() {
-        glClear(GL::COLOR_BUFFER_BIT as uint32);
+        glClear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT);
     }
 
     fun draw(va: *const VertexArray, ib: *const IndexBuffer, shader: *const ShaderProgram) {
         shader->bind();
         va->bind();
         ib->bind();
-        glDrawElements(GL::TRIANGLES, ib->get_count(), GL::UNSIGNED_INT, null);
+        glDrawArrays(GL::TRIANGLES, 0, 36);
     }
 }

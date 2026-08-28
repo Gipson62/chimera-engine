@@ -37,6 +37,8 @@ public struct Window {
 
         glViewport(0, 0, width, height);
 
+        glEnable(GL::DEPTH_TEST);
+
         return std::expected<This, std::string>::expect(std::move(w));
     }
     fun swap_buffers(*this) {
