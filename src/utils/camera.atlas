@@ -87,4 +87,7 @@ public struct Camera {
     fun position(*const this) -> la::vec3 {
         return this->position;
     }
+    fun front(*const this) -> la::vec3 {
+        return this->front;
+    }
 }

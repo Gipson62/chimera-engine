@@ -174,7 +174,11 @@ fun main() -> int32 {
 
         shader_program.bind();
         shader_program.set_vec3("viewPos", &app.camera()->position());
-        shader_program.set_vec3("light.position", &light_pos);
+        shader_program.set_vec3("light.position", &app.camera()->position());
+        shader_program.set_vec3("light.direction", &app.camera()->front());
+        shader_program.set_float("light.cutOff", la::cos(la::radians(12.5)));
+        shader_program.set_float("light.outerCutOff", la::cos(la::radians(17.5)));
+        
         renderer->draw(&va, &shader_program, &cube_positions, &view, &projection);
 
         let light_model = la::mat4::identity()
