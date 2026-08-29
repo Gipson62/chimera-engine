@@ -128,14 +128,16 @@ fun main() -> int32 {
 
     shader_program.bind();
     shader_program.set_int("material.diffuse", 0);
-    shader_program.set_int("material.diffuse", 0);
     shader_program.set_int("material.specular", 1);
     shader_program.set_float("material.shininess", 32.0);
     shader_program.set_vec3("light.ambient", &la::vec3::new(0.2, 0.2, 0.2));
     shader_program.set_vec3("light.diffuse", &la::vec3::new(0.5, 0.5, 0.5));
     shader_program.set_vec3("light.specular", &la::vec3::new(1.0, 1.0, 1.0));
+    shader_program.set_float("light.constant", 1.0);
+    shader_program.set_float("light.linear", 0.09);
+    shader_program.set_float("light.quadratic", 0.032);
 
-    let light_direction = la::vec3::new(1.0, 0.3, 0.5);
+    let light_pos = la::vec3::new(1.2, 1.0, 2.0);
 
     let fps_timer = std::instant::now();
     let frame_count: int64 = 0;
@@ -167,15 +169,20 @@ fun main() -> int32 {
         let view = app.camera()->view_matrix();
         let projection = app.camera()->projection_matrix();
 
+        light_pos.set(0, 1.0 + la::sin(glfw::GetTime() as float32) * 2.0);
+        light_pos.set(1, la::sin(glfw::GetTime() as float32 / 2.0) * 1.0);
 
         shader_program.bind();
         shader_program.set_vec3("viewPos", &app.camera()->position());
-        shader_program.set_vec3("light.direction", &light_direction);
+        shader_program.set_vec3("light.position", &light_pos);
         renderer->draw(&va, &shader_program, &cube_positions, &view, &projection);
 
         let light_model = la::mat4::identity()
-            .translated(light_direction.x(), light_direction.y(), light_direction.z())
+            .translated(light_pos.x(), light_pos.y(), light_pos.z())
             .scaled(0.2, 0.2, 0.2);
+
+        renderer->begin_scene(&light_shader_program, &view, &projection);
+        renderer->submit_mesh(&light_va, &light_shader_program, &light_model, 36);
 
         frame_count = frame_count + 1;
         let elapsed = fps_timer.elapsed();
