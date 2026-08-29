@@ -129,9 +129,13 @@ fun main() -> int32 {
 
     shader_program.bind();
     shader_program.set_vec3("objectColor", &la::vec3::new(1.0, 0.5, 0.31));
-    shader_program.set_vec3("lightColor", &la::vec3::new(1.0, 1.0, 1.0));
-    shader_program.set_int("texture1", 0);
-    shader_program.set_int("texture2", 1);
+    shader_program.set_vec3("material.ambient", &la::vec3::new(1.0, 0.5, 0.31));
+    shader_program.set_vec3("material.diffuse", &la::vec3::new(1.0, 0.5, 0.31));
+    shader_program.set_vec3("material.specular", &la::vec3::new(0.5, 0.5, 0.5));
+    shader_program.set_float("material.shininess", 32.0);
+    shader_program.set_vec3("light.ambient", &la::vec3::new(0.2, 0.2, 0.2));
+    shader_program.set_vec3("light.diffuse", &la::vec3::new(0.5, 0.5, 0.5));
+    shader_program.set_vec3("light.specular", &la::vec3::new(1.0, 1.0, 1.0));
 
     let light_pos = la::vec3::new(1.2, 1.0, 2.0);
 
@@ -162,7 +166,7 @@ fun main() -> int32 {
 
         shader_program.bind();
         shader_program.set_vec3("viewPos", &app.camera()->position());
-        shader_program.set_vec3("lightPos", &light_pos);
+        shader_program.set_vec3("light.position", &light_pos);
         renderer->draw(&va, &shader_program, &cube_positions, &view, &projection);
 
         let light_model = la::mat4::identity()

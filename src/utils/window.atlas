@@ -30,7 +30,7 @@ public struct Window {
 
         glfw::MakeContextCurrent(w.handle);
 
-        glfw::SetInputMode(w.handle, glfw::CURSOR, glfw::CURSOR_DISABLED);
+        //glfw::SetInputMode(w.handle, glfw::CURSOR, glfw::CURSOR_DISABLED);
 
         glfw::SetFramebufferSizeCallback(w.handle, w.callback);
 
