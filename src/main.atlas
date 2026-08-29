@@ -115,23 +115,21 @@ fun main() -> int32 {
     light_va.unbind();
     vb.unbind();
 
-    let texture_opt = Texture2D::new("src/container.jpg");
+    let texture_opt = Texture2D::new("src/container2.png");
     if texture_opt.is_empty() {
         std::panic("Something is wrong with the first texture2D boss");
     }
     let texture = texture_opt.value();
-
-    let texture2_opt = Texture2D::new("src/awesomeface.png");
-    if texture2_opt.is_empty() {
-        std::panic("Something is wrong with the second texture2D boss");
+    let specular_map_opt = Texture2D::new("src/container2_specular.png");
+    if specular_map_opt.is_empty() {
+        std::panic("Something is wrong with the specular map texture boss");
     }
-    let texture2 = texture2_opt.value();
+    let specular_map = specular_map_opt.value();
 
     shader_program.bind();
-    shader_program.set_vec3("objectColor", &la::vec3::new(1.0, 0.5, 0.31));
-    shader_program.set_vec3("material.ambient", &la::vec3::new(1.0, 0.5, 0.31));
-    shader_program.set_vec3("material.diffuse", &la::vec3::new(1.0, 0.5, 0.31));
-    shader_program.set_vec3("material.specular", &la::vec3::new(0.5, 0.5, 0.5));
+    shader_program.set_int("material.diffuse", 0);
+    shader_program.set_int("material.diffuse", 0);
+    shader_program.set_int("material.specular", 1);
     shader_program.set_float("material.shininess", 32.0);
     shader_program.set_vec3("light.ambient", &la::vec3::new(0.2, 0.2, 0.2));
     shader_program.set_vec3("light.diffuse", &la::vec3::new(0.5, 0.5, 0.5));
@@ -143,7 +141,16 @@ fun main() -> int32 {
     let frame_count: int64 = 0;
 
     let cube_positions = std::vector<la::vec3>::with_capacity(1);
-    cube_positions.push(la::vec3::new(0.0, 0.0, 0.0));
+        cube_positions.push(la::vec3::new( 0.0,  0.0,  0.0));
+        cube_positions.push(la::vec3::new( 2.0,  5.0, -15.0));
+        cube_positions.push(la::vec3::new(-1.5, -2.2, -2.5));
+        cube_positions.push(la::vec3::new(-3.8, -2.2, -12.3));
+        cube_positions.push(la::vec3::new( 2.4, -0.4, -3.5));
+        cube_positions.push(la::vec3::new( -1.7, 3.0, -7.5));
+        cube_positions.push(la::vec3::new( 1.3, -2.0, -2.5));
+        cube_positions.push(la::vec3::new( 1.5,  2.0, -2.5));
+        cube_positions.push(la::vec3::new( 1.5,  0.2, -1.5));
+        cube_positions.push(la::vec3::new(-1.3,  1.0, -1.5));
 
     while (!app.should_close()) {
         let delta_time = app.begin_frame();
@@ -155,7 +162,7 @@ fun main() -> int32 {
         renderer->clear();
 
         texture.set_texture_unit(GL::TEXTURE0);
-        texture2.set_texture_unit(GL::TEXTURE1);
+        specular_map.set_texture_unit(GL::TEXTURE1);
 
         let view = app.camera()->view_matrix();
         let projection = app.camera()->projection_matrix();
