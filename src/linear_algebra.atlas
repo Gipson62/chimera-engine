@@ -450,7 +450,7 @@ namespace la {
             );
         }
 
-        fun from_la::vec2(xy: *const la::vec2, z: float32) -> This {
+        fun from_vec2(xy: *const la::vec2, z: float32) -> This {
             return la::vec3::new(
                 xy->x(),
                 xy->y(),

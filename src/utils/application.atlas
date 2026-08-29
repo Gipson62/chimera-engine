@@ -1,0 +1,80 @@
+import "std/expected";
+
+import "src/glfw3.atlas";
+
+import "src/utils/window.atlas";
+import "src/utils/camera.atlas";
+import "src/utils/input.atlas";
+
+public struct Application {
+  private:
+    window: Window;
+    input: Input;
+    renderer: Renderer;
+    camera: Camera;
+    last_frame: float32;
+
+  public:
+    fun new() -> std::expected<This, std::string> {
+        let window_res = Window::new(800, 600, "LearnOpenGL", Window::size_callback);
+        if window_res.is_unexpected() {
+            return std::expected<This, std::string>::unexpected(window_res.unexpected_value());
+        }
+        let window = window_res.expected_value();
+
+        let app = Application {
+            .window = std::move(window),
+            .input = Input::new(window.handle()),
+            .renderer = Renderer::default(),
+            .camera = Camera::default(800.0 / 600.0),
+            .last_frame = glfw::GetTime() as float32,
+        };
+
+        return std::expected<This, std::string>::expect(std::move(app));
+    }
+
+    fun process_input(*this, delta_time: float32) {
+        if this->input.just_pressed(glfw::KEY::ESCAPE) {
+            glfw::SetWindowShouldClose(this->window.handle(), true);
+        }
+        if this->input.is_down(glfw::KEY::W) { 
+            this->camera.process_keyboard(CameraMovement::MOVE_FORWARD, delta_time);
+        }
+        if this->input.is_down(glfw::KEY::S) {
+            this->camera.process_keyboard(CameraMovement::MOVE_BACKWARD, delta_time);
+        }
+        if this->input.is_down(glfw::KEY::A) {
+            this->camera.process_keyboard(CameraMovement::MOVE_LEFT, delta_time);
+        }
+        if this->input.is_down(glfw::KEY::D) {
+            this->camera.process_keyboard(CameraMovement::MOVE_RIGHT, delta_time);
+        }
+
+        let m = this->input.mouse_delta();
+        this->camera.process_mouse(m.x(), m.y());
+        this->camera.process_scroll(this->input.scroll_y());
+    }
+
+    fun setup(*this) {
+        glfw::SetWindowUserPointer(this->window.handle(), &this->input as *unit);
+        glfw::SetScrollCallback(this->window.handle(), Input::scroll_callback);
+    }
+
+    fun begin_frame(*this) -> float32 {
+        let current_frame = glfw::GetTime() as float32;
+        let delta_time = current_frame - this->last_frame;
+        this->last_frame = current_frame;
+
+        this->input.update();
+        return delta_time;
+    }
+
+    fun should_close(*const this) -> bool { return this->window.should_close(); }
+    fun set_window_title(*this, title: *uint8) { this->window.set_window_title(title); }
+    fun renderer(*this) -> *Renderer { return &this->renderer; }
+    fun camera(*this) -> *Camera { return &this->camera; }
+    fun end_frame(*this) {
+        this->window.swap_buffers();
+        this->window.poll_events();
+    }
+}

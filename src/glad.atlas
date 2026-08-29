@@ -1,6 +1,5 @@
-public extern struct gladGLversionStruct
-{
-public:
+public extern struct gladGLversionStruct {
+  public:
     major: int32;
     minor: int32;
 }

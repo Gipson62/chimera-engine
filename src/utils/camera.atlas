@@ -1,0 +1,87 @@
+public enum CameraMovement {
+    MOVE_FORWARD;
+    MOVE_BACKWARD;
+    MOVE_LEFT;
+    MOVE_RIGHT;
+}
+
+public struct Camera {
+  public:
+    position: la::vec3;
+    front: la::vec3;
+    up: la::vec3;
+    right: la::vec3;
+    world_up: la::vec3;
+
+    yaw: float32;
+    pitch: float32;
+
+    movement_speed: float32;
+    mouse_sensitivity: float32;
+    zoom: float32;
+    aspect: float32;
+
+    fun default(aspect: float32) -> This {
+        let cam = Camera {
+            .position = la::vec3::new(0.0, 0.0, 3.0),
+            .front = la::vec3::new(0.0, 0.0, -1.0),
+            .world_up = la::vec3::up(),
+            .up = la::vec3::up(),
+            .right = la::vec3::right(),
+            .yaw = -90.0,
+            .pitch = 0.0,
+            .movement_speed = 2.5,
+            .mouse_sensitivity = 0.05,
+            .zoom = 45.0,
+            .aspect = aspect,
+        };
+        cam.update_vectors();
+        return cam;
+    }
+
+    fun process_keyboard(*this, direction: CameraMovement, delta_time: float32) {
+        let velocity = this->movement_speed * delta_time;
+        // switch statements don't exist in atlas77
+        if direction == CameraMovement::MOVE_FORWARD  { this->position = this->position + this->front.scale(velocity); }
+        else if direction == CameraMovement::MOVE_BACKWARD { this->position = this->position - this->front.scale(velocity); }
+        else if direction == CameraMovement::MOVE_LEFT     { this->position = this->position - this->right.scale(velocity); }
+        else if direction == CameraMovement::MOVE_RIGHT    { this->position = this->position + this->right.scale(velocity); }
+    }
+
+    fun process_mouse(*this, dx: float32, dy: float32) {
+        this->yaw = this->yaw + dx * this->mouse_sensitivity;
+        this->pitch = la::clamp(this->pitch + dy * this->mouse_sensitivity, -89.0, 89.0);
+        this->update_vectors();
+    }
+
+    fun process_scroll(*this, dy: float32) {
+        this->zoom = la::clamp(this->zoom - dy, 1.0, 45.0);
+        std::printf("Camera::zoom=%.2f \n", this->zoom);
+    }
+
+    fun resize(*this, width: int32, height: int32) {
+        this->aspect = width as float32 / height as float32;
+    }
+
+    fun update_vectors(*this) {
+        let yaw_r = la::radians(this->yaw);
+        let pitch_r = la::radians(this->pitch);
+
+        this->front = la::vec3::new(
+            la::cos(yaw_r) * la::cos(pitch_r),
+            la::sin(pitch_r),
+            la::sin(yaw_r) * la::cos(pitch_r)
+        );
+
+        this->right = this->front.cross(&this->world_up).normalized();
+        this->up = this->right.cross(&this->front).normalized();
+    }
+
+    fun view_matrix(*const this) -> la::mat4 {
+        return la::mat4::look_at(&this->position, &(this->position + this->front), &this->up);
+    }
+
+    fun projection_matrix(*const this) -> la::mat4 {
+        return la::mat4::perspective(la::radians(this->zoom), this->aspect, 0.1, 100.0);
+    }
+}

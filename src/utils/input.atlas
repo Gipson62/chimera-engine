@@ -1,0 +1,78 @@
+import "src/glfw3.atlas";
+
+#[std::trivially_copyable]
+public struct Input {
+  private:
+    handle: *glfw::window;
+    keys: [bool; 349];
+    keys_prev: [bool; 349];
+    mouse_x: float64;
+    mouse_y: float64;
+    mouse_dx: float64;
+    mouse_dy: float64;
+    first_mouse: bool;
+    scroll_x: float64;
+    scroll_y: float64;
+
+  public:
+    fun new(handle: *glfw::window) -> This {
+        return Input {
+            .handle = handle,
+            .keys = [false; 349],
+            .keys_prev = [false; 349],
+            .mouse_x = 0.0, .mouse_y = 0.0,
+            .mouse_dx = 0.0, .mouse_dy = 0.0,
+            .first_mouse = true,
+        };
+    }
+
+    fun update(*this) {
+        this->keys_prev = this->keys;
+
+        let i: uint32 = 0u;
+        while i < 349u {
+            this->keys[i] = 
+                glfw::GetKey(this->handle, i as glfw::KEY) == glfw::KeyState::Press;
+            i = i + 1u;
+        }
+
+        let x: float64 = 0.0;
+        let y: float64 = 0.0;
+        glfw::GetCursorPos(this->handle, &x, &y);
+
+        if this->first_mouse {
+            this->mouse_x = x;
+            this->mouse_y = y;
+            this->first_mouse = false;
+        }
+
+        this->mouse_dx = x - this->mouse_x;
+        this->mouse_dy = this->mouse_y - y;
+        this->mouse_x = x;
+        this->mouse_y = y;
+    }
+
+    fun is_down(*const this, key: glfw::KEY) -> bool {
+        return this->keys[key];
+    }
+    fun just_pressed(*const this, key: glfw::KEY) -> bool {
+        return this->keys[key] && !this->keys_prev[key];
+    }
+    // ABSOLUTELY HORRENDOUS DESIGN BUT IT WORKS
+    // There should be a "Input::clear(*this)" method
+    fun scroll_y(*this) -> float32 {
+        let scroll_y = this->scroll_y;
+        this->scroll_y = 0.0;
+        return scroll_y as float32;
+    }
+    fun mouse_delta(*const this) -> la::vec2 {
+        return la::vec2::new(this->mouse_dx as float32, this->mouse_dy as float32);
+    }
+    fun scroll_callback(window: *glfw::window, xoffset: float64, yoffset: float64) {
+        let input = glfw::GetWindowUserPointer(window) as *Input;
+        if (input != null)  {
+            input->scroll_x = xoffset;
+            input->scroll_y = yoffset;
+        }
+    }
+}

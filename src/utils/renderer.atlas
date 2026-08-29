@@ -1,21 +1,55 @@
-import "src/glad.atlas";
-import "src/utils/buffer.atlas";
-import "src/utils/shader.atlas";
-
 public struct Renderer {
   public:
-    fun clear_color(r: float32, g: float32, b: float32, a: float32) {
-        glClearColor(r, g, b, a);
+    fun default() -> This { return Renderer {}; }
+
+    fun clear_color(*const this, r: float32, g: float32, b: float32, a: float32) { glClearColor(r, g, b, a); }
+    fun clear(*const this) { glClear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT); }
+
+    fun begin_scene(*const this, shader: *const ShaderProgram, view: *const la::mat4, projection: *const la::mat4) {
+        shader->bind();
+        shader->set_mat4("view", view);
+        shader->set_mat4("projection", projection);
     }
 
-    fun clear() {
-        glClear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT);
+    fun submit(
+        *const this,
+        va: *const VertexArray,
+        ib: *const IndexBuffer,
+        shader: *const ShaderProgram,
+        model: *const la::mat4
+    ) {
+        shader->set_mat4("model", model);
+        va->bind();
+        ib->bind();
+        glDrawElements(GL::TRIANGLES, ib->get_count(), GL::UNSIGNED_INT, null);
     }
 
-    fun draw(va: *const VertexArray, ib: *const IndexBuffer, shader: *const ShaderProgram) {
+    fun draw(
+        *const this,
+        va: *const VertexArray,
+        ib: *const IndexBuffer,
+        shader: *const ShaderProgram,
+        positions: *const std::vector<la::vec3>,
+        view: *const la::mat4,
+        projection: *const la::mat4,
+    ) {
         shader->bind();
         va->bind();
         ib->bind();
-        glDrawArrays(GL::TRIANGLES, 0, 36);
+
+        let i: uint64 = 0;
+        while i < positions->len() {
+            let pos = positions->get(i);
+            let model_matrix = la::mat4::identity()
+                .translated(pos->x(), pos->y(), pos->z())
+                .rotated(&la::vec3::new(1.0, 0.3, 0.5), glfw::GetTime() as float32 * la::radians(50.0));
+
+            shader->set_mat4("model", &model_matrix);
+            shader->set_mat4("view", view);
+            shader->set_mat4("projection", projection);
+
+            glDrawArrays(GL::TRIANGLES, 0, 36);
+            i = i + 1;
+        }
     }
 }

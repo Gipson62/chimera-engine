@@ -1,3 +1,8 @@
+enum glfw {
+    CURSOR = 0x00033001;
+    CURSOR_DISABLED = 0x00034003;
+}
+
 namespace glfw {
     // We don't have global constant. 
     // The language doesn't support them for now sadly.

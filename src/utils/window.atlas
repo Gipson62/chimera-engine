@@ -6,7 +6,7 @@ public struct Window {
   public:
 
     fun default() -> std::expected<This, std::string> {
-        return Window::new(800, 600, "Chimera Engine", Window::default_callback);
+        return Window::new(800, 600, "Chimera Engine", Window::size_callback);
     }
     fun new(width: int32, height: int32, title: str, callback: fun(*glfw::window, int32, int32) -> unit) -> std::expected<This, std::string> {
         glfw::Init();
@@ -24,15 +24,19 @@ public struct Window {
         w.handle = glfw::CreateWindow(w.width, w.height, w.title, null, null);
 
         if w.handle == null {
-            return std::expected<This, std::string>::unexpected(std::string::from_chars("Failed to create GLFW window"));
+            return std::expected<This, std::string>::unexpected(
+                std::string::from_chars("Failed to create GLFW window"));
         }
 
         glfw::MakeContextCurrent(w.handle);
 
+        glfw::SetInputMode(w.handle, glfw::CURSOR, glfw::CURSOR_DISABLED);
+
         glfw::SetFramebufferSizeCallback(w.handle, w.callback);
 
         if (gladLoadGLLoader(glfw::GetProcAddress as fun(*const char) -> *unit) == 0) {
-            return std::expected<This, std::string>::unexpected(std::string::from_chars("Failed to initialize GLAD"));
+            return std::expected<This, std::string>::unexpected(
+                std::string::from_chars("Failed to initialize GLAD"));
         }
 
         glViewport(0, 0, width, height);
@@ -41,30 +45,21 @@ public struct Window {
 
         return std::expected<This, std::string>::expect(std::move(w));
     }
-    fun swap_buffers(*this) {
-        glfw::SwapBuffers(this->handle);
-    }
-    fun default_callback(handle: *glfw::window, width: int32, height: int32) -> unit {
+
+    fun handle(*const this) -> *glfw::window { return this->handle; }
+    fun width(*const this) -> int32 { return this->width; }
+    fun height(*const this) -> int32 { return this->height; }
+
+    fun swap_buffers(*this) { glfw::SwapBuffers(this->handle); }
+    fun poll_events(*const this) { glfw::PollEvents(); }
+    fun should_close(*const this) -> bool { return glfw::WindowShouldClose(this->handle) != 0; }
+    fun set_window_title(*this, new_title: *uint8) { glfw::SetWindowTitle(this->handle, new_title); }
+
+    fun size_callback(handle: *glfw::window, width: int32, height: int32) -> unit {
         glViewport(0, 0, width, height);
     }
-    fun process_inputs(*this) {
-        if glfw::GetKey(this->handle, glfw::KEY::ESCAPE) == glfw::KeyState::Press {
-            glfw::SetWindowShouldClose(this->handle, true);
-        }
-    }
-    fun set_window_title(*this, new_title: *uint8) {
-        glfw::SetWindowTitle(this->handle, new_title);
-    }
-    fun should_close(*const this) -> bool {
-        return glfw::WindowShouldClose(this->handle) == 0;
-    }
-    fun poll_events(*const this) {
-        glfw::PollEvents();
-    }
 
-    ~Window() {
-        glfw::Terminate();
-    }
+    ~Window() { glfw::Terminate(); }
 
   private:
     width: int32;

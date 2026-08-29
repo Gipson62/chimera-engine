@@ -11,14 +11,14 @@ public struct VertexArray {
         glGenVertexArrays(1, &id);
         return VertexArray { .id = id };
     }
+    ~VertexArray() {
+        glDeleteVertexArrays(1, &this->id);
+    }
     fun bind(*const this) {
         glBindVertexArray(this->id);
     }
     fun unbind(*const this) {
         glBindVertexArray(0);
-    }
-    ~VertexArray() {
-        glDeleteVertexArrays(1, &this->id);
     }
     // Maybe we should require mutable pointers here for vb and layout
     // Idk tbf...
