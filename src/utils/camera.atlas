@@ -56,7 +56,6 @@ public struct Camera {
 
     fun process_scroll(*this, dy: float32) {
         this->zoom = la::clamp(this->zoom - dy, 1.0, 45.0);
-        std::printf("Camera::zoom=%.2f \n", this->zoom);
     }
 
     fun resize(*this, width: int32, height: int32) {
@@ -83,5 +82,9 @@ public struct Camera {
 
     fun projection_matrix(*const this) -> la::mat4 {
         return la::mat4::perspective(la::radians(this->zoom), this->aspect, 0.1, 100.0);
+    }
+
+    fun position(*const this) -> la::vec3 {
+        return this->position;
     }
 }

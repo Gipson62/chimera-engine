@@ -24,10 +24,23 @@ public struct Renderer {
         glDrawElements(GL::TRIANGLES, ib->get_count(), GL::UNSIGNED_INT, null);
     }
 
+    // Non-indexed single-mesh draw. Requires begin_scene() called first
+    // (shader bound, view/projection set).
+    fun submit_mesh(
+        *const this,
+        va: *const VertexArray,
+        shader: *const ShaderProgram,
+        model: *const la::mat4,
+        vertex_count: int32
+    ) {
+        shader->set_mat4("model", model);
+        va->bind();
+        glDrawArrays(GL::TRIANGLES, 0, vertex_count);
+    }
+
     fun draw(
         *const this,
         va: *const VertexArray,
-        ib: *const IndexBuffer,
         shader: *const ShaderProgram,
         positions: *const std::vector<la::vec3>,
         view: *const la::mat4,
@@ -35,14 +48,11 @@ public struct Renderer {
     ) {
         shader->bind();
         va->bind();
-        ib->bind();
 
         let i: uint64 = 0;
         while i < positions->len() {
             let pos = positions->get(i);
-            let model_matrix = la::mat4::identity()
-                .translated(pos->x(), pos->y(), pos->z())
-                .rotated(&la::vec3::new(1.0, 0.3, 0.5), glfw::GetTime() as float32 * la::radians(50.0));
+            let model_matrix = la::mat4::identity().translated(pos->x(), pos->y(), pos->z());
 
             shader->set_mat4("model", &model_matrix);
             shader->set_mat4("view", view);

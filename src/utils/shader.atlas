@@ -82,6 +82,9 @@ public struct ShaderProgram {
     fun set_mat4(*const this, name: str, value: *const la::mat4) {
         glUniformMatrix4fv(glGetUniformLocation(this->id, name), 1, GL::FALSE, value->get_ptr());
     }
+    fun set_vec3(*const this, name: str, value: *const la::vec3) {
+        glUniform3f(glGetUniformLocation(this->id, name), value->x(), value->y(), value->z());
+    }
     fun bind(*const this) {
         glUseProgram(this->id);
     }

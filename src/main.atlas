@@ -8,107 +8,112 @@ import "src/glad.atlas";
 import "src/linear_algebra.atlas";
 
 import "src/utils/buffer.atlas";
-import "src/utils/texture.atlas";
 import "src/utils/shader.atlas";
 import "src/utils/renderer.atlas";
 import "src/utils/window.atlas";
 import "src/utils/camera.atlas";
 import "src/utils/input.atlas";
 import "src/utils/application.atlas";
+import "src/utils/texture.atlas";
 
 extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
 fun main() -> int32 {
-    stbi::set_flip_vertically_on_load(true as int32);
-
     let app_res = Application::new();
     if app_res.is_unexpected() { std::panic("Something is wrong with the app boss"); }
-
     let app = app_res.expected_value();
     app.setup();
 
+    // --- object shader: objectColor * lightColor ---
     let vertex_shader_opt = ShaderStage::new("src/vertex.vert", ShaderKind::VERTEX_SHADER);
-    if vertex_shader_opt.is_empty() {
-        std::panic("Something is wrong with the vertex shader boss");
-    }
-
+    if vertex_shader_opt.is_empty() { std::panic("Something is wrong with the vertex shader boss"); }
     let fragment_shader_opt = ShaderStage::new("src/fragment.frag", ShaderKind::FRAGMENT_SHADER);
-    if fragment_shader_opt.is_empty() {
-        std::panic("Something is wrong with the fragment shader boss");
-    }
-    
-    let vertex_shader = vertex_shader_opt.value();
-    let fragment_shader = fragment_shader_opt.value();
+    if fragment_shader_opt.is_empty() { std::panic("Something is wrong with the fragment shader boss"); }
 
-    let shader_program_opt = ShaderProgram::link(std::move(vertex_shader), std::move(fragment_shader));
-    if shader_program_opt.is_empty() {
-        std::panic("Something is wrong with the shader program boss");
-    }
-
+    let shader_program_opt = ShaderProgram::link(
+        vertex_shader_opt.value(),
+        fragment_shader_opt.value()
+    );
+    if shader_program_opt.is_empty() { std::panic("Something is wrong with the shader program boss"); }
     let shader_program = shader_program_opt.value();
 
-    let vertices_arr: [float32; 180] = [
-        // positions        // texture coordinates
-        -0.5, -0.5, -0.5,  0.0, 0.0,
-         0.5, -0.5, -0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 0.0,
+    // --- light shader: flat white ---
+    let light_vertex_shader_opt = ShaderStage::new("src/vertex.vert", ShaderKind::VERTEX_SHADER);
+    if light_vertex_shader_opt.is_empty() { std::panic("Something is wrong with the light vertex shader boss"); }
+    let light_fragment_shader_opt = ShaderStage::new("src/light.frag", ShaderKind::FRAGMENT_SHADER);
+    if light_fragment_shader_opt.is_empty() { std::panic("Something is wrong with the light fragment shader boss"); }
 
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-        -0.5,  0.5,  0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
+    let light_shader_program_opt = ShaderProgram::link(
+        light_vertex_shader_opt.value(),
+        light_fragment_shader_opt.value()
+    );
+    if light_shader_program_opt.is_empty() { std::panic("Something is wrong with the light shader program boss"); }
+    let light_shader_program = light_shader_program_opt.value();
+    
 
-        -0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5,  0.5,  1.0, 0.0,
+    // full 36-vertex cube, position-only
+    let vertices_arr: [float32; 288] = [
+        // Positions      // Normals        // Texture Coordinate
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
+         0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 0.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+        -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
 
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
+         0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 0.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
+        -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
 
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
+        -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0, 1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+        -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0, 0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
 
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0, 1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+         0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0, 0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0, 1.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0, 0.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
+         0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0, 1.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+        -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0, 0.0,
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0
     ];
     let vertices: *float32 = &vertices_arr[0];
-    let indices_arr: [uint32; 6] = [0, 1, 3, 1, 2, 3];
-    let indices: *uint32 = &indices_arr[0];
 
-    let vb = VertexBuffer::new(vertices as *unit, size_of<[float32; 180]>() as uint32);
-    
+    let vb = VertexBuffer::new(vertices as *unit, size_of<[float32; 288]>() as uint32);
+
     let layout = VertexBufferLayout::default();
+    layout.push<float32>(3);
     layout.push<float32>(3);
     layout.push<float32>(2);
 
     let va = VertexArray::new();
     va.add_buffer(&vb, &layout);
 
-    let ib = IndexBuffer::new(indices as *unit, size_of<[uint32; 6]>() as uint32, 6);
+    let light_va = VertexArray::new();
+    light_va.add_buffer(&vb, &layout); // same VBO, second VAO
 
     va.unbind();
+    light_va.unbind();
     vb.unbind();
-    ib.unbind();
 
     let texture_opt = Texture2D::new("src/container.jpg");
     if texture_opt.is_empty() {
@@ -123,26 +128,18 @@ fun main() -> int32 {
     let texture2 = texture2_opt.value();
 
     shader_program.bind();
+    shader_program.set_vec3("objectColor", &la::vec3::new(1.0, 0.5, 0.31));
+    shader_program.set_vec3("lightColor", &la::vec3::new(1.0, 1.0, 1.0));
     shader_program.set_int("texture1", 0);
     shader_program.set_int("texture2", 1);
+
+    let light_pos = la::vec3::new(1.2, 1.0, 2.0);
 
     let fps_timer = std::instant::now();
     let frame_count: int64 = 0;
 
-    let last_frame = glfw::GetTime() as float32;
-
-    let cube_positions = std::vector<la::vec3>::with_capacity(10);
-
-    cube_positions.push(la::vec3::new( 0.0,  0.0,  0.0));
-    cube_positions.push(la::vec3::new( 2.0,  5.0, -15.0));
-    cube_positions.push(la::vec3::new(-1.5, -2.2, -2.5));
-    cube_positions.push(la::vec3::new(-3.8, -2.2, -12.3));
-    cube_positions.push(la::vec3::new( 2.4, -0.4, -3.5));
-    cube_positions.push(la::vec3::new( -1.7, 3.0, -7.5));
-    cube_positions.push(la::vec3::new( 1.3, -2.0, -2.5));
-    cube_positions.push(la::vec3::new( 1.5,  2.0, -2.5));
-    cube_positions.push(la::vec3::new( 1.5,  0.2, -1.5));
-    cube_positions.push(la::vec3::new(-1.3,  1.0, -1.5));
+    let cube_positions = std::vector<la::vec3>::with_capacity(1);
+    cube_positions.push(la::vec3::new(0.0, 0.0, 0.0));
 
     while (!app.should_close()) {
         let delta_time = app.begin_frame();
@@ -159,19 +156,30 @@ fun main() -> int32 {
         let view = app.camera()->view_matrix();
         let projection = app.camera()->projection_matrix();
 
-        app.renderer()->draw(&va, &ib, &shader_program, &cube_positions, &view, &projection);
-        
+
+        light_pos.set(0, 1.0 + la::sin(glfw::GetTime() as float32) * 2.0);
+        light_pos.set(1, la::sin(glfw::GetTime() as float32 / 2.0) * 1.0);
+
+        shader_program.bind();
+        shader_program.set_vec3("viewPos", &app.camera()->position());
+        shader_program.set_vec3("lightPos", &light_pos);
+        renderer->draw(&va, &shader_program, &cube_positions, &view, &projection);
+
+        let light_model = la::mat4::identity()
+            .translated(light_pos.x(), light_pos.y(), light_pos.z())
+            .scaled(0.2, 0.2, 0.2);
+
+        renderer->begin_scene(&light_shader_program, &view, &projection);
+        renderer->submit_mesh(&light_va, &light_shader_program, &light_model, 36);
+
         frame_count = frame_count + 1;
         let elapsed = fps_timer.elapsed();
 
         if (elapsed.ns >= 1_000_000_000) {
             let fps = frame_count as float64 / elapsed.seconds();
-
             let title: [uint8; 64] = [0; 64];
             sprintf(&title[0], "Atlas77 - FPS: %.1f", fps);
-
             app.set_window_title(&title[0]);
-
             frame_count = 0;
             fps_timer = std::instant::now();
         }
