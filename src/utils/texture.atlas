@@ -4,9 +4,18 @@ import "src/glad.atlas";
 
 import "src/stb_image.atlas";
 
+public enum TEXTURE_TYPE {
+    MATERIAL_SPECULAR;
+    MATERIAL_DIFFUSE;
+}
+
+
 public struct Texture2D {
   public:
-    fun new(path: str) -> std::optional<This> {
+    id: uint32;
+    type: str; // Shader uniform name
+
+    fun new(path: str, type: TEXTURE_TYPE) -> std::optional<This> {
         let width: int32 = 0;
         let height: int32 = 0;
         let nr_channels: int32 = 0;
@@ -24,14 +33,18 @@ public struct Texture2D {
             data_format = GL::RGBA;
         }
 
+        let type_name = "material.diffuse";
+        if type == TEXTURE_TYPE::MATERIAL_SPECULAR { type_name = "material.specular"; }
+
         let texture = Texture2D {
             .id = 0,
+            .type = type_name,
         };
         glGenTextures(1, &texture.id);
 
         texture.bind();
 
-        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);	
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);    
         glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT);
         glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
@@ -52,15 +65,13 @@ public struct Texture2D {
 
         return std::optional<This>::of(texture);
     }
+
     fun bind(*const this) {
         glBindTexture(GL::TEXTURE_2D, this->id);
     }
-    // 
-    fun set_texture_unit(*this, texture_unit: uint32) {
+    
+    fun set_texture_unit(*const this, texture_unit: uint32) {
         glActiveTexture(texture_unit);
         this->bind();
     }
-
-  private:
-    id: uint32;
 }

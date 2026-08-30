@@ -1,0 +1,101 @@
+public fun create_debug_cube(diffuse_path: str, specular_path: str) -> Model {
+    let vertices_arr: [float32; 288] = [
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
+         0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 0.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+        -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
+
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
+         0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 0.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
+        -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
+
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
+        -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0, 1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+        -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0, 0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
+
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0, 1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+         0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0, 0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0, 1.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0, 0.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
+         0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0, 1.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+        -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0, 0.0,
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0
+    ];
+
+    let vertices = std::vector<Vertex>::with_capacity(36);
+    let indices = std::vector<uint32>::with_capacity(36);
+
+    let i: uint64 = 0;
+    while i < 36 {
+        let base_index = i * 8;
+        
+        vertices.push(Vertex {
+            .position   = la::vec3::new(vertices_arr[base_index], vertices_arr[base_index + 1], vertices_arr[base_index + 2]),
+            .normal     = la::vec3::new(vertices_arr[base_index + 3], vertices_arr[base_index + 4], vertices_arr[base_index + 5]),
+            .tex_coords = la::vec2::new(vertices_arr[base_index + 6], vertices_arr[base_index + 7])
+        });
+        
+        indices.push(i as uint32);
+        i = i + 1;
+    }
+
+    let textures = std::vector<Texture2D>::with_capacity(2);
+    
+    let diffuse_tex = Texture2D::new(diffuse_path, TEXTURE_TYPE::MATERIAL_DIFFUSE);
+    if diffuse_tex.has_value() {
+        textures.push(diffuse_tex.value());
+    } else {
+        std::printf("path: %s\n", diffuse_path);
+        std::panic("FAILED to load diffuse texture\n");
+    }
+
+    let specular_tex = Texture2D::new(specular_path, TEXTURE_TYPE::MATERIAL_SPECULAR);
+    if specular_tex.has_value() {
+        textures.push(specular_tex.value());
+    } else {
+        std::printf("path: %s\n", specular_path);
+        std::panic("FAILED to load specular texture\n");
+    }
+
+    let material = Material::new(
+        "debug_material", 
+        std::move(textures), 
+        32.0
+    );
+
+    let mesh = Mesh::new(
+        std::move(vertices), 
+        std::move(indices), 
+        std::move(material)
+    );
+
+    let meshes = std::vector<Mesh>::with_capacity(1);
+    meshes.push(std::move(mesh));
+
+    return Model {
+        .meshes   = std::move(meshes),
+        .matrix   = la::mat4::identity(),
+        .position = la::vec3::new(0.0, 0.0, 0.0)
+    };
+}

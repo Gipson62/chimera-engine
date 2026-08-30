@@ -1,0 +1,11 @@
+import "src/utils/material.atlas";
+import "src/utils/mesh.atlas";
+
+import "src/linear_algebra.atlas";
+
+public struct Model {
+  public:
+    meshes: std::vector<Mesh>;
+    matrix: la::mat4;
+    position: la::vec3;
+}

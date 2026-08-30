@@ -20,8 +20,6 @@ public struct VertexArray {
     fun unbind(*const this) {
         glBindVertexArray(0);
     }
-    // Maybe we should require mutable pointers here for vb and layout
-    // Idk tbf...
     fun add_buffer(*this, vb: *const VertexBuffer, layout: *const VertexBufferLayout) {
         this->bind();
         vb->bind();
@@ -60,7 +58,6 @@ public struct VertexBufferElement {
     count: uint32;
     normalized: uint8;
 
-    // In VertexBufferElement struct
     fun get_size_of_type(type: uint32) -> uint32 {
         if type == GL::FLOAT          { return 4; } 
         if type == GL::DOUBLE         { return 8; }
@@ -219,5 +216,5 @@ public struct IndexBuffer {
 
   private:
     id: uint32;
-    count: int32; // Kept so you know how many indices to pass to glDrawElements later
+    count: int32;
 }

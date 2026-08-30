@@ -1,0 +1,6 @@
+public struct Vertex {
+  public:
+    position: la::vec3;
+    normal: la::vec3;
+    tex_coords: la::vec2;
+}

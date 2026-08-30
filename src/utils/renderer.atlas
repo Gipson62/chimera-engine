@@ -1,3 +1,5 @@
+import "src/utils/model.atlas";
+
 public struct Renderer {
   public:
     fun default() -> This { return Renderer {}; }
@@ -38,6 +40,45 @@ public struct Renderer {
         glDrawArrays(GL::TRIANGLES, 0, vertex_count);
     }
 
+    // Non-indexed single-mesh draw. Requires begin_scene() called first
+    // (shader bound, view/projection set).
+    fun draw_model(
+        *const this,
+        model: *const Model,
+        shader: *const ShaderProgram,
+        view: *const la::mat4,
+        projection: *const la::mat4
+    ) {
+        shader->bind();
+        shader->set_mat4("view", view);
+        shader->set_mat4("projection", projection);
+        shader->set_mat4("model", &model->matrix);
+
+        let i: uint64 = 0;
+        while i < model->meshes.len() {
+            let mesh = model->meshes.get(i);
+            mesh->vertex_array()->bind();
+            mesh->index_buffer()->bind();
+
+            let j: uint64 = 0;
+            while j < mesh->material.textures.len() {
+                let tex = mesh->material.textures.get(j);
+                
+                tex->set_texture_unit(GL::TEXTURE0 as uint32 + j as uint32);
+                
+                shader->set_int(tex->type, j as int32);
+                
+                j = j + 1;
+            }
+
+            glActiveTexture(GL::TEXTURE0);
+
+            shader->set_float("material.shininess", mesh->material.shininess);
+            glDrawElements(GL::TRIANGLES, mesh->index_buffer()->get_count(), GL::UNSIGNED_INT, null);
+            i = i + 1;
+        }
+    }
+
     fun draw(
         *const this,
         va: *const VertexArray,
@@ -55,7 +96,7 @@ public struct Renderer {
             let angle = 20.0 * i as float32;
             let model_matrix = la::mat4::identity()
                 .translated(pos->x(), pos->y(), pos->z())
-                .rotated(&la::vec3::new(1.0, 0.3, 0.5), la::radians(angle));
+                .rotated(&la::vec3::new(0.0, 0.0, -3.0), la::radians(angle));
 
             shader->set_mat4("model", &model_matrix);
             shader->set_mat4("view", view);

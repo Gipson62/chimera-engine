@@ -1,0 +1,85 @@
+import "std/vector";
+
+import "src/linear_algebra.atlas";
+
+import "src/utils/material.atlas";
+import "src/utils/vertex.atlas";
+
+public struct Mesh {
+  public:
+    vertices: std::vector<Vertex>;
+    indices:  std::vector<uint32>;
+    material: Material;
+
+    fun new(
+        vertices:  std::vector<Vertex>, 
+        indices:   std::vector<uint32>,
+        material: Material
+    ) -> This {
+        if vertices.len() == 0 {
+            std::panic("Mesh::setup_mesh: mesh has no vertices");
+        }
+
+        if indices.len() == 0 {
+            std::panic("Mesh::setup_mesh: mesh has no indices");
+        }
+
+        let vertex_buffer = VertexBuffer::new(
+            vertices.get(0) as *unit, 
+            (vertices.len() * size_of<Vertex>()) as uint32
+        );
+        
+        let layout = VertexBufferLayout::default();
+            layout.push<float32>(3);
+            layout.push<float32>(3);
+            layout.push<float32>(2);
+
+        let vertex_array = VertexArray::new();
+        vertex_array.add_buffer(
+            &vertex_buffer, 
+            &layout
+        );
+
+        let index_buffer = IndexBuffer::new(
+            indices.get(0) as *unit,
+            (indices.len() * size_of<uint32>()) as uint32,
+            indices.len() as int32
+        );
+
+        let mesh = Mesh {
+            .vertices  = std::move(vertices),
+            .indices   = std::move(indices),
+            .material = std::move(material),
+            .vertex_array = std::move(vertex_array),
+            .vertex_buffer = std::move(vertex_buffer),
+            .index_buffer = std::move(index_buffer)
+        };
+
+        mesh.setup_mesh();
+
+        return std::move(mesh);
+    }
+
+    fun vertex_buffer(*const this) -> *const VertexBuffer {
+        return &this->vertex_buffer;
+    }
+    fun vertex_array(*const this) -> *const VertexArray {
+        return &this->vertex_array;
+    }
+    fun index_buffer(*const this) -> *const IndexBuffer {
+        return &this->index_buffer;
+    }
+
+    fun draw(*this) {
+        
+    }
+
+  private:
+    fun setup_mesh(*this) {
+
+    }
+
+    vertex_buffer: VertexBuffer;    
+    vertex_array: VertexArray;
+    index_buffer: IndexBuffer;
+}

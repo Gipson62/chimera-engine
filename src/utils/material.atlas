@@ -1,0 +1,22 @@
+import "std/vector";
+
+import "src/utils/texture.atlas";
+
+public struct Material {
+  public:
+    name: str;
+    textures: std::vector<Texture2D>;
+    shininess: float32;
+
+    fun new(
+        name: str,
+        textures: std::vector<Texture2D>,
+        shininess: float32
+    ) -> This {
+        return Material {
+            .name      = name,
+            .textures  = std::move(textures),
+            .shininess = shininess,
+        };
+    }
+}
