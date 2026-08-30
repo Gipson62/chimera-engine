@@ -4,10 +4,15 @@ public struct Renderer {
   public:
     default_diffuse: Texture2D;
     default_specular: Texture2D;
+    default_normal_map: Texture2D;
     fun default() -> This { 
         return Renderer {
-            .default_diffuse  = Texture2D::from_color(255, 255, 255, 255, "material.diffuse"),
-            .default_specular = Texture2D::from_color(0, 0, 0, 255, "material.specular"),
+            .default_diffuse    = Texture2D::from_color(
+                255, 255, 255, 255, std::string::from_chars("material.diffuse")),
+            .default_specular   = Texture2D::from_color(
+                  0,   0,   0, 255, std::string::from_chars("material.specular")),
+            .default_normal_map = Texture2D::from_color(
+                128, 128, 128, 255, std::string::from_chars("material.normal_map"))
         }; 
     }
 
@@ -78,6 +83,13 @@ public struct Renderer {
                 this->default_specular.set_texture_unit(GL::TEXTURE1);
             }
             shader->set_int("material.specular", 1);
+
+            if mesh->material.normal_map.has_value() {
+                mesh->material.normal_map.get()->set_texture_unit(GL::TEXTURE2);
+            } else {
+                this->default_normal_map.set_texture_unit(GL::TEXTURE2);
+            }
+            shader->set_int("material.normal_map", 2);
 
             glActiveTexture(GL::TEXTURE0);
 

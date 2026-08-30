@@ -12,7 +12,7 @@ namespace stbi {
     #[c_name("stbi_stbi_load_from_callbacks")]
     public extern fun load_from_callbacks(clbk: *stbi::io_callbacks, user: *unit, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
     #[c_name("stbi_stbi_load")]
-    public extern fun load(filename: *uint8, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
+    public extern fun load(filename: *const uint8, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
     #[c_name("stbi_stbi_load_from_file")]
     public extern fun load_from_file(f: *stbi::FILE, x: *int32, y: *int32, channels_in_file: *int32, desired_channels: int32) -> *uint8;
     #[c_name("stbi_stbi_load_gif_from_memory")]

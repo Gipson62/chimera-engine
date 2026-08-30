@@ -30,9 +30,11 @@ public struct Mesh {
         );
         
         let layout = VertexBufferLayout::default();
-            layout.push<float32>(3);
-            layout.push<float32>(3);
-            layout.push<float32>(2);
+            layout.push<float32>(3); // position
+            layout.push<float32>(3); // normal
+            layout.push<float32>(2); // tex_coords
+            layout.push<float32>(3); // tangent
+            layout.push<float32>(3); // bi_tangent
 
         let vertex_array = VertexArray::new();
         vertex_array.add_buffer(

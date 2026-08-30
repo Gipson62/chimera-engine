@@ -7,19 +7,20 @@ import "src/stb_image.atlas";
 public enum TEXTURE_TYPE {
     MATERIAL_SPECULAR;
     MATERIAL_DIFFUSE;
+    MATERIAL_NORMAL;
 }
 
 
 public struct Texture2D {
   public:
     id: uint32;
-    type: str; // Shader uniform name
+    type: std::string; // Shader uniform name
 
-    fun new(path: str, type: TEXTURE_TYPE) -> std::optional<This> {
+    fun new(path: std::string, type: TEXTURE_TYPE) -> std::optional<This> {
         let width: int32 = 0;
         let height: int32 = 0;
         let nr_channels: int32 = 0;
-        let data = stbi::load(path, &width, &height, &nr_channels, 0);
+        let data = stbi::load(path.c_str(), &width, &height, &nr_channels, 0);
 
         if data == null {
             return std::optional<This>::empty();
@@ -33,12 +34,14 @@ public struct Texture2D {
             data_format = GL::RGBA;
         }
 
-        let type_name = "material.diffuse";
-        if type == TEXTURE_TYPE::MATERIAL_SPECULAR { type_name = "material.specular"; }
+        let type_name = std::string::with_capacity(20);
+        if type == TEXTURE_TYPE::MATERIAL_DIFFUSE  { type_name.push_str("material.specular"); }
+        if type == TEXTURE_TYPE::MATERIAL_SPECULAR { type_name.push_str("material.specular"); }
+        if type == TEXTURE_TYPE::MATERIAL_NORMAL   { type_name.push_str("material.normal");   }
 
         let texture = Texture2D {
             .id = 0,
-            .type = type_name,
+            .type = std::move(type_name),
         };
         glGenTextures(1, &texture.id);
 
@@ -63,7 +66,7 @@ public struct Texture2D {
         glGenerateMipmap(GL::TEXTURE_2D);
         stbi::image_free(data as *unit);
 
-        return std::optional<This>::of(texture);
+        return std::optional<This>::of(std::move(texture));
     }
 
     fun bind(*const this) {
@@ -75,12 +78,12 @@ public struct Texture2D {
         this->bind();
     }
 
-    fun from_color(r: uint8, g: uint8, b: uint8, a: uint8, type_name: str) -> This {
+    fun from_color(r: uint8, g: uint8, b: uint8, a: uint8, type_name: std::string) -> This {
         let pixel: [uint8; 4] = [r, g, b, a];
 
         let texture = Texture2D {
             .id = 0,
-            .type = type_name,
+            .type = std::move(type_name),
         };
         glGenTextures(1, &texture.id);
         texture.bind();

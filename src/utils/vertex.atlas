@@ -3,4 +3,6 @@ public struct Vertex {
     position: la::vec3;
     normal: la::vec3;
     tex_coords: la::vec2;
+    tangent: la::vec3;
+    bitangent: la::vec3;
 }
