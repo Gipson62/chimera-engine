@@ -54,7 +54,7 @@ fun main() -> int32 {
     let light_shader_program = light_shader_program_opt.value();
     
     // --- Initializing the Model ---
-    let cube_model = create_debug_cube("src/container2.png", "src/container2_specular.png");
+    let cube_model = create_debug_cube("src/container2.png", "src/container2_specular_plus.png");
 
     shader_program.bind();
     shader_program.set_vec3("light.ambient", &la::vec3::new(0.2, 0.2, 0.2));
@@ -98,8 +98,7 @@ fun main() -> int32 {
 
         shader_program.bind();
         shader_program.set_vec3("viewPos", &app.camera()->position());
-        shader_program.set_vec3("light.position", &app.camera()->position());
-        shader_program.set_vec3("light.direction", &app.camera()->front());
+        shader_program.set_vec3("light.position", &light_pos);
         shader_program.set_float("light.cutOff", la::cos(la::radians(12.5)));
         shader_program.set_float("light.outerCutOff", la::cos(la::radians(17.5)));
         
