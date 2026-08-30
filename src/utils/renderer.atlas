@@ -2,7 +2,14 @@ import "src/utils/model.atlas";
 
 public struct Renderer {
   public:
-    fun default() -> This { return Renderer {}; }
+    default_diffuse: Texture2D;
+    default_specular: Texture2D;
+    fun default() -> This { 
+        return Renderer {
+            .default_diffuse  = Texture2D::from_color(255, 255, 255, 255, "material.diffuse"),
+            .default_specular = Texture2D::from_color(0, 0, 0, 255, "material.specular"),
+        }; 
+    }
 
     fun clear_color(*const this, r: float32, g: float32, b: float32, a: float32) { glClearColor(r, g, b, a); }
     fun clear(*const this) { glClear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT); }
@@ -40,8 +47,6 @@ public struct Renderer {
         glDrawArrays(GL::TRIANGLES, 0, vertex_count);
     }
 
-    // Non-indexed single-mesh draw. Requires begin_scene() called first
-    // (shader bound, view/projection set).
     fun draw_model(
         *const this,
         model: *const Model,
@@ -60,16 +65,19 @@ public struct Renderer {
             mesh->vertex_array()->bind();
             mesh->index_buffer()->bind();
 
-            let j: uint64 = 0;
-            while j < mesh->material.textures.len() {
-                let tex = mesh->material.textures.get(j);
-                
-                tex->set_texture_unit(GL::TEXTURE0 as uint32 + j as uint32);
-                
-                shader->set_int(tex->type, j as int32);
-                
-                j = j + 1;
+            if mesh->material.diffuse.has_value() {
+                mesh->material.diffuse.get()->set_texture_unit(GL::TEXTURE0);
+            } else {
+                this->default_diffuse.set_texture_unit(GL::TEXTURE0);
             }
+            shader->set_int("material.diffuse", 0);
+
+            if mesh->material.specular.has_value() {
+                mesh->material.specular.get()->set_texture_unit(GL::TEXTURE1);
+            } else {
+                this->default_specular.set_texture_unit(GL::TEXTURE1);
+            }
+            shader->set_int("material.specular", 1);
 
             glActiveTexture(GL::TEXTURE0);
 

@@ -63,24 +63,19 @@ public fun create_debug_cube(diffuse_path: str, specular_path: str) -> Model {
     let textures = std::vector<Texture2D>::with_capacity(2);
     
     let diffuse_tex = Texture2D::new(diffuse_path, TEXTURE_TYPE::MATERIAL_DIFFUSE);
-    if diffuse_tex.has_value() {
-        textures.push(diffuse_tex.value());
-    } else {
-        std::printf("path: %s\n", diffuse_path);
-        std::panic("FAILED to load diffuse texture\n");
+    if !diffuse_tex.has_value() {
+        std::printf("FAILED to load diffuse texture path: %s\n", diffuse_path);
     }
 
     let specular_tex = Texture2D::new(specular_path, TEXTURE_TYPE::MATERIAL_SPECULAR);
-    if specular_tex.has_value() {
-        textures.push(specular_tex.value());
-    } else {
-        std::printf("path: %s\n", specular_path);
-        std::panic("FAILED to load specular texture\n");
+    if !specular_tex.has_value() {
+        std::printf("FAILED to load specular texture path: %s\n", specular_path);
     }
 
     let material = Material::new(
         "debug_material", 
-        std::move(textures), 
+        std::move(diffuse_tex),
+        std::move(specular_tex),
         32.0
     );
 

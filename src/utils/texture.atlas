@@ -74,4 +74,34 @@ public struct Texture2D {
         glActiveTexture(texture_unit);
         this->bind();
     }
+
+    fun from_color(r: uint8, g: uint8, b: uint8, a: uint8, type_name: str) -> This {
+        let pixel: [uint8; 4] = [r, g, b, a];
+
+        let texture = Texture2D {
+            .id = 0,
+            .type = type_name,
+        };
+        glGenTextures(1, &texture.id);
+        texture.bind();
+
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
+
+        glTexImage2D(
+            GL::TEXTURE_2D,
+            0,
+            GL::RGBA,
+            1, 1,
+            0,
+            GL::RGBA,
+            GL::UNSIGNED_BYTE,
+            &pixel[0] as *unit
+        );
+        // No glGenerateMipmap: a 1x1 texture has exactly one mip level already.
+
+        return texture;
+    }
 }
