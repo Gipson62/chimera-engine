@@ -33,12 +33,21 @@ void main()
     TexCoords = aTexCoord;
 
     mat3 normalMatrix = transpose(inverse(mat3(model)));
+    
     vec3 T = normalize(normalMatrix * aTangent);
+    vec3 B = normalize(normalMatrix * aBitangent);
     vec3 N = normalize(normalMatrix * aNormal);
+    
     T = normalize(T - dot(T, N) * N);
-    vec3 B = cross(N, T);
+    
+    if (dot(cross(N, T), B) < 0.0) {
+        T = T * -1.0;
+    }
+    
+    B = normalize(cross(N, T));
     
     mat3 TBN = transpose(mat3(T, B, N));    
+    
     TangentLightPos = TBN * light.position;
     TangentViewPos  = TBN * viewPos;
     TangentFragPos  = TBN * fragPosLocal;
