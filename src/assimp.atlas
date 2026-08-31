@@ -1,0 +1,231 @@
+namespace assimp {
+    #[c_name("struct aiMaterial")]
+    public extern struct Material
+    {
+    public:
+    }
+    #[c_name("struct aiVector3D")]
+    public extern struct Vector3D
+    {
+    public:
+        x: float32;
+        y: float32;
+        z: float32;
+    }
+
+    #[c_name("struct aiColor4D")]
+    public extern struct Color4D
+    {
+    public:
+        r: float32;
+        g: float32;
+        b: float32;
+        a: float32;
+    }
+
+    #[c_name("struct aiMatrix4x4")]
+    public extern struct Matrix4x4
+    {
+    public:
+        a1: float32; a2: float32; a3: float32; a4: float32;
+        b1: float32; b2: float32; b3: float32; b4: float32;
+        c1: float32; c2: float32; c3: float32; c4: float32;
+        d1: float32; d2: float32; d3: float32; d4: float32;
+    }
+
+    #[c_name("struct aiString")]
+    public extern struct String
+    {
+    public:
+        length: uint32;
+        data: [uint8];
+        ~String() {}
+    }
+
+    #[c_name("struct aiFace")]
+    public extern struct Face
+    {
+    public:
+        mNumIndices: uint32;
+        mIndices: *uint32;
+        ~Face() {}
+    }
+
+    #[c_name("struct aiMesh")]
+    public extern struct Mesh
+    {
+    public:
+        mPrimitiveTypes: uint32;
+        mNumVertices: uint32;
+        mNumFaces: uint32;
+        mVertices: *assimp::Vector3D;
+        mNormals: *assimp::Vector3D;
+        mTangents: *assimp::Vector3D;
+        mBitangents: *assimp::Vector3D;
+        mColors: **assimp::Color4D;
+        mTextureCoords: **assimp::Vector3D;
+        mNumUVComponents: *uint32;
+        mFaces: *assimp::Face;
+        mMaterialIndex: uint32;
+        mName: assimp::String;
+        ~Mesh() {}
+    }
+
+    #[c_name("struct aiNode")]
+    public extern struct Node
+    {
+    public:
+        mName: assimp::String;
+        mTransformation: assimp::Matrix4x4;
+        mParent: *assimp::Node;
+        mNumChildren: uint32;
+        mChildren: **assimp::Node;
+        mNumMeshes: uint32;
+        // indices into Scene::mMeshes, not mesh pointers
+        mMeshes: *uint32;
+        ~Node() {}
+    }
+
+    #[c_name("struct aiScene")]
+    public extern struct Scene
+    {
+    public:
+        mFlags: uint32;
+        mRootNode: *assimp::Node;
+        mNumMeshes: uint32;
+        mMeshes: **assimp::Mesh;
+        mNumMaterials: uint32;
+        mMaterials: **assimp::Material;
+        ~Scene() {}
+    }
+
+
+    public extern enum SceneFlag {
+        INCOMPLETE         = 0x1;
+        VALIDATED          = 0x2;
+        VALIDATION_WARNING = 0x4;
+        NON_VERBOSE_FORMAT = 0x8;
+        TERRAIN            = 0x10;
+        ALLOW_SHARED       = 0x20;
+    }
+
+    #[c_name("aiReturn")]
+    public extern enum Return {
+        SUCCESS = 0x0;
+        FAILURE = 0xFFFFFFFF;
+        OUTOFMEMORY = 0xFFFFFFFD;
+    }
+
+    #[c_name("aiPrimitiveType")]
+    public extern enum PrimitiveType {
+        POINT = 0x1;
+        LINE = 0x2;
+        TRIANGLE = 0x4;
+        POLYGON = 0x8;
+        NGON_ENCODING_FLAG = 0x10;
+    }
+
+    #[c_name("aiTextureType")]
+    public extern enum TextureType {
+        NONE = 0;
+        DIFFUSE = 1;
+        SPECULAR = 2;
+        AMBIENT = 3;
+        EMISSIVE = 4;
+        HEIGHT = 5;
+        NORMALS = 6;
+        SHININESS = 7;
+        OPACITY = 8;
+        DISPLACEMENT = 9;
+        LIGHTMAP = 10;
+        REFLECTION = 11;
+        BASE_COLOR = 12;
+        NORMAL_CAMERA = 13;
+        EMISSION_COLOR = 14;
+        METALNESS = 15;
+        DIFFUSE_ROUGHNESS = 16;
+        AMBIENT_OCCLUSION = 17;
+        UNKNOWN = 18;
+        SHEEN = 19;
+        CLEARCOAT = 20;
+        TRANSMISSION = 21;
+    }
+
+    #[c_name("aiPostProcessSteps")]
+    public extern enum PostProcessSteps {
+        CalcTangentSpace = 0x1;
+        JoinIdenticalVertices = 0x2;
+        MakeLeftHanded = 0x4;
+        Triangulate = 0x8;
+        RemoveComponent = 0x10;
+        GenNormals = 0x20;
+        GenSmoothNormals = 0x40;
+        SplitLargeMeshes = 0x80;
+        PreTransformVertices = 0x100;
+        LimitBoneWeights = 0x200;
+        ValidateDataStructure = 0x400;
+        ImproveCacheLocality = 0x800;
+        RemoveRedundantMaterials = 0x1000;
+        FixInfacingNormals = 0x2000;
+        SortByPType = 0x8000;
+        FindDegenerates = 0x10000;
+        FindInvalidData = 0x20000;
+        GenUVCoords = 0x40000;
+        TransformUVCoords = 0x80000;
+        FindInstances = 0x100000;
+        OptimizeMeshes = 0x200000;
+        OptimizeGraph = 0x400000;
+        FlipUVs = 0x800000;
+        FlipWindingOrder = 0x1000000;
+        SplitByBoneCount = 0x2000000;
+        Debone = 0x4000000;
+        GlobalScale = 0x8000000;
+        EmbedTextures = 0x10000000;
+        ForceGenNormals = 0x20000000;
+        DropNormals = 0x40000000;
+    }
+
+    #[c_name("aiImportFile")]
+    public extern fun ImportFile(pFile: *const uint8, pFlags: uint32) -> *const assimp::Scene;
+
+    #[c_name("aiApplyPostProcessing")]
+    public extern fun ApplyPostProcessing(pScene: *assimp::Scene, pFlags: uint32) -> *assimp::Scene;
+
+    #[c_name("aiReleaseImport")]
+    public extern fun ReleaseImport(pScene: *const assimp::Scene);
+
+    #[c_name("aiGetErrorString")]
+    public extern fun GetErrorString() -> *const uint8;
+
+    #[c_name("aiGetMaterialFloatArray")]
+    public extern fun GetMaterialFloatArray(pMat: *assimp::Material, pKey: *uint8, type: uint32, index: uint32, pOut: *float32, pMax: *uint32) -> uint32; // assimp::Return
+
+    #[c_name("aiGetMaterialIntegerArray")]
+    public extern fun GetMaterialIntegerArray(pMat: *assimp::Material, pKey: *uint8, type: uint32, index: uint32, pOut: *int32, pMax: *uint32) -> uint32; // assimp::Return
+
+    #[c_name("aiGetMaterialColor")]
+    public extern fun GetMaterialColor(pMat: *assimp::Material, pKey: *uint8, type: uint32, index: uint32, pOut: *assimp::Color4D) -> uint32; // assimp::Return
+
+    #[c_name("aiGetMaterialString")]
+    public extern fun GetMaterialString(pMat: *assimp::Material, pKey: *uint8, type: uint32, index: uint32, pOut: *assimp::String) -> uint32; // assimp::Return
+
+    #[c_name("aiGetMaterialTextureCount")]
+    public extern fun GetMaterialTextureCount(pMat: *assimp::Material, type: uint32) -> uint32;
+
+    // mapping/op/mapmode are enum out-params in the real signature (aiTextureMapping*,
+    // aiTextureOp*, aiTextureMapMode*); left as *int32 here since most callers just
+    // pass null for them, matching assimp's own C default of NULL.
+    #[c_name("aiGetMaterialTexture")]
+    public extern fun GetMaterialTexture(mat: *assimp::Material, texture_type: uint32, index: uint32, path: *assimp::String, mapping: *int32, uvindex: *uint32, blend: *float32, op: *int32, mapmode: *int32, flags: *uint32) -> uint32; // assimp::Return
+
+    // AI_MATKEY_* macros: real C signature is (key, type, index). These cover the
+    // (key, 0, 0) cases; call as e.g. GetMaterialColor(mat, KEY_COLOR_DIFFUSE(), 0, 0, &out).
+    public fun KEY_NAME() -> *uint8 { return "?mat.name"; }
+    public fun KEY_COLOR_DIFFUSE() -> *uint8 { return "$clr.diffuse"; }
+    public fun KEY_COLOR_AMBIENT() -> *uint8 { return "$clr.ambient"; }
+    public fun KEY_COLOR_SPECULAR() -> *uint8 { return "$clr.specular"; }
+    public fun KEY_COLOR_EMISSIVE() -> *uint8 { return "$clr.emissive"; }
+    public fun KEY_OPACITY() -> *uint8 { return "$mat.opacity"; }
+    public fun KEY_SHININESS() -> *uint8 { return "$mat.shininess"; }
+    public fun KEY_TWOSIDED() -> *uint8 { return "$mat.twosided"; }
+}

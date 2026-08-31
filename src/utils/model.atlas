@@ -1,11 +1,208 @@
 import "src/utils/material.atlas";
 import "src/utils/mesh.atlas";
 
+import "src/assimp.atlas";
+
 import "src/linear_algebra.atlas";
 
 public struct Model {
   public:
     meshes: std::vector<Mesh>;
+    path: std::string;
+    directory: std::string;
+    // TODO move that to the Model Instance later on
     matrix: la::mat4;
-    position: la::vec3;
+
+    fun load_model(path: std::string) -> std::optional<This> {
+        std::printf("Start of model loading %f\n", glfw::GetTime() as float32);
+
+        let scene: *const assimp::Scene = assimp::ImportFile(path.c_str(),
+            assimp::PostProcessSteps::Triangulate as uint32 |
+            assimp::PostProcessSteps::FlipUVs as uint32 |
+            assimp::PostProcessSteps::CalcTangentSpace as uint32);
+
+        if scene == null {
+            std::printf("assimp import failed for %s: ", path.c_str());
+            std::printf("%s\n", assimp::GetErrorString());
+            return std::optional<This>::empty();
+        }
+        if (scene->mFlags & assimp::SceneFlag::INCOMPLETE as uint32) != 0 {
+            std::printf("assimp import incomplete for %s: ", path.c_str());
+            std::printf("%s\n", assimp::GetErrorString());
+            return std::optional<This>::empty();
+        }
+
+        let directory = Model::directory_of(&path);
+
+        let model = Model {
+            .meshes = Model::process_node(
+                scene->mRootNode, 
+                scene, 
+                &directory, 
+                la::mat4::identity()
+            ),
+            .path = std::move(path),
+            .directory = std::move(directory),
+            .matrix = la::mat4::identity(),
+        };
+
+        assimp::ReleaseImport(scene);
+        std::printf("End of model loading %f\n", glfw::GetTime() as float32);
+
+        return std::optional<This>::of(std::move(model));
+    }
+
+    fun process_node(
+        node: *assimp::Node,
+        scene: *const assimp::Scene, 
+        directory: *const std::string,
+        parent_transform: la::mat4
+    ) -> std::vector<Mesh> {
+        let meshes = std::vector<Mesh>::with_capacity(node->mNumMeshes);
+
+        let node_transform = parent_transform * Model::mat4_from_assimp(&node->mTransformation);
+
+        let i: uint64 = 0;
+        while i < node->mNumMeshes as uint64 {
+            let mesh = scene->mMeshes[node->mMeshes[i]];
+            meshes.push(Model::process_mesh(mesh, scene, directory, node_transform));
+            i = i + 1;
+        }
+
+        let i_children: uint64 = 0;
+        while i_children < node->mNumChildren as uint64 {
+            meshes.append(Model::process_node(node->mChildren[i_children], scene, directory, node_transform));
+            i_children = i_children + 1;
+        }
+
+        return std::move(meshes);
+    }
+
+    fun process_mesh(
+        mesh: *assimp::Mesh,
+        scene: *const assimp::Scene,
+        directory: *const std::string,
+        local_transform: la::mat4
+    ) -> Mesh {
+        let vertices = std::vector<Vertex>::with_capacity(mesh->mNumVertices);
+        let indices = std::vector<uint32>::with_capacity(mesh->mNumFaces * 3);
+
+        let i: uint64 = 0;
+        while i < mesh->mNumVertices as uint64 {
+            let pos = mesh->mVertices[i];
+            let vertex = Vertex {
+                .position   = la::vec3::new(pos.x, pos.y, pos.z),
+                .normal     = la::vec3::zero(),
+                .tex_coords = la::vec2::zero(),
+                .tangent    = la::vec3::zero(),
+                .bitangent = la::vec3::zero(),
+            };
+
+            if mesh->mNormals != null {
+                let n = mesh->mNormals[i];
+                vertex.normal = la::vec3::new(n.x, n.y, n.z);
+            }
+            if mesh->mTangents != null {
+                let t = mesh->mTangents[i];
+                vertex.tangent = la::vec3::new(t.x, t.y, t.z);
+            }
+            if mesh->mBitangents != null {
+                let b = mesh->mBitangents[i];
+                vertex.bitangent = la::vec3::new(b.x, b.y, b.z);
+            }
+
+            if mesh->mTextureCoords[0] != null {
+                let uv = mesh->mTextureCoords[0][i];
+                vertex.tex_coords = la::vec2::new(uv.x, uv.y);
+            }
+
+            vertices.push(vertex);
+            i = i + 1;
+        }
+
+        let f: uint64 = 0;
+        while f < mesh->mNumFaces as uint64 {
+            let face = mesh->mFaces[f];
+            let idx: uint64 = 0;
+            while idx < face.mNumIndices as uint64 {
+                indices.push(face.mIndices[idx]);
+                idx = idx + 1;
+            }
+            f = f + 1;
+        }
+
+        let ai_mat = scene->mMaterials[mesh->mMaterialIndex];
+
+        let diffuse    = Model::load_material_texture(ai_mat, assimp::TextureType::DIFFUSE,  directory, TEXTURE_TYPE::MATERIAL_DIFFUSE);
+        let specular   = Model::load_material_texture(ai_mat, assimp::TextureType::SPECULAR, directory, TEXTURE_TYPE::MATERIAL_SPECULAR);
+        let normal_map = Model::load_material_texture(ai_mat, assimp::TextureType::NORMALS,  directory, TEXTURE_TYPE::MATERIAL_NORMAL);
+
+        let shininess: float32 = 32.0;
+        let shininess_out: float32 = 0.0;
+        let written: uint32 = 0;
+        if assimp::GetMaterialFloatArray(ai_mat, assimp::KEY_SHININESS(), 0, 0, &shininess_out, &written) == assimp::Return::SUCCESS {
+            shininess = shininess_out;
+        }
+
+        let material = Material::new("material", std::move(diffuse), std::move(specular), std::move(normal_map), shininess);
+        return Mesh::new(
+            std::move(vertices),
+            std::move(indices),
+            std::move(material),
+            local_transform
+        );
+    }
+
+    fun load_material_texture(
+        mat: *assimp::Material,
+        ai_type: uint32,
+        directory: *const std::string,
+        type: TEXTURE_TYPE
+    ) -> std::optional<Texture2D> {
+        if assimp::GetMaterialTextureCount(mat, ai_type) == 0 {
+            return std::optional<Texture2D>::empty();
+        }
+
+        let path_out = assimp::String { .length = 0, .data = [0] };
+        let result = assimp::GetMaterialTexture(mat, ai_type, 0, &path_out, null, null, null, null, null, null);
+        if result != assimp::Return::SUCCESS {
+            return std::optional<Texture2D>::empty();
+        }
+
+        let full_path = directory->copy();
+            full_path.push_str("/");
+            full_path.push_str(&path_out.data[0]);
+
+        return Texture2D::new(std::move(full_path), type);
+    }
+
+    fun directory_of(path: *const std::string) -> std::string {
+        let s = path->c_str();
+        let len: uint64 = 0;
+        while s[len] != 0 { len = len + 1; }
+
+        let last_slash: uint64 = 0;
+        let found = false;
+        let k: uint64 = 0;
+        while k < len {
+            if s[k] == '/' as uint8 || s[k] == '\\' as uint8 {
+                last_slash = k;
+                found = true;
+            }
+            k = k + 1;
+        }
+
+        if !found { return std::string::from_chars("."); }
+        
+        return path->substr(0, last_slash);
+    }
+
+    fun mat4_from_assimp(m: *const assimp::Matrix4x4) -> la::mat4 {
+        return la::mat4::from_row_major(
+            m->a1, m->a2, m->a3, m->a4,
+            m->b1, m->b2, m->b3, m->b4,
+            m->c1, m->c2, m->c3, m->c4,
+            m->d1, m->d2, m->d3, m->d4
+        );
+    }
 }

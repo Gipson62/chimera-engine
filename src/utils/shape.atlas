@@ -157,7 +157,8 @@ public fun create_debug_cube(
     let mesh = Mesh::new(
         std::move(vertices), 
         std::move(indices), 
-        std::move(material)
+        std::move(material),
+        la::mat4::identity()
     );
 
     let meshes = std::vector<Mesh>::with_capacity(1);

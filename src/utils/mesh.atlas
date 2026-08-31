@@ -10,11 +10,13 @@ public struct Mesh {
     vertices: std::vector<Vertex>;
     indices:  std::vector<uint32>;
     material: Material;
+    local_transform: la::mat4;
 
     fun new(
         vertices:  std::vector<Vertex>, 
         indices:   std::vector<uint32>,
-        material: Material
+        material: Material,
+        local_transform: la::mat4,
     ) -> This {
         if vertices.len() == 0 {
             std::panic("Mesh::setup_mesh: mesh has no vertices");
@@ -52,6 +54,7 @@ public struct Mesh {
             .vertices  = std::move(vertices),
             .indices   = std::move(indices),
             .material = std::move(material),
+            .local_transform = local_transform,
             .vertex_array = std::move(vertex_array),
             .vertex_buffer = std::move(vertex_buffer),
             .index_buffer = std::move(index_buffer)

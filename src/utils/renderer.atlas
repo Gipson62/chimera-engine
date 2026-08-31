@@ -62,11 +62,14 @@ public struct Renderer {
         shader->bind();
         shader->set_mat4("view", view);
         shader->set_mat4("projection", projection);
-        shader->set_mat4("model", &model->matrix);
 
         let i: uint64 = 0;
         while i < model->meshes.len() {
             let mesh = model->meshes.get(i);
+            // std::printf("Number of vertices on this mesh: %d\n", mesh->vertices.len());
+            let mesh_world = model->matrix * mesh->local_transform;
+            shader->set_mat4("model", &mesh_world);
+            
             mesh->vertex_array()->bind();
             mesh->index_buffer()->bind();
 

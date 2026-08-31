@@ -54,11 +54,9 @@ fun main() -> int32 {
     let light_shader_program = light_shader_program_opt.value();
     
     // --- Initializing the Model ---
-    let cube_model = create_debug_cube(
-        "src/container2.png", 
-        "src/container2_specular_plus.png", 
-        "src/container2_normal.png"
-    );
+    let model_3d = Model::load_model(std::string::from_chars("assets/models/vampire/dancing_vampire.dae")).value();
+
+    //model_3d.matrix = la::mat4::identity().scaled(1.0, 1.0, 1.0);
 
     shader_program.bind();
     shader_program.set_vec3("light.ambient", &la::vec3::new(0.2, 0.2, 0.2));
@@ -73,17 +71,20 @@ fun main() -> int32 {
     let fps_timer = std::instant::now();
     let frame_count: int64 = 0;
 
-    let cube_positions = std::vector<la::vec3>::with_capacity(10);
-        cube_positions.push(la::vec3::new( 0.0,  0.0,   0.0));
-        cube_positions.push(la::vec3::new( 2.0,  5.0, -15.0));
-        cube_positions.push(la::vec3::new(-1.5, -2.2,  -2.5));
-        cube_positions.push(la::vec3::new(-3.8, -2.2, -12.3));
-        cube_positions.push(la::vec3::new( 2.4, -0.4,  -3.5));
-        cube_positions.push(la::vec3::new(-1.7,  3.0,  -7.5));
-        cube_positions.push(la::vec3::new( 1.3, -2.0,  -2.5));
-        cube_positions.push(la::vec3::new( 1.5,  2.0,  -2.5));
-        cube_positions.push(la::vec3::new( 1.5,  0.2,  -1.5));
-        cube_positions.push(la::vec3::new(-1.3,  1.0,  -1.5));
+    let model_positions = std::vector<la::vec3>::with_capacity(10);
+        model_positions.push(la::vec3::new( 0.0,  0.0,   0.0));
+        model_positions.push(la::vec3::new( 2.0,  5.0, -15.0));
+        model_positions.push(la::vec3::new(-1.5, -2.2,  -2.5));
+        model_positions.push(la::vec3::new(-3.8, -2.2, -12.3));
+        model_positions.push(la::vec3::new( 2.4, -0.4,  -3.5));
+        model_positions.push(la::vec3::new(-1.7,  3.0,  -7.5));
+        model_positions.push(la::vec3::new( 1.3, -2.0,  -2.5));
+        model_positions.push(la::vec3::new( 1.5,  2.0,  -2.5));
+        model_positions.push(la::vec3::new( 1.5,  0.2,  -1.5));
+        model_positions.push(la::vec3::new(-1.3,  1.0,  -1.5));
+
+    // We don't need textures for this cube
+    let cube = create_debug_cube("", "", "");
 
     while (!app.should_close()) {
         let delta_time = app.begin_frame();
@@ -106,33 +107,24 @@ fun main() -> int32 {
         shader_program.set_vec3("lightPos", &light_pos);
         
         let i: uint64 = 0;
-        while i < cube_positions.len() {
-            let pos = cube_positions.get(i);
+        while i < model_positions.len() {
+            let pos = model_positions.get(i);
             let angle = 20.0 * i as float32 * la::sin(glfw::GetTime() as float32);
             
-            cube_model.matrix = la::mat4::identity()
+            model_3d.matrix = la::mat4::identity()
                 .translated(pos->x(), pos->y(), pos->z())
                 .rotated(&la::vec3::new(1.0, 0.3, 0.5), la::radians(angle));
 
-            renderer->draw_model(&cube_model, &shader_program, &view, &projection);
+            renderer->draw_model(&model_3d, &shader_program, &view, &projection);
             i = i + 1;
         }
 
-  
-
-        // Draw light source using the geometry of the first mesh inside cube_model
-        let light_model = la::mat4::identity()
+        // Draw light source using a cube
+        cube.matrix = la::mat4::identity()
             .translated(light_pos.x(), light_pos.y(), light_pos.z())
             .scaled(0.2, 0.2, 0.2);
 
-        renderer->begin_scene(&light_shader_program, &view, &projection);
-        
-        let light_mesh = cube_model.meshes.get(0);
-        light_shader_program.set_mat4("model", &light_model);
-        
-        light_mesh->vertex_array()->bind();
-        light_mesh->index_buffer()->bind();
-        glDrawElements(GL::TRIANGLES, light_mesh->index_buffer()->get_count(), GL::UNSIGNED_INT, null);
+        renderer->draw_model(&cube, &light_shader_program, &view, &projection);
 
         frame_count = frame_count + 1;
         let elapsed = fps_timer.elapsed();

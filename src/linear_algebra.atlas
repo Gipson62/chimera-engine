@@ -1130,6 +1130,20 @@ namespace la {
             ] };
         }
 
+        fun from_row_major(
+            a1: float32, a2: float32, a3: float32, a4: float32,
+            b1: float32, b2: float32, b3: float32, b4: float32,
+            c1: float32, c2: float32, c3: float32, c4: float32,
+            d1: float32, d2: float32, d3: float32, d4: float32
+        ) -> This {
+            return la::mat4 { .data = [
+                a1, b1, c1, d1,
+                a2, b2, c2, d2,
+                a3, b3, c3, d3,
+                a4, b4, c4, d4,
+            ] };
+        }
+
         fun get(*const this, col: uint32, row: uint32) -> float32 {
             if col < 4u && row < 4u {
                 return this->data[col * 4u + row];

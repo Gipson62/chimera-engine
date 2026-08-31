@@ -11,6 +11,10 @@ headers = [
     "atlas77-glfw3.h",
     "glad/glad.h",
     "atlas77-stb_image.h",
+    "assimp/cimport.h",
+    "assimp/scene.h",
+    "assimp/mesh.h",
+    "assimp/postprocess.h",
 ]
 
 [dependencies.windows]
@@ -18,7 +22,7 @@ headers = ["minwindef.h"]
 headers_before = "glad/glad.h"
 
 [link]
-shared = []
+shared = ["assimp"]
 
 [link.windows]
 libs = ["glfw3", "gdi32"]
@@ -32,7 +36,9 @@ source_dirs = ["include/", "include/glad/"]
 lib_dirs = ["lib/"]
 
 [c.windows]
-include_dirs = ["C:/msys64/ucrt64/include/"]
+include_dirs = [
+    "C:/msys64/ucrt64/include/",
+]
 
 [c.linux]
 lib_dirs = []
