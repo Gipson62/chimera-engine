@@ -1,6 +1,7 @@
 public fun create_debug_cube(
     diffuse_path: str, 
     specular_path: str, 
+    emission_path: str,
     normal_path: str
 ) -> Model {
     let vertices_arr: [float32; 288] = [
@@ -146,10 +147,16 @@ public fun create_debug_cube(
     if !normal_tex.has_value() {
         std::printf("FAILED to load normal texture path: %s\n", normal_path);
     }
+
+    let emission_tex = Texture2D::new(std::string::from_chars(emission_path), TEXTURE_TYPE::MATERIAL_NORMAL);
+    if !emission_tex.has_value() {
+        std::printf("FAILED to load emission texture path: %s\n", emission_path);
+    }
     let material = Material::new(
         ("debug_material"), 
         std::move(diffuse_tex),
         std::move(specular_tex),
+        std::move(emission_tex),
         std::move(normal_tex),
         32.0
     );

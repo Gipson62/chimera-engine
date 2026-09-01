@@ -84,7 +84,7 @@ fun main() -> int32 {
         model_positions.push(la::vec3::new(-1.3,  1.0,  -1.5));
 
     // We don't need textures for this cube
-    let cube = create_debug_cube("", "", "");
+    let cube = create_debug_cube("", "", "", "");
 
     while (!app.should_close()) {
         let delta_time = app.begin_frame();

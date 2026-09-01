@@ -38,7 +38,8 @@ public struct Model {
             .meshes = Model::process_node(
                 scene->mRootNode, 
                 scene, 
-                &directory, 
+                &directory,
+                &path,
                 la::mat4::identity()
             ),
             .path = std::move(path),
@@ -56,6 +57,7 @@ public struct Model {
         node: *assimp::Node,
         scene: *const assimp::Scene, 
         directory: *const std::string,
+        model_path: *const std::string,
         parent_transform: la::mat4
     ) -> std::vector<Mesh> {
         let meshes = std::vector<Mesh>::with_capacity(node->mNumMeshes);
@@ -65,13 +67,19 @@ public struct Model {
         let i: uint64 = 0;
         while i < node->mNumMeshes as uint64 {
             let mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push(Model::process_mesh(mesh, scene, directory, node_transform));
+            meshes.push(Model::process_mesh(mesh, scene, directory, model_path, node_transform));
             i = i + 1;
         }
 
         let i_children: uint64 = 0;
         while i_children < node->mNumChildren as uint64 {
-            meshes.append(Model::process_node(node->mChildren[i_children], scene, directory, node_transform));
+            meshes.append(Model::process_node(
+                node->mChildren[i_children],
+                scene, 
+                directory, 
+                model_path, 
+                node_transform
+            ));
             i_children = i_children + 1;
         }
 
@@ -82,6 +90,7 @@ public struct Model {
         mesh: *assimp::Mesh,
         scene: *const assimp::Scene,
         directory: *const std::string,
+        model_path: *const std::string,
         local_transform: la::mat4
     ) -> Mesh {
         let vertices = std::vector<Vertex>::with_capacity(mesh->mNumVertices);
@@ -135,7 +144,18 @@ public struct Model {
 
         let diffuse    = Model::load_material_texture(ai_mat, assimp::TextureType::DIFFUSE,  directory, TEXTURE_TYPE::MATERIAL_DIFFUSE);
         let specular   = Model::load_material_texture(ai_mat, assimp::TextureType::SPECULAR, directory, TEXTURE_TYPE::MATERIAL_SPECULAR);
+        let emission   = Model::load_material_texture(ai_mat, assimp::TextureType::EMISSIVE, directory, TEXTURE_TYPE::MATERIAL_EMISSION);
         let normal_map = Model::load_material_texture(ai_mat, assimp::TextureType::NORMALS,  directory, TEXTURE_TYPE::MATERIAL_NORMAL);
+        // Fallback
+        if normal_map.is_empty() {
+            normal_map =
+                Model::load_material_texture(
+                    ai_mat,
+                    assimp::TextureType::HEIGHT,
+                    directory,
+                    TEXTURE_TYPE::MATERIAL_NORMAL
+                );
+        }
 
         let shininess: float32 = 32.0;
         let shininess_out: float32 = 0.0;
@@ -144,7 +164,14 @@ public struct Model {
             shininess = shininess_out;
         }
 
-        let material = Material::new("material", std::move(diffuse), std::move(specular), std::move(normal_map), shininess);
+        let material = Material::new(
+            "material",
+            std::move(diffuse), 
+            std::move(specular),
+            std::move(emission),
+            std::move(normal_map),
+            shininess
+        );
         return Mesh::new(
             std::move(vertices),
             std::move(indices),
@@ -166,6 +193,7 @@ public struct Model {
         let path_out = assimp::String { .length = 0, .data = [0] };
         let result = assimp::GetMaterialTexture(mat, ai_type, 0, &path_out, null, null, null, null, null, null);
         if result != assimp::Return::SUCCESS {
+            std::printf("[ERROR] Model::load_material_texture couldn't load texture because of: %s\n", assimp::GetErrorString());
             return std::optional<Texture2D>::empty();
         }
 

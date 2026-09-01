@@ -8,6 +8,7 @@ public enum TEXTURE_TYPE {
     MATERIAL_SPECULAR;
     MATERIAL_DIFFUSE;
     MATERIAL_NORMAL;
+    MATERIAL_EMISSION;
 }
 
 
@@ -37,6 +38,7 @@ public struct Texture2D {
         let type_name = std::string::with_capacity(20);
         if type == TEXTURE_TYPE::MATERIAL_DIFFUSE  { type_name.push_str("material.specular"); }
         if type == TEXTURE_TYPE::MATERIAL_SPECULAR { type_name.push_str("material.specular"); }
+        if type == TEXTURE_TYPE::MATERIAL_EMISSION { type_name.push_str("material.emission");   }
         if type == TEXTURE_TYPE::MATERIAL_NORMAL   { type_name.push_str("material.normal");   }
 
         let texture = Texture2D {
@@ -50,7 +52,7 @@ public struct Texture2D {
         glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);    
         glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT);
         glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
 
         glTexImage2D(
             GL::TEXTURE_2D, 

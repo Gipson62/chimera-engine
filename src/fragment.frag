@@ -8,6 +8,7 @@ struct Material {
     sampler2D diffuse;
     sampler2D specular;
     sampler2D normal_map;
+    sampler2D emission;
 
     float shininess;
 };
@@ -35,6 +36,7 @@ void main()
     // Material textures
     vec3 albedo = texture(material.diffuse, TexCoords).rgb;
     vec3 specularMap = texture(material.specular, TexCoords).rgb;
+    vec3 emission = texture(material.emission, TexCoords).rgb;
     vec3 normal = texture(material.normal_map, TexCoords).rgb;
     normal = normalize(normal * 2.0 - 1.0);
 
@@ -63,6 +65,6 @@ void main()
     specular *= attenuation;
 
     // Final color
-    vec3 result = ambient + diffuse + specular;
+    vec3 result = ambient + diffuse + specular + emission;
     FragColor = vec4(result, 1.0);
 }

@@ -7,6 +7,7 @@ public struct Material {
     name: str;
     diffuse: std::optional<Texture2D>;
     specular: std::optional<Texture2D>;
+    emission: std::optional<Texture2D>;
     normal_map: std::optional<Texture2D>;
     shininess: float32;
 
@@ -14,15 +15,17 @@ public struct Material {
         name: str,
         diffuse: std::optional<Texture2D>,
         specular: std::optional<Texture2D>,
+        emission: std::optional<Texture2D>,
         normal_map: std::optional<Texture2D>,
         shininess: float32
     ) -> This {
         return Material {
-            .name      = name,
-            .diffuse   = std::move(diffuse),
-            .specular  = std::move(specular),
+            .name       = name,
+            .diffuse    = std::move(diffuse),
+            .specular   = std::move(specular),
             .normal_map = std::move(normal_map),
-            .shininess = shininess,
+            .emission   = std::move(emission),
+            .shininess  = shininess,
         };
     }
 }
