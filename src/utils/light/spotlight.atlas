@@ -1,0 +1,39 @@
+public struct SpotLight {
+  public:
+    position: la::vec3;
+    direction: la::vec3;
+    cut_off: float32;
+    outer_cut_off: float32;
+    ambient: la::vec3;
+    diffuse: la::vec3;
+    specular: la::vec3;
+    constant: float32;
+    linear: float32;
+    quadratic: float32;
+
+    fun new(
+        position: la::vec3,
+        direction: la::vec3,
+        cut_off: float32,
+        outer_cut_off: float32,
+        constant: float32,
+        linear: float32,
+        quadratic: float32,
+        ambient: la::vec3,
+        diffuse: la::vec3,
+        specular: la::vec3,
+    ) -> This {
+        return SpotLight {
+            .position       = position,
+            .direction      = direction,
+            .constant       = constant,
+            .linear         = linear,
+            .quadratic      = quadratic,
+            .cut_off        = cut_off,
+            .outer_cut_off  = outer_cut_off,
+            .ambient        = ambient,
+            .diffuse        = diffuse,
+            .specular       = specular
+        };
+    }
+}

@@ -1,0 +1,23 @@
+import "src/linear_algebra.atlas";
+
+public struct DirectionalLight {
+  public:
+    direction: la::vec3;
+    ambient: la::vec3;
+    diffuse: la::vec3;
+    specular: la::vec3;
+    
+    fun new(
+        direction: la::vec3,
+        ambient: la::vec3,
+        diffuse: la::vec3,
+        specular: la::vec3
+    ) -> This {
+        return DirectionalLight {
+            .direction = direction,
+            .ambient   = ambient,
+            .diffuse   = diffuse,
+            .specular  = specular,
+        };
+    }
+}

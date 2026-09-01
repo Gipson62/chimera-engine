@@ -18,6 +18,9 @@ import "src/utils/texture.atlas";
 import "src/utils/mesh.atlas";
 import "src/utils/shape.atlas";
 import "src/utils/model.atlas";
+import "src/utils/light/directional_light.atlas";
+import "src/utils/light/point_light.atlas";
+import "src/utils/light/spotlight.atlas";
 
 extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
@@ -28,9 +31,9 @@ fun main() -> int32 {
     app.setup();
 
     // --- object shader: objectColor * lightColor ---
-    let vertex_shader_opt = ShaderStage::new("src/vertex.vert", ShaderKind::VERTEX_SHADER);
+    let vertex_shader_opt = ShaderStage::new("src/shader/vertex.vert", ShaderKind::VERTEX_SHADER);
     if vertex_shader_opt.is_empty() { std::panic("Something is wrong with the vertex shader boss"); }
-    let fragment_shader_opt = ShaderStage::new("src/fragment.frag", ShaderKind::FRAGMENT_SHADER);
+    let fragment_shader_opt = ShaderStage::new("src/shader/fragment.frag", ShaderKind::FRAGMENT_SHADER);
     if fragment_shader_opt.is_empty() { std::panic("Something is wrong with the fragment shader boss"); }
 
     let shader_program_opt = ShaderProgram::link(
@@ -41,9 +44,9 @@ fun main() -> int32 {
     let shader_program = shader_program_opt.value();
 
     // --- light shader: flat white ---
-    let light_vertex_shader_opt = ShaderStage::new("src/vertex.vert", ShaderKind::VERTEX_SHADER);
+    let light_vertex_shader_opt = ShaderStage::new("src/shader/vertex.vert", ShaderKind::VERTEX_SHADER);
     if light_vertex_shader_opt.is_empty() { std::panic("Something is wrong with the light vertex shader boss"); }
-    let light_fragment_shader_opt = ShaderStage::new("src/light.frag", ShaderKind::FRAGMENT_SHADER);
+    let light_fragment_shader_opt = ShaderStage::new("src/shader/light.frag", ShaderKind::FRAGMENT_SHADER);
     if light_fragment_shader_opt.is_empty() { std::panic("Something is wrong with the light fragment shader boss"); }
 
     let light_shader_program_opt = ShaderProgram::link(
@@ -59,14 +62,6 @@ fun main() -> int32 {
     //model_3d.matrix = la::mat4::identity().scaled(1.0, 1.0, 1.0);
 
     shader_program.bind();
-    shader_program.set_vec3("light.ambient", &la::vec3::new(0.2, 0.2, 0.2));
-    shader_program.set_vec3("light.diffuse", &la::vec3::new(0.5, 0.5, 0.5));
-    shader_program.set_vec3("light.specular", &la::vec3::new(1.0, 1.0, 1.0));
-    shader_program.set_float("light.constant", 1.0);
-    shader_program.set_float("light.linear", 0.09);
-    shader_program.set_float("light.quadratic", 0.032);
-
-    let light_pos = la::vec3::new(1.2, 1.0, 2.0);
 
     let fps_timer = std::instant::now();
     let frame_count: int64 = 0;
@@ -86,6 +81,22 @@ fun main() -> int32 {
     // We don't need textures for this cube
     let cube = create_debug_cube("", "", "", "");
 
+    let dir_light = DirectionalLight::new(
+        la::vec3::new(-0.2, -1.0, -0.3),
+        la::vec3::new(0.2, 0.2, 0.2),
+        la::vec3::new(0.5, 0.5, 0.5),
+        la::vec3::new(1.0, 1.0, 1.0)
+    );
+    let point_light = PointLight::new(
+        la::vec3::new(1.2, 1.0, 2.0),
+        1.0,
+        0.09,
+        0.032,
+        la::vec3::new(0.2, 0.2, 0.2),
+        la::vec3::new(0.5, 0.5, 0.5),
+        la::vec3::new(1.0, 1.0, 1.0)
+    );
+
     while (!app.should_close()) {
         let delta_time = app.begin_frame();
         let renderer = app.renderer();
@@ -98,14 +109,17 @@ fun main() -> int32 {
         let view = app.camera()->view_matrix();
         let projection = app.camera()->projection_matrix();
 
-        light_pos.set(0, 1.0 + la::sin(glfw::GetTime() as float32) * 2.0);
-        light_pos.set(1, la::sin(glfw::GetTime() as float32 / 2.0) * 1.0);
+        point_light.position.set(0, 1.0 + la::sin(glfw::GetTime() as float32) * 2.0);
+        point_light.position.set(1, la::sin(glfw::GetTime() as float32 / 2.0) * 1.0);
 
         shader_program.bind();
         shader_program.set_vec3("viewPos", &app.camera()->position());
-        shader_program.set_vec3("light.position", &light_pos);
-        shader_program.set_vec3("lightPos", &light_pos);
+        shader_program.set_vec3("light.position", &point_light.position);
+        shader_program.set_vec3("lightPos", &point_light.position);
         
+        let point_lights = [&point_light, null, null, null];
+        let spot_lights: [*SpotLight; 2] = [null, null];
+
         let i: uint64 = 0;
         while i < model_positions.len() {
             let pos = model_positions.get(i);
@@ -115,16 +129,32 @@ fun main() -> int32 {
                 .translated(pos->x(), pos->y(), pos->z())
                 .rotated(&la::vec3::new(1.0, 0.3, 0.5), la::radians(angle));
 
-            renderer->draw_model(&model_3d, &shader_program, &view, &projection);
+            renderer->draw_model(
+                &model_3d, 
+                &shader_program, 
+                &view, 
+                &projection,
+                &dir_light,
+                point_lights,
+                spot_lights
+            );
             i = i + 1;
         }
 
         // Draw light source using a cube
         cube.matrix = la::mat4::identity()
-            .translated(light_pos.x(), light_pos.y(), light_pos.z())
+            .translated(point_light.position.x(), point_light.position.y(), point_light.position.z())
             .scaled(0.2, 0.2, 0.2);
 
-        renderer->draw_model(&cube, &light_shader_program, &view, &projection);
+        renderer->draw_model(
+            &cube, 
+            &light_shader_program, 
+            &view, 
+            &projection,
+            &dir_light,
+            point_lights,
+            spot_lights
+        );
 
         frame_count = frame_count + 1;
         let elapsed = fps_timer.elapsed();

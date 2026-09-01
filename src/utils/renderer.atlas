@@ -1,4 +1,6 @@
 import "src/utils/model.atlas";
+import "src/utils/light/directional_light.atlas";
+import "src/utils/light/point_light.atlas";
 
 public struct Renderer {
   public:
@@ -22,49 +24,100 @@ public struct Renderer {
     fun clear_color(*const this, r: float32, g: float32, b: float32, a: float32) { glClearColor(r, g, b, a); }
     fun clear(*const this) { glClear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT); }
 
-    fun begin_scene(*const this, shader: *const ShaderProgram, view: *const la::mat4, projection: *const la::mat4) {
-        shader->bind();
-        shader->set_mat4("view", view);
-        shader->set_mat4("projection", projection);
-    }
-
-    fun submit(
-        *const this,
-        va: *const VertexArray,
-        ib: *const IndexBuffer,
-        shader: *const ShaderProgram,
-        model: *const la::mat4
-    ) {
-        shader->set_mat4("model", model);
-        va->bind();
-        ib->bind();
-        glDrawElements(GL::TRIANGLES, ib->get_count(), GL::UNSIGNED_INT, null);
-    }
-
-    // Non-indexed single-mesh draw. Requires begin_scene() called first
-    // (shader bound, view/projection set).
-    fun submit_mesh(
-        *const this,
-        va: *const VertexArray,
-        shader: *const ShaderProgram,
-        model: *const la::mat4,
-        vertex_count: int32
-    ) {
-        shader->set_mat4("model", model);
-        va->bind();
-        glDrawArrays(GL::TRIANGLES, 0, vertex_count);
-    }
-
     fun draw_model(
         *const this,
         model: *const Model,
         shader: *const ShaderProgram,
         view: *const la::mat4,
         projection: *const la::mat4
+        // Not necessary
+        dir_light: *const DirectionalLight,
+        point_lights: [*PointLight; 4],
+        spot_lights: [*SpotLight; 2]
     ) {
         shader->bind();
         shader->set_mat4("view", view);
         shader->set_mat4("projection", projection);
+        if dir_light != null {
+            shader->set_vec3("dirLight.direction", &dir_light->direction);
+            shader->set_vec3("dirLight.ambient", &dir_light->ambient);
+            shader->set_vec3("dirLight.diffuse", &dir_light->diffuse);
+            shader->set_vec3("dirLight.specular", &dir_light->specular);
+        }
+
+        let num_active_point_lights: int32 = 0;
+
+        // TODO: Refactor this to be clean. It's ugly asf
+        if point_lights[0] != null {
+            num_active_point_lights = num_active_point_lights + 1;
+            shader->set_vec3("pointLights[0].position", &point_lights[0]->position);
+            shader->set_float("pointLights[0].constant", point_lights[0]->constant);
+            shader->set_float("pointLights[0].linear", point_lights[0]->linear);
+            shader->set_float("pointLights[0].quadratic", point_lights[0]->quadratic);
+            shader->set_vec3("pointLights[0].ambient", &point_lights[0]->ambient);
+            shader->set_vec3("pointLights[0].diffuse", &point_lights[0]->diffuse);
+            shader->set_vec3("pointLights[0].specular", &point_lights[0]->specular);
+        }
+        if point_lights[1] != null {
+            num_active_point_lights = num_active_point_lights + 1;
+            shader->set_vec3("pointLights[1].position", &point_lights[1]->position);
+            shader->set_float("pointLights[1].constant", point_lights[1]->constant);
+            shader->set_float("pointLights[1].linear", point_lights[1]->linear);
+            shader->set_float("pointLights[1].quadratic", point_lights[1]->quadratic);
+            shader->set_vec3("pointLights[1].ambient", &point_lights[1]->ambient);
+            shader->set_vec3("pointLights[1].diffuse", &point_lights[1]->diffuse);
+            shader->set_vec3("pointLights[1].specular", &point_lights[1]->specular);
+        }
+        if point_lights[2] != null {
+            num_active_point_lights = num_active_point_lights + 1;
+            shader->set_vec3("pointLights[2].position", &point_lights[2]->position);
+            shader->set_float("pointLights[2].constant", point_lights[2]->constant);
+            shader->set_float("pointLights[2].linear", point_lights[2]->linear);
+            shader->set_float("pointLights[2].quadratic", point_lights[2]->quadratic);
+            shader->set_vec3("pointLights[2].ambient", &point_lights[2]->ambient);
+            shader->set_vec3("pointLights[2].diffuse", &point_lights[2]->diffuse);
+            shader->set_vec3("pointLights[2].specular", &point_lights[2]->specular);
+        }
+        if point_lights[3] != null {
+            num_active_point_lights = num_active_point_lights + 1;
+            shader->set_vec3("pointLights[3].position", &point_lights[3]->position);
+            shader->set_float("pointLights[3].constant", point_lights[3]->constant);
+            shader->set_float("pointLights[3].linear", point_lights[3]->linear);
+            shader->set_float("pointLights[3].quadratic", point_lights[3]->quadratic);
+            shader->set_vec3("pointLights[3].ambient", &point_lights[3]->ambient);
+            shader->set_vec3("pointLights[3].diffuse", &point_lights[3]->diffuse);
+            shader->set_vec3("pointLights[3].specular", &point_lights[3]->specular);
+        }
+        shader->set_int("numActivePointLights", num_active_point_lights);
+
+        let num_active_spot_lights: int32 = 0;
+
+        if spot_lights[0] != null {
+            num_active_spot_lights = num_active_spot_lights + 1;
+            shader->set_vec3("spotLights[0].position", &spot_lights[0]->position);
+            shader->set_vec3("spotLights[0].direction", &spot_lights[0]->direction);
+            shader->set_float("spotLights[0].cutOff", spot_lights[0]->cut_off);
+            shader->set_float("spotLights[0].outerCutOff", spot_lights[0]->outer_cut_off);
+            shader->set_float("spotLights[0].constant", spot_lights[0]->constant);
+            shader->set_float("spotLights[0].linear", spot_lights[0]->linear);
+            shader->set_float("spotLights[0].quadratic", spot_lights[0]->quadratic);
+            shader->set_vec3("spotLights[0].ambient", &spot_lights[0]->ambient);
+            shader->set_vec3("spotLights[0].diffuse", &spot_lights[0]->diffuse);
+            shader->set_vec3("spotLights[0].specular", &spot_lights[0]->specular);
+        }
+        if spot_lights[1] != null {
+            num_active_spot_lights = num_active_spot_lights + 1;
+            shader->set_vec3("spotLights[1].position", &spot_lights[1]->position);
+            shader->set_vec3("spotLights[1].direction", &spot_lights[1]->direction);
+            shader->set_float("spotLights[1].cutOff", spot_lights[1]->cut_off);
+            shader->set_float("spotLights[1].outerCutOff", spot_lights[1]->outer_cut_off);
+            shader->set_float("spotLights[1].constant", spot_lights[1]->constant);
+            shader->set_float("spotLights[1].linear", spot_lights[1]->linear);
+            shader->set_float("spotLights[1].quadratic", spot_lights[1]->quadratic);
+            shader->set_vec3("spotLights[1].ambient", &spot_lights[1]->ambient);
+            shader->set_vec3("spotLights[1].diffuse", &spot_lights[1]->diffuse);
+            shader->set_vec3("spotLights[1].specular", &spot_lights[1]->specular);
+        }
 
         let i: uint64 = 0;
         while i < model->meshes.len() {
@@ -108,34 +161,6 @@ public struct Renderer {
 
             shader->set_float("material.shininess", mesh->material.shininess);
             glDrawElements(GL::TRIANGLES, mesh->index_buffer()->get_count(), GL::UNSIGNED_INT, null);
-            i = i + 1;
-        }
-    }
-
-    fun draw(
-        *const this,
-        va: *const VertexArray,
-        shader: *const ShaderProgram,
-        positions: *const std::vector<la::vec3>,
-        view: *const la::mat4,
-        projection: *const la::mat4,
-    ) {
-        shader->bind();
-        va->bind();
-
-        let i: uint64 = 0;
-        while i < positions->len() {
-            let pos = positions->get(i);
-            let angle = 20.0 * i as float32;
-            let model_matrix = la::mat4::identity()
-                .translated(pos->x(), pos->y(), pos->z())
-                .rotated(&la::vec3::new(0.0, 0.0, -3.0), la::radians(angle));
-
-            shader->set_mat4("model", &model_matrix);
-            shader->set_mat4("view", view);
-            shader->set_mat4("projection", projection);
-
-            glDrawArrays(GL::TRIANGLES, 0, 36);
             i = i + 1;
         }
     }

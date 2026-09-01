@@ -1,0 +1,30 @@
+struct PointLight {
+  public:
+    position: la::vec3;
+    constant: float32;
+    linear: float32;
+    quadratic: float32;
+    ambient: la::vec3;
+    diffuse: la::vec3;
+    specular: la::vec3;
+
+    fun new(
+        position: la::vec3,
+        constant: float32,
+        linear: float32,
+        quadratic: float32,
+        ambient: la::vec3,
+        diffuse: la::vec3,
+        specular: la::vec3
+    ) -> This {
+        return PointLight {
+            .position  = position,
+            .constant  = constant,
+            .linear    = linear,
+            .quadratic = quadratic,
+            .ambient   = ambient,
+            .diffuse   = diffuse,
+            .specular  = specular
+        };
+    }
+}

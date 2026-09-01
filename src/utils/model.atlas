@@ -2,8 +2,13 @@ import "src/utils/material.atlas";
 import "src/utils/mesh.atlas";
 
 import "src/assimp.atlas";
-
 import "src/linear_algebra.atlas";
+
+public struct MissingTexture {
+  public:
+    mesh_index: uint64;
+    slot: TEXTURE_TYPE;
+}
 
 public struct Model {
   public:
@@ -34,14 +39,17 @@ public struct Model {
 
         let directory = Model::directory_of(&path);
 
+        let meshes = std::vector<Mesh>::with_capacity(0);
+        Model::process_node(
+            scene->mRootNode,
+            scene,
+            &directory,
+            la::mat4::identity(),
+            &meshes
+        );
+
         let model = Model {
-            .meshes = Model::process_node(
-                scene->mRootNode, 
-                scene, 
-                &directory,
-                &path,
-                la::mat4::identity()
-            ),
+            .meshes = std::move(meshes),
             .path = std::move(path),
             .directory = std::move(directory),
             .matrix = la::mat4::identity(),
@@ -55,42 +63,43 @@ public struct Model {
 
     fun process_node(
         node: *assimp::Node,
-        scene: *const assimp::Scene, 
+        scene: *const assimp::Scene,
         directory: *const std::string,
-        model_path: *const std::string,
-        parent_transform: la::mat4
-    ) -> std::vector<Mesh> {
-        let meshes = std::vector<Mesh>::with_capacity(node->mNumMeshes);
-
+        parent_transform: la::mat4,
+        out_meshes: *std::vector<Mesh>
+    ) {
         let node_transform = parent_transform * Model::mat4_from_assimp(&node->mTransformation);
 
         let i: uint64 = 0;
         while i < node->mNumMeshes as uint64 {
             let mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push(Model::process_mesh(mesh, scene, directory, model_path, node_transform));
+            let processed_mesh = Model::process_mesh(
+                mesh,
+                scene,
+                directory,
+                node_transform
+            );
+            out_meshes->push(std::move(processed_mesh));
             i = i + 1;
         }
 
         let i_children: uint64 = 0;
         while i_children < node->mNumChildren as uint64 {
-            meshes.append(Model::process_node(
+            Model::process_node(
                 node->mChildren[i_children],
-                scene, 
-                directory, 
-                model_path, 
-                node_transform
-            ));
+                scene,
+                directory,
+                node_transform,
+                out_meshes
+            );
             i_children = i_children + 1;
         }
-
-        return std::move(meshes);
     }
 
     fun process_mesh(
         mesh: *assimp::Mesh,
         scene: *const assimp::Scene,
         directory: *const std::string,
-        model_path: *const std::string,
         local_transform: la::mat4
     ) -> Mesh {
         let vertices = std::vector<Vertex>::with_capacity(mesh->mNumVertices);
@@ -104,7 +113,7 @@ public struct Model {
                 .normal     = la::vec3::zero(),
                 .tex_coords = la::vec2::zero(),
                 .tangent    = la::vec3::zero(),
-                .bitangent = la::vec3::zero(),
+                .bitangent  = la::vec3::zero(),
             };
 
             if mesh->mNormals != null {
@@ -119,7 +128,6 @@ public struct Model {
                 let b = mesh->mBitangents[i];
                 vertex.bitangent = la::vec3::new(b.x, b.y, b.z);
             }
-
             if mesh->mTextureCoords[0] != null {
                 let uv = mesh->mTextureCoords[0][i];
                 vertex.tex_coords = la::vec2::new(uv.x, uv.y);
@@ -142,19 +150,38 @@ public struct Model {
 
         let ai_mat = scene->mMaterials[mesh->mMaterialIndex];
 
-        let diffuse    = Model::load_material_texture(ai_mat, assimp::TextureType::DIFFUSE,  directory, TEXTURE_TYPE::MATERIAL_DIFFUSE);
-        let specular   = Model::load_material_texture(ai_mat, assimp::TextureType::SPECULAR, directory, TEXTURE_TYPE::MATERIAL_SPECULAR);
-        let emission   = Model::load_material_texture(ai_mat, assimp::TextureType::EMISSIVE, directory, TEXTURE_TYPE::MATERIAL_EMISSION);
-        let normal_map = Model::load_material_texture(ai_mat, assimp::TextureType::NORMALS,  directory, TEXTURE_TYPE::MATERIAL_NORMAL);
-        // Fallback
+        let diffuse  = Model::load_material_texture(
+            ai_mat, 
+            assimp::TextureType::DIFFUSE,
+            directory,
+            TEXTURE_TYPE::MATERIAL_DIFFUSE
+        );
+        let specular = Model::load_material_texture(
+            ai_mat,
+            assimp::TextureType::SPECULAR,
+            directory,
+            TEXTURE_TYPE::MATERIAL_SPECULAR
+        );
+        let emission = Model::load_material_texture(
+            ai_mat,
+            assimp::TextureType::EMISSIVE,
+            directory,
+            TEXTURE_TYPE::MATERIAL_EMISSION
+        );
+
+        let normal_map = Model::load_material_texture(
+            ai_mat,
+            assimp::TextureType::NORMALS,
+            directory,
+            TEXTURE_TYPE::MATERIAL_NORMAL
+        );
         if normal_map.is_empty() {
-            normal_map =
-                Model::load_material_texture(
-                    ai_mat,
-                    assimp::TextureType::HEIGHT,
-                    directory,
-                    TEXTURE_TYPE::MATERIAL_NORMAL
-                );
+            normal_map = Model::load_material_texture(
+                ai_mat,
+                assimp::TextureType::HEIGHT,
+                directory,
+                TEXTURE_TYPE::MATERIAL_NORMAL
+            );
         }
 
         let shininess: float32 = 32.0;
@@ -166,18 +193,13 @@ public struct Model {
 
         let material = Material::new(
             "material",
-            std::move(diffuse), 
+            std::move(diffuse),
             std::move(specular),
             std::move(emission),
             std::move(normal_map),
             shininess
         );
-        return Mesh::new(
-            std::move(vertices),
-            std::move(indices),
-            std::move(material),
-            local_transform
-        );
+        return Mesh::new(std::move(vertices), std::move(indices), std::move(material), local_transform);
     }
 
     fun load_material_texture(
@@ -193,36 +215,45 @@ public struct Model {
         let path_out = assimp::String { .length = 0, .data = [0] };
         let result = assimp::GetMaterialTexture(mat, ai_type, 0, &path_out, null, null, null, null, null, null);
         if result != assimp::Return::SUCCESS {
-            std::printf("[ERROR] Model::load_material_texture couldn't load texture because of: %s\n", assimp::GetErrorString());
+            std::printf("[Model] GetMaterialTexture failed: %s\n", assimp::GetErrorString());
             return std::optional<Texture2D>::empty();
         }
 
         let full_path = directory->copy();
-            full_path.push_str("/");
-            full_path.push_str(&path_out.data[0]);
+        full_path.push_str("/");
+        full_path.push_str(&path_out.data[0]);
 
         return Texture2D::new(std::move(full_path), type);
     }
 
-    fun directory_of(path: *const std::string) -> std::string {
-        let s = path->c_str();
-        let len: uint64 = 0;
-        while s[len] != 0 { len = len + 1; }
+    // Finds the last occurrence of any byte in `chars` (a null-terminated
+    // set, e.g. "/\\" or ".") within `s`. Shared by directory_of and
+    // anything else that needs to split a path on separators/extension.
+    fun find_last_of(s: *const std::string, chars: *const uint8) -> std::optional<uint64> {
+        let bytes = s->c_str();
+        let len = s->len();
 
-        let last_slash: uint64 = 0;
-        let found = false;
-        let k: uint64 = 0;
-        while k < len {
-            if s[k] == '/' as uint8 || s[k] == '\\' as uint8 {
-                last_slash = k;
-                found = true;
+        let num_chars: uint64 = 0;
+        while chars[num_chars] != 0 { num_chars = num_chars + 1; }
+
+        let i: uint64 = len;
+        while i > 0 {
+            i = i - 1;
+            let c: uint64 = 0;
+            while c < num_chars {
+                if bytes[i] == chars[c] {
+                    return std::optional<uint64>::of(i);
+                }
+                c = c + 1;
             }
-            k = k + 1;
         }
+        return std::optional<uint64>::empty();
+    }
 
-        if !found { return std::string::from_chars("."); }
-        
-        return path->substr(0, last_slash);
+    fun directory_of(path: *const std::string) -> std::string {
+        let slash = Model::find_last_of(path, "/\\");
+        if slash.is_empty() { return std::string::from_chars("."); }
+        return path->substr(0, slash.value());
     }
 
     fun mat4_from_assimp(m: *const assimp::Matrix4x4) -> la::mat4 {
@@ -232,5 +263,28 @@ public struct Model {
             m->c1, m->c2, m->c3, m->c4,
             m->d1, m->d2, m->d3, m->d4
         );
+    }
+
+    fun missing_textures(*const this) -> std::vector<MissingTexture> {
+        let out = std::vector<MissingTexture>::with_capacity(0);
+        let i: uint64 = 0;
+        while i < this->meshes.len() {
+            let mesh = this->meshes.get(i);
+            if mesh->material.diffuse.is_empty()    { out.push(MissingTexture { .mesh_index = i, .slot = TEXTURE_TYPE::MATERIAL_DIFFUSE }); }
+            if mesh->material.specular.is_empty()   { out.push(MissingTexture { .mesh_index = i, .slot = TEXTURE_TYPE::MATERIAL_SPECULAR }); }
+            if mesh->material.emission.is_empty()   { out.push(MissingTexture { .mesh_index = i, .slot = TEXTURE_TYPE::MATERIAL_EMISSION }); }
+            if mesh->material.normal_map.is_empty() { out.push(MissingTexture { .mesh_index = i, .slot = TEXTURE_TYPE::MATERIAL_NORMAL }); }
+            i = i + 1;
+        }
+        return std::move(out);
+    }
+
+    fun set_texture(*this, mesh_index: uint64, slot: TEXTURE_TYPE, texture: std::optional<Texture2D>) {
+        let mesh = this->meshes.get_mut(mesh_index);
+
+        if      slot == TEXTURE_TYPE::MATERIAL_DIFFUSE    { mesh->material.diffuse    = std::move(texture); }
+        else if slot == TEXTURE_TYPE::MATERIAL_SPECULAR   { mesh->material.specular   = std::move(texture); }
+        else if slot == TEXTURE_TYPE::MATERIAL_EMISSION   { mesh->material.emission   = std::move(texture); }
+        else if slot == TEXTURE_TYPE::MATERIAL_NORMAL     { mesh->material.normal_map = std::move(texture); }
     }
 }
