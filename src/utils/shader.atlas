@@ -5,8 +5,8 @@ import "src/glad.atlas";
 import "std/optional";
 
 enum ShaderKind {
-    FRAGMENT_SHADER = 0x8B30; // _GL_FRAGMENT_SHADER
-    VERTEX_SHADER = 0x8B31;   // _GL_VERTEX_SHADER
+    FRAGMENT_SHADER = 0x8B30;
+    VERTEX_SHADER   = 0x8B31;
 }
 
 public  struct ShaderStage {
@@ -74,6 +74,9 @@ public struct ShaderProgram {
     fun set_int(*const this, name: str, value: int32) {
         glUniform1i(glGetUniformLocation(this->id, name), value);
     }
+    fun set_uint(*const this, name: str, value: uint32) {
+        glUniform1ui(glGetUniformLocation(this->id, name), value);
+    }
     fun set_bool(*const this, name: str, value: bool) {
         glUniform1i(glGetUniformLocation(this->id, name), value as int32);
     }
@@ -83,8 +86,23 @@ public struct ShaderProgram {
     fun set_mat4(*const this, name: str, value: *const la::mat4) {
         glUniformMatrix4fv(glGetUniformLocation(this->id, name), 1, GL::FALSE, value->get_ptr());
     }
+    fun set_vec2(*const this, name: str, value: *const la::vec2) {
+        glUniform2f(glGetUniformLocation(this->id, name), value->x(), value->y());
+    }
     fun set_vec3(*const this, name: str, value: *const la::vec3) {
         glUniform3f(glGetUniformLocation(this->id, name), value->x(), value->y(), value->z());
+    }
+    fun set_vec4(*const this, name: str, value: *const la::vec4) {
+        glUniform4f(glGetUniformLocation(this->id, name), value->x(), value->y(), value->z(), value->w());
+    }
+    fun set_uvec2(*const this, name: str, x: uint32, y: uint32) {
+        glUniform2ui(glGetUniformLocation(this->id, name), x, y);
+    }
+    fun set_uvec3(*const this, name: str, x: uint32, y: uint32, z: uint32) {
+        glUniform3ui(glGetUniformLocation(this->id, name), x, y, z);
+    }
+    fun set_uvec4(*const this, name: str, x: uint32, y: uint32, z: uint32, w: uint32) {
+        glUniform4ui(glGetUniformLocation(this->id, name), x, y, z, w);
     }
     fun bind(*const this) {
         glUseProgram(this->id);

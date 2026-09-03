@@ -1,6 +1,7 @@
 import "src/utils/model.atlas";
 import "src/utils/light/directional_light.atlas";
 import "src/utils/light/point_light.atlas";
+import "src/utils/light/spotlight.atlas";
 
 public struct Renderer {
   public:
@@ -24,13 +25,42 @@ public struct Renderer {
     fun clear_color(*const this, r: float32, g: float32, b: float32, a: float32) { glClearColor(r, g, b, a); }
     fun clear(*const this) { glClear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT); }
 
+    fun begin_scene(*this) {
+        
+    }
+
+    fun restore_viewport(*const this, width: int32, height: int32) {
+        glBindFramebuffer(GL::FRAMEBUFFER, 0);
+        glViewport(0, 0, width, height);
+    }
+
+    fun draw_depth_model(
+        *const this,
+        model: *const Model,
+        shader: *const ShaderProgram,
+        light_space: *const la::mat4
+    ) {
+        shader->bind();
+        shader->set_mat4("lightSpaceMatrix", light_space);
+
+        let i: uint64 = 0;
+        while i < model->meshes.len() {
+            let mesh = model->meshes.get(i);
+            let mesh_world = model->matrix * mesh->local_transform;
+            shader->set_mat4("model", &mesh_world);
+            mesh->vertex_array()->bind();
+            mesh->index_buffer()->bind();
+            glDrawElements(GL::TRIANGLES, mesh->index_buffer()->get_count(), GL::UNSIGNED_INT, null);
+            i = i + 1;
+        }
+    }
+
     fun draw_model(
         *const this,
         model: *const Model,
         shader: *const ShaderProgram,
         view: *const la::mat4,
         projection: *const la::mat4
-        // Not necessary
         dir_light: *const DirectionalLight,
         point_lights: [*PointLight; 4],
         spot_lights: [*SpotLight; 2]

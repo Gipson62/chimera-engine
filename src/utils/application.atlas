@@ -70,6 +70,8 @@ public struct Application {
     }
 
     fun should_close(*const this) -> bool { return this->window.should_close(); }
+    fun window_width(*const this) -> int32 { return this->window.width(); }
+    fun window_height(*const this) -> int32 { return this->window.height(); }
     fun set_window_title(*this, title: *uint8) { this->window.set_window_title(title); }
     fun renderer(*this) -> *Renderer { return &this->renderer; }
     fun camera(*this) -> *Camera { return &this->camera; }

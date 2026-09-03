@@ -6,18 +6,21 @@ public struct DirectionalLight {
     ambient: la::vec3;
     diffuse: la::vec3;
     specular: la::vec3;
-    
+    cast_shadow: bool;
+
     fun new(
         direction: la::vec3,
         ambient: la::vec3,
         diffuse: la::vec3,
-        specular: la::vec3
+        specular: la::vec3,
+        cast_shadow: bool
     ) -> This {
         return DirectionalLight {
-            .direction = direction,
-            .ambient   = ambient,
-            .diffuse   = diffuse,
-            .specular  = specular,
+            .direction   = direction,
+            .ambient     = ambient,
+            .diffuse     = diffuse,
+            .specular    = specular,
+            .cast_shadow = cast_shadow
         };
     }
 }

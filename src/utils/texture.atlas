@@ -9,6 +9,8 @@ public enum TEXTURE_TYPE {
     MATERIAL_DIFFUSE;
     MATERIAL_NORMAL;
     MATERIAL_EMISSION;
+
+    DEPTH_MAP;
 }
 
 
@@ -106,6 +108,35 @@ public struct Texture2D {
             &pixel[0] as *unit
         );
         // No glGenerateMipmap: a 1x1 texture has exactly one mip level already.
+
+        return texture;
+    }
+
+    fun from_size(width: int32, height: int32, format: int32) -> This {
+        let texture = Texture2D {
+            .id = 0,
+            .type = std::string::from_chars("depth_map")
+        };
+        
+        glGenTextures(1, &texture.id);
+        texture.bind();
+
+        glTexImage2D(
+            GL::TEXTURE_2D,
+            0,
+            format,
+            width,
+            height,
+            0,
+            format as uint32,
+            GL::FLOAT,
+            null
+        );
+
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
+        glTexParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
 
         return texture;
     }

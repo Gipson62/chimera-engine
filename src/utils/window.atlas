@@ -42,6 +42,8 @@ public struct Window {
         glViewport(0, 0, width, height);
 
         glEnable(GL::DEPTH_TEST);
+        
+        glEnable(GL::TEXTURE_CUBE_MAP_SEAMLESS);
 
         return std::expected<This, std::string>::expect(std::move(w));
     }

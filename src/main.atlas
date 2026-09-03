@@ -55,9 +55,22 @@ fun main() -> int32 {
     );
     if light_shader_program_opt.is_empty() { std::panic("Something is wrong with the light shader program boss"); }
     let light_shader_program = light_shader_program_opt.value();
+
+    let shadow_vertex_shader_opt = ShaderStage::new("src/shader/shadom_map.vert", ShaderKind::VERTEX_SHADER);
+    if shadow_vertex_shader_opt.is_empty() { std::panic("Something is wrong with the shadow vertex shader boss"); }
+    let shadow_fragment_shader_opt = ShaderStage::new("src/shader/shadow_map.frag", ShaderKind::FRAGMENT_SHADER);
+    if shadow_fragment_shader_opt.is_empty() { std::panic("Something is wrong with the shadow fragment shader boss"); }
+    let shadow_shader_program_opt = ShaderProgram::link(
+        shadow_vertex_shader_opt.value(),
+        shadow_fragment_shader_opt.value()
+    );
+    if shadow_shader_program_opt.is_empty() { std::panic("Something is wrong with the shadow shader program boss"); }
+    let shadow_shader_program = shadow_shader_program_opt.value();
+    let shadow_buffer = DepthBuffer::new(4096, 4096);
     
     // --- Initializing the Model ---
     let model_3d = Model::load_model(std::string::from_chars("assets/models/vampire/dancing_vampire.dae")).value();
+    model_3d.meshes.get_mut(0)->material.normal_map = Texture2D::new(std::string::from_chars("assets/models/vampire/textures/Vampire_normal.png"), TEXTURE_TYPE::MATERIAL_NORMAL);
 
     //model_3d.matrix = la::mat4::identity().scaled(1.0, 1.0, 1.0);
 
@@ -85,7 +98,8 @@ fun main() -> int32 {
         la::vec3::new(-0.2, -1.0, -0.3),
         la::vec3::new(0.2, 0.2, 0.2),
         la::vec3::new(0.5, 0.5, 0.5),
-        la::vec3::new(1.0, 1.0, 1.0)
+        la::vec3::new(1.0, 1.0, 1.0),
+        true
     );
     let point_light = PointLight::new(
         la::vec3::new(1.2, 1.0, 2.0),
@@ -94,7 +108,8 @@ fun main() -> int32 {
         0.032,
         la::vec3::new(0.2, 0.2, 0.2),
         la::vec3::new(0.5, 0.5, 0.5),
-        la::vec3::new(1.0, 1.0, 1.0)
+        la::vec3::new(1.0, 1.0, 1.0),
+        true,
     );
 
     while (!app.should_close()) {
@@ -108,6 +123,32 @@ fun main() -> int32 {
 
         let view = app.camera()->view_matrix();
         let projection = app.camera()->projection_matrix();
+
+        let light_position = la::vec3::new(6.0, 30.0, 9.0);
+        let shadow_view = la::mat4::look_at(
+            &light_position,
+            &la::vec3::new(0.0, 0.0, 0.0),
+            &la::vec3::new(0.0, 1.0, 0.0)
+        );
+        let shadow_projection = la::mat4::orthographic(-30.0, 30.0, -30.0, 30.0, 1.0, 75.0);
+        let light_space = shadow_projection * shadow_view;
+        shadow_buffer.bind_for_writing();
+        let shadow_i: uint64 = 0;
+        while shadow_i < model_positions.len() {
+            let shadow_pos = model_positions.get(shadow_i);
+            let shadow_angle = 20.0 * shadow_i as float32 * la::sin(glfw::GetTime() as float32);
+            model_3d.matrix = la::mat4::identity()
+                .translated(shadow_pos->x(), shadow_pos->y(), shadow_pos->z())
+                .rotated(&la::vec3::new(1.0, 0.3, 0.5), la::radians(shadow_angle));
+            renderer->draw_depth_model(&model_3d, &shadow_shader_program, &light_space);
+            shadow_i = shadow_i + 1;
+        }
+        renderer->restore_viewport(app.window_width(), app.window_height());
+        shader_program.bind();
+        shader_program.set_mat4("lightSpaceMatrix", &light_space);
+        shadow_buffer.bind_for_reading(GL::TEXTURE4);
+        shader_program.set_int("shadowMap", 4);
+        shader_program.set_bool("shadowMapEnabled", dir_light.cast_shadow);
 
         point_light.position.set(0, 1.0 + la::sin(glfw::GetTime() as float32) * 2.0);
         point_light.position.set(1, la::sin(glfw::GetTime() as float32 / 2.0) * 1.0);

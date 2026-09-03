@@ -1,4 +1,6 @@
-struct PointLight {
+import "src/linear_algebra.atlas";
+
+public struct PointLight {
   public:
     position: la::vec3;
     constant: float32;
@@ -7,6 +9,7 @@ struct PointLight {
     ambient: la::vec3;
     diffuse: la::vec3;
     specular: la::vec3;
+    cast_shadow: bool;
 
     fun new(
         position: la::vec3,
@@ -15,16 +18,18 @@ struct PointLight {
         quadratic: float32,
         ambient: la::vec3,
         diffuse: la::vec3,
-        specular: la::vec3
+        specular: la::vec3,
+        cast_shadow: bool
     ) -> This {
         return PointLight {
-            .position  = position,
-            .constant  = constant,
-            .linear    = linear,
-            .quadratic = quadratic,
-            .ambient   = ambient,
-            .diffuse   = diffuse,
-            .specular  = specular
+            .position   = position,
+            .constant   = constant,
+            .linear     = linear,
+            .quadratic  = quadratic,
+            .ambient    = ambient,
+            .diffuse    = diffuse,
+            .specular   = specular,
+            .cast_shadow = cast_shadow
         };
     }
 }

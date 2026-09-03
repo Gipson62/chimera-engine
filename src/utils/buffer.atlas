@@ -167,6 +167,9 @@ public struct VertexBuffer {
         
         buffer.bind();
         glBufferData(GL::ARRAY_BUFFER, size, data, GL::STATIC_DRAW);
+
+        buffer.unbind();
+
         return buffer;
     }
     // Not sure about having a const pointer here...
@@ -195,6 +198,9 @@ public struct IndexBuffer {
         
         buffer.bind();
         glBufferData(GL::ELEMENT_ARRAY_BUFFER, size, data, GL::STATIC_DRAW);
+
+        buffer.unbind();
+
         return buffer;
     }
 
@@ -217,4 +223,75 @@ public struct IndexBuffer {
   private:
     id: uint32;
     count: int32;
+}
+
+// A framebuffer with only a depth attachment: exactly what a shadow map
+// render pass needs (we never write color while rendering depth-from-light).
+// Used directly for the directional light and each spot light. Point lights
+// use PointShadowMap (see shadow.atlas) instead, since they need a cubemap.
+public struct DepthBuffer {
+  public:
+    width: int32;
+    height: int32;
+
+    fun new(width: int32, height: int32) -> This {
+        let buffer = DepthBuffer {
+            .id     = 0,
+            .width  = width,
+            .height = height,
+            .texture = Texture2D::from_size(width, height, GL::DEPTH_COMPONENT),
+        };
+        glGenFramebuffers(1, &buffer.id);
+        buffer.bind();
+
+        glFramebufferTexture2D(
+            GL::FRAMEBUFFER,
+            GL::DEPTH_ATTACHMENT,
+            GL::TEXTURE_2D,
+            buffer.texture.id,
+            0
+        );
+
+        // No color attachment at all: tell GL not to expect/read one.
+        glDrawBuffer(GL::NONE);
+        glReadBuffer(GL::NONE);
+
+        buffer.unbind();
+
+        return buffer;
+    }
+
+    fun bind(*const this) {
+        glBindFramebuffer(GL::FRAMEBUFFER, this->id);
+    }
+    fun unbind(*const this) {
+        glBindFramebuffer(GL::FRAMEBUFFER, 0);
+    }
+
+    // Bind this FBO as the render target and point the viewport at it.
+    // Call this, render the scene with a depth-only shader, then call
+    // Renderer::restore_viewport (or bind the default FBO + glViewport
+    // yourself) to go back to rendering to the screen.
+    fun bind_for_writing(*const this) {
+        this->bind();
+        glViewport(0, 0, this->width, this->height);
+        glClear(GL::DEPTH_BUFFER_BIT);
+    }
+
+    // Bind the resulting depth texture for sampling in a lighting shader.
+    fun bind_for_reading(*const this, texture_unit: uint32) {
+        this->texture.set_texture_unit(texture_unit);
+    }
+
+    fun texture_id(*const this) -> uint32 {
+        return this->texture.id;
+    }
+
+    ~DepthBuffer() {
+        glDeleteFramebuffers(1, &this->id);
+    }
+
+  private:
+    id: uint32;
+    texture: Texture2D;
 }

@@ -1,0 +1,16 @@
+import "src/linear_algebra.atlas";
+
+public struct Position {
+  public:
+    val: la::vec3;
+}
+
+public struct Rotation {
+  public:
+    val: la::vec3;
+}
+
+public struct Scale {
+  public:
+    val: la::vec3;
+}

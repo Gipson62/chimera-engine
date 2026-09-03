@@ -51,6 +51,7 @@ in vec2 TexCoords;
 in vec3 TangentViewPos;
 in vec3 TangentFragPos;
 in mat3 TBN; // world -> tangent
+in vec4 FragPosLightSpace;
 
 #define NR_POINT_LIGHTS 4
 uniform PointLight pointLights[NR_POINT_LIGHTS];
@@ -60,6 +61,8 @@ uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform int numActiveSpotLights;
 uniform Material material;
 uniform DirectionalLight dirLight;
+uniform sampler2D shadowMap;
+uniform bool shadowMapEnabled;
 
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo, vec3 specMap);
 vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, vec3 specMap);
@@ -102,11 +105,30 @@ vec3 calculateDirectionalLight(
 
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    if (dot(normal, lightDir) <= 0.0) {
+        spec = 0.0;
+    }
     float normalizationFactor = (material.shininess + 8.0) / (8.0 * PI);
 
-    vec3 ambient  = light.ambient  * albedo;
+    vec3 ambient  = light.ambient * albedo;
     vec3 diffuse  = light.diffuse  * diff * albedo;
     vec3 specular = light.specular * (spec * normalizationFactor) * specMap;
+
+    float shadow = 0.0;
+    if (shadowMapEnabled) {
+        vec3 projectedCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
+        projectedCoords = projectedCoords * 0.5 + 0.5;
+        if (projectedCoords.z <= 1.0 && projectedCoords.x >= 0.0 && projectedCoords.x <= 1.0 &&
+            projectedCoords.y >= 0.0 && projectedCoords.y <= 1.0) {
+            float closestDepth = texture(shadowMap, projectedCoords.xy).r;
+            float currentDepth = projectedCoords.z;
+            float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);
+            shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+        }
+    }
+
+    diffuse *= 1.0 - shadow;
+    specular *= 1.0 - shadow;
 
     return ambient + diffuse + specular;
 }
@@ -126,12 +148,15 @@ vec3 calculatePointLight(
 
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    if (dot(normal, lightDir) <= 0.0) {
+        spec = 0.0;
+    }
     float normalizationFactor = (material.shininess + 8.0) / (8.0 * PI);
 
     float distance = length(tangentLightPos - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
 
-    vec3 ambient  = light.ambient  * albedo;
+    vec3 ambient  = vec3(0.0);
     vec3 diffuse  = light.diffuse  * diff * albedo;
     vec3 specular = light.specular * (spec * normalizationFactor) * specMap;
 
@@ -159,6 +184,9 @@ vec3 calculateSpotLight(
 
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    if (dot(normal, lightDir) <= 0.0) {
+        spec = 0.0;
+    }
     float normalizationFactor = (material.shininess + 8.0) / (8.0 * PI);
 
     float distance = length(tangentLightPos - fragPos);
@@ -169,7 +197,7 @@ vec3 calculateSpotLight(
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-    vec3 ambient  = light.ambient  * albedo;
+    vec3 ambient  = vec3(0.0);
     vec3 diffuse  = light.diffuse  * diff * albedo;
     vec3 specular = light.specular * (spec * normalizationFactor) * specMap;
 
