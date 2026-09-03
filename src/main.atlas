@@ -71,6 +71,14 @@ fun main() -> int32 {
     // --- Initializing the Model ---
     let model_3d = Model::load_model(std::string::from_chars("assets/models/vampire/dancing_vampire.dae")).value();
     model_3d.meshes.get_mut(0)->material.normal_map = Texture2D::new(std::string::from_chars("assets/models/vampire/textures/Vampire_normal.png"), TEXTURE_TYPE::MATERIAL_NORMAL);
+    let floor = create_debug_plane(
+        25,
+        "assets/textures/container2.png",
+        "assets/textures/container2_specular_plus.png",
+        "plane",
+        "assets/textures/container2_normal.png"
+    );
+    floor.matrix = la::mat4::identity().translated(0.0, -2.0, 0.0);
 
     //model_3d.matrix = la::mat4::identity().scaled(1.0, 1.0, 1.0);
 
@@ -92,7 +100,7 @@ fun main() -> int32 {
         model_positions.push(la::vec3::new(-1.3,  1.0,  -1.5));
 
     // We don't need textures for this cube
-    let cube = create_debug_cube("", "", "", "");
+    let cube = create_debug_cube("cube", "cube", "cube", "cube");
 
     let dir_light = DirectionalLight::new(
         la::vec3::new(-0.2, -1.0, -0.3),
@@ -143,7 +151,9 @@ fun main() -> int32 {
             renderer->draw_depth_model(&model_3d, &shadow_shader_program, &light_space);
             shadow_i = shadow_i + 1;
         }
+        renderer->draw_depth_model(&floor, &shadow_shader_program, &light_space);
         renderer->restore_viewport(app.window_width(), app.window_height());
+
         shader_program.bind();
         shader_program.set_mat4("lightSpaceMatrix", &light_space);
         shadow_buffer.bind_for_reading(GL::TEXTURE4);
@@ -196,6 +206,16 @@ fun main() -> int32 {
             point_lights,
             spot_lights
         );
+        renderer->draw_model(
+            &floor, 
+            &shader_program, 
+            &view, 
+            &projection,
+            &dir_light,
+            point_lights,
+            spot_lights
+        );
+        
 
         frame_count = frame_count + 1;
         let elapsed = fps_timer.elapsed();
