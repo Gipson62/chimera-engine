@@ -115,15 +115,28 @@ vec3 calculateDirectionalLight(
     vec3 specular = light.specular * (spec * normalizationFactor) * specMap;
 
     float shadow = 0.0;
+
     if (shadowMapEnabled) {
-        vec3 projectedCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
-        projectedCoords = projectedCoords * 0.5 + 0.5;
-        if (projectedCoords.z <= 1.0 && projectedCoords.x >= 0.0 && projectedCoords.x <= 1.0 &&
-            projectedCoords.y >= 0.0 && projectedCoords.y <= 1.0) {
-            float closestDepth = texture(shadowMap, projectedCoords.xy).r;
-            float currentDepth = projectedCoords.z;
-            float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);
-            shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+        vec3 lightSpaceCoordinates = FragPosLightSpace.xyz / FragPosLightSpace.w;
+
+        vec3 shadowTextureCoordinates = lightSpaceCoordinates * 0.5 + 0.5;
+
+        bool isInsideShadowMap = shadowTextureCoordinates.z <= 1.0 &&
+                                shadowTextureCoordinates.x >= 0.0 &&
+                                shadowTextureCoordinates.x <= 1.0 &&
+                                shadowTextureCoordinates.y >= 0.0 &&
+                                shadowTextureCoordinates.y <= 1.0;
+
+        if (isInsideShadowMap) {
+            vec2 shadowMapTexelSize = 1.0 / vec2(textureSize(shadowMap, 0));
+            shadowTextureCoordinates.xy = (floor(shadowTextureCoordinates.xy / shadowMapTexelSize) + 0.5) * shadowMapTexelSize;
+            float shadowMapDepth = texture(shadowMap, shadowTextureCoordinates.xy).r;
+            float fragmentDepth = shadowTextureCoordinates.z;
+            float surfaceToLightAlignment = max(dot(normal, lightDir), 0.0);
+            float slopeBasedBias = 0.005 * (1.0 - surfaceToLightAlignment);
+            float texelBasedBias = 0.5 * shadowMapTexelSize.x;
+            float depthBias = max(slopeBasedBias, texelBasedBias);
+            shadow = fragmentDepth - depthBias > shadowMapDepth ? 1.0 : 0.0;
         }
     }
 

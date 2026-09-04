@@ -138,7 +138,7 @@ fun main() -> int32 {
             &la::vec3::new(0.0, 0.0, 0.0),
             &la::vec3::new(0.0, 1.0, 0.0)
         );
-        let shadow_projection = la::mat4::orthographic(-30.0, 30.0, -30.0, 30.0, 1.0, 75.0);
+        let shadow_projection = la::mat4::orthographic(-15.0, 15.0, -15.0, 15.0, 1.0, 50.0);
         let light_space = shadow_projection * shadow_view;
         shadow_buffer.bind_for_writing();
         let shadow_i: uint64 = 0;
