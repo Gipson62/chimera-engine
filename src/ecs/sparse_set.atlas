@@ -1,0 +1,20 @@
+
+public concept CSparseSet {
+    type EntityIndex;
+    fun unset(*this, index: This::EntityIndex);
+    fun clear(*this);
+    fun len(*const this) -> uint64;
+    fun contains_index(*const this, index: This::EntityIndex) -> bool;
+    fun get_index_list(*const this) -> std::vector<This::EntityIndex>
+}
+
+public struct SparseSet<T> {
+  private:
+    dense: std::vector<T>;
+    // There will not be more than 4 billions entities, so uint32 is good enough
+    sparse: std::vector<uint32>;
+}
+
+extend SparseSet<T> with CSparseSet {
+    type EntityIndex = uint64;
+}

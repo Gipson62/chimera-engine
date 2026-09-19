@@ -84,6 +84,10 @@ namespace glfw {
         user: *unit;
     }
 
+    namespace KEY {
+        // TODO: Add everything as constants here maybe?
+    }
+
     public enum KEY {
         // Printable keys 
         SPACE            =  32;

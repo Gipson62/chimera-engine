@@ -7,6 +7,8 @@ import "src/glfw3.atlas";
 import "src/glad.atlas";
 import "src/linear_algebra.atlas";
 
+import "src/ecs/query.atlas";
+
 import "src/utils/buffer.atlas";
 import "src/utils/shader.atlas";
 import "src/utils/renderer.atlas";
@@ -25,6 +27,7 @@ import "src/utils/light/spotlight.atlas";
 extern "C" fun sprintf<T>(buffer: *uint8, format: const str, val: T) -> int32;
 
 fun main() -> int32 {
+    let q = Query<And<With<Position>, With<Velocity>>>::create();
     let app_res = Application::new();
     if app_res.is_unexpected() { std::panic("Something is wrong with the app boss"); }
     let app = app_res.expected_value();

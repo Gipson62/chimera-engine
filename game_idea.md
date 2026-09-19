@@ -30,6 +30,12 @@
 
 * **Leveling:** Linear level cap achievement followed by strict horizontal progression over the quality of the gear you acquire (capped as well) and the masteries you have over weapon types (akin to Albion Online). The idea is to expand the pool of possibilities without making you necessarily stronger, players stay humans, just enhanced with gear infused with magic.
 * **Economy/Loot:** Gear acquisition scales horizontally to prevent power creep and infinite scaling metrics.
+> NB: There still needs to be some kind of vertical progression, as players start from knights trainee to people who can defeat (in groups) dragons or even legendary knights and at their peak King Arthur wielding Excalibur. So we need some kind of way to make the progression go vertical, without making previous content unplayable because you'd just delete older bosses... 
+> 
+> I thought about adding something akin to Albion Online: The more you think your sword, the more proeficient you get in swinging your sword (aka more damage). As well as adding gear level: "Common", "Rare", "Uncommon", "Legendary" and "Artifact" (only one artifact grade gear in your whole build would be permitted).
+> Those gear grades get unlocked throughout the story, but then, what's stopping a player to just use Legendary gear and speedrun the dragon raid? idk... Dynamic scaling could be a solution, meaning you restrict the stat of the player to be as if they had the required gear for that raid but can keep their skills, idk, it's still very blurry in my head. 
+> 
+> A lore fix for the dynamic scaling could be that quality of gear just increase the throughput of ambient magic. It's just that the zone has overall less magic, meaning it's already extracting everything it can. And lower tier gear is working at 100% efficiency, meaning it extract all the magic around it, but it's still an overall low amount as there isn't much magic around
 
 ## 5. Multiplayer & Network Architecture
 

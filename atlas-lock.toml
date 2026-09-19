@@ -1,0 +1,3 @@
+[std]
+git = "https://github.com/atlas77-lang/std"
+resolved_commit = "c9d4e90c72baf9fd9df7ee96e08dadcaed978692"

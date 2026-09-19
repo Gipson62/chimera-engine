@@ -1,0 +1,81 @@
+import "std/either";
+import "std/pair";
+
+namespace flecs {
+    public concept query_term {
+        type Column;
+        type Item;
+
+        fun term_count() -> uint64;
+    }
+
+	public concept query_leaf {
+        fun component_id() -> uint64;
+    }
+    public struct query_handle {
+      public:
+        handle: uint64;
+    }
+}
+
+public struct With<T> {
+    operator equal(*const this, other: *const This) -> bool {
+        return true;
+    }
+}
+
+extend With<T> with flecs::query_term {
+	type Column = *T;
+	type Item = *T;
+	fun term_count() -> uint64 { return 1u; }
+}
+
+extend With<T> with flecs::query_leaf {
+    fun component_id() -> uint64 { return 5; }
+}
+
+struct Without<T> {}
+extend Without<T> with flecs::query_term {
+    type Column = std::empty;
+    type Item = std::empty;
+    fun term_count() -> uint64 { return 1u; }
+}
+
+struct Optional<T> {}
+extend Optional<T> with flecs::query_term {
+    type Column = *T;
+    type Item = *T;
+    fun term_count() -> uint64 { return 1u; }
+}
+
+
+struct And<A: flecs::query_term, B: flecs::query_term> {}
+extend And<A, B> with flecs::query_term {
+    type Column = std::pair<A::Column, B::Column>;
+    type Item = std::pair<A::Item, B::Item>;
+
+    fun term_count() -> uint64 { return A::term_count() + B::term_count(); }
+}
+
+struct Or<A: flecs::query_leaf, B: flecs::query_leaf> {}
+extend Or<A, B> with flecs::query_term  {
+    type Column = std::either<A::Column, B::Column>;  // resolved component type per table; see note below
+    type Item = std::either<A::Item, B::Item>;
+
+    fun term_count() -> uint64 { return 1u; }
+}
+
+struct Query<D: flecs::query_term> {
+    handle: uint64;
+
+    fun create() -> Query<D> {
+        return Query<D> { .handle = 0 };
+    }
+
+    fun each(*const this, callback: fun() -> unit) {}
+}
+
+public struct Position {}
+public struct Velocity {}
+public struct Kinematic {}
+public struct Frozen {}

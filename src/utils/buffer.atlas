@@ -1,6 +1,6 @@
 import "std/vector";
 import "std/byte";
-import "core/reflection";
+import "std/reflection";
 
 import "src/glad.atlas";
 

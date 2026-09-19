@@ -34,7 +34,7 @@ public struct Window {
 
         glfw::SetFramebufferSizeCallback(w.handle, w.callback);
 
-        if (gladLoadGLLoader(glfw::GetProcAddress as fun(*const char) -> *unit) == 0) {
+        if (gladLoadGLLoader(glfw::GetProcAddress as fun(*const c_char) -> *unit) == 0) {
             return std::expected<This, std::string>::unexpected(
                 std::string::from_chars("Failed to initialize GLAD"));
         }
